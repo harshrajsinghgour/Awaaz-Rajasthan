@@ -1032,3 +1032,117 @@
 
   </div>
 </section>
+<!-- ================= 07. SEARCH RESULTS SCREEN ================= -->
+<section id="search-screen" class="page-screen">
+  <div class="container main-layout">
+    <div class="left-content">
+      <div class="category-header-card">
+        <h2><i class="fa-solid fa-magnifying-glass text-red"></i> खोज परिणाम (Search Results)</h2>
+        <p>परिणाम: "<span id="search-query-text">जयपुर बारिश</span>"</p>
+      </div>
+
+      <div class="category-feed-list mt-20">
+        <div class="feed-card" onclick="showScreen('detail-screen')">
+          <div class="feed-img">
+            <img src="https://picsum.photos/300/180?random=701" alt="Search Result">
+          </div>
+          <div class="feed-info">
+            <span class="time-stamp"><i class="fa-regular fa-clock"></i> 2 घंटे पहले</span>
+            <h3>जयपुर: बारिश के चलते यातायात पुलिस ने जारी की एडवाइजरी</h3>
+            <p>शहर के जलभराव वाले क्षेत्रों में ट्रैफ़िक डाइवर्ट किया गया है...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-sidebar">
+      <div class="sidebar-box">
+        <h3 class="side-title">लोकप्रिय खोजें</h3>
+        <div class="sub-category-pills" style="flex-wrap: wrap;">
+          <button class="pill-btn">मानसून 2026</button>
+          <button class="pill-btn">राजस्थान बजट</button>
+          <button class="pill-btn">जयपुर भर्ती</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 08. E-PAPER VIEWER SCREEN (WITH WATERMARK) ================= -->
+<section id="epaper-screen" class="page-screen">
+  <div class="container">
+    <div class="epaper-toolbar">
+      <div class="epaper-date-picker">
+        <label for="epaper-date"><strong>ई-पेपर तिथि:</strong></label>
+        <input type="date" id="epaper-date" value="2026-09-01">
+      </div>
+      <div class="epaper-actions">
+        <button class="btn-main" onclick="window.print()"><i class="fa-solid fa-print"></i> प्रिंट करें</button>
+        <button class="btn-main" style="background:#16a34a;"><i class="fa-solid fa-download"></i> PDF डाउनलोड</button>
+      </div>
+    </div>
+
+    <!-- E-Paper Display Box with Central Logo Watermark -->
+    <div class="epaper-viewer-box">
+      <!-- Watermark Element -->
+      <div class="epaper-watermark">
+        <div class="watermark-logo-circle">
+          <span>आवाज<br>राजस्थान</span>
+        </div>
+        <p class="watermark-text">आवाज राजस्थान ई-पेपर</p>
+      </div>
+
+      <!-- Simulated Newspaper Content -->
+      <div class="epaper-page-content">
+        <div class="epaper-header-strip">
+          <h1>आवाज राजस्थान - दैनिक समाचार पत्र</h1>
+          <p>जयपुर संस्करण | वर्ष 1 | अंक 102</p>
+        </div>
+        <div class="epaper-dummy-layout">
+          <div class="epaper-col-main">
+            <h2>जयपुर में बारिश का रिकॉर्ड टूटा, नदियां उफान पर</h2>
+            <img src="https://picsum.photos/700/350?random=801" alt="Epaper News">
+            <p>बीती रात से हो रही झमाझम बारिश से जनजीवन प्रभावित हुआ है...</p>
+          </div>
+          <div class="epaper-col-side">
+            <h3>संक्षिप्त समाचार</h3>
+            <p>• मौसम विभाग ने ऑरेंज अलर्ट जारी किया।</p>
+            <p>• स्कूल-कॉलेजों में छुट्टी का ऐलान।</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 09. CONTACT US SCREEN ================= -->
+<section id="contact-screen" class="page-screen">
+  <div class="container main-layout">
+    <div class="left-content">
+      <div class="article-wrapper">
+        <h2 class="article-main-title"><i class="fa-solid fa-envelope text-red"></i> संपर्क करें (Contact Us)</h2>
+        <p>हमें अपनी प्रतिक्रिया, शिकायत या विज्ञापन हेतु संदेश भेजें:</p>
+        
+        <form class="comment-form mt-20" onsubmit="event.preventDefault(); alert('आपका संदेश प्राप्त हो गया है!');">
+          <input type="text" placeholder="आपका पूरा नाम" required>
+          <input type="email" placeholder="ईमेल पता" required>
+          <input type="tel" placeholder="मोबाइल नंबर" required>
+          <textarea rows="4" placeholder="अपना संदेश यहाँ लिखें..." required></textarea>
+          <button type="submit" class="btn-main">संदेश भेजें</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="right-sidebar">
+      <div class="sidebar-box">
+        <h3 class="side-title">कार्यालय का पता</h3>
+        <p style="font-size: 0.9rem; color: var(--text-gray); line-height: 1.6;">
+          <strong>आवाज राजस्थान मीडिया ग्रुप</strong><br>
+          एमआई रोड, जयपुर, राजस्थान - 302001<br>
+          <strong>ईमेल:</strong> contact@aawazrajasthan.com<br>
+          <strong>फोन:</strong> +91 141 2345678
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
