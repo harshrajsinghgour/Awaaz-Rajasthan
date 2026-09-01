@@ -1,3 +1,14 @@
+// Splash Screen Auto Hide Logic
+window.addEventListener('DOMContentLoaded', () => {
+  const splash = document.getElementById('splash-screen');
+  
+  // 2.5 second baad splash screen disappear ho jayegi
+  setTimeout(() => {
+    if (splash) {
+      splash.classList.add('splash-hidden');
+    }
+  }, 2500); 
+});
 // Function to switch between different screens/pages
 function showScreen(screenId) {
   // Hide all screens
