@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>आवाज़ राजस्थान - आपकी आवाज़, आपका राजस्थान</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- 1. TOP BAR -->
+    <div class="top-bar">
+        <div class="container flex-between">
+            <div class="date-weather">
+                <span id="current-date"><i class="far fa-calendar-alt"></i> मंगलवार, 1 सितंबर 2026</span>
+                <span><i class="fas fa-cloud-sun"></i> जयपुर 32°C</span>
+            </div>
+            <div class="top-right flex-gap">
+                <button class="district-btn"><i class="fas fa-map-marker-alt"></i> अपना ज़िला चुनें</button>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. HEADER -->
+    <header>
+        <div class="container flex-between">
+            <div class="logo">
+                <img src="logo.png" alt="आवाज़ राजस्थान">
+            </div>
+            <div class="header-ads">
+                <a href="#" class="btn btn-live"><i class="fas fa-broadcast-tower"></i> लाइव सुनो आवाज़</a>
+                <a href="#" class="btn btn-red"><i class="fas fa-newspaper"></i> ई-पेपर</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. NAVIGATION BAR -->
+    <nav>
+        <div class="container flex-between">
+            <ul class="nav-links">
+                <li class="active"><a href="#">होम</a></li>
+                <li><a href="#">राजस्थान</a></li>
+                <li><a href="#">राजनीति</a></li>
+                <li><a href="#">क्राइम</a></li>
+                <li><a href="#">रोजगार व शिक्षा</a></li>
+                <li><a href="#">मनोरंजन</a></li>
+                <li><a href="#">वीडियो</a></li>
+            </ul>
+            <div class="nav-icons">
+                <i class="fas fa-search"></i>
+                <i class="fas fa-moon" id="theme-toggle"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 4. BREAKING NEWS TICKER -->
+    <div class="ticker-box">
+        <div class="container flex-align">
+            <span class="ticker-title">ब्रेकिंग न्यूज़</span>
+            <marquee behavior="scroll" direction="left">
+                * जयपुर में नई मेट्रो लाइन का विस्तार जल्द * राजस्थान में मानसून एक्टिव, कई ज़िलों में अलर्ट * शिक्षा विभाग में निकलीं बंपर भर्तियां *
+            </marquee>
+        </div>
+    </div>
+
+    <div class="container main-layout">
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="left-content">
+            
+            <!-- SLIDER 1: HERO SLIDER (ब्रेकिंग / ट्रेंडिंग) -->
+            <section class="slider-section">
+                <div class="slider-container" id="hero-slider">
+                    <div class="slide active">
+                        <img src="https://picsum.photos/800/400?random=1" alt="News Image">
+                        <div class="slide-caption">
+                            <span class="badge">जयपुर एक्सक्लूसिव</span>
+                            <h2>राजस्थान विधानसभा का बजट सत्र: आम जनता के लिए बड़ी घोषणाएं</h2>
+                            <button class="btn-audio"><i class="fas fa-volume-up"></i> खबर सुनें</button>
+                        </div>
+                    </div>
+                    <div class="slide">
+                        <img src="https://picsum.photos/800/400?random=2" alt="News Image">
+                        <div class="slide-caption">
+                            <span class="badge">मौसम अपडेट</span>
+                            <h2>राजस्थान के 10 जिलों में भारी बारिश की चेतावनी जारी</h2>
+                            <button class="btn-audio"><i class="fas fa-volume-up"></i> खबर सुनें</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDER 2: TOP STORIES CAROUSEL -->
+            <section class="carousel-section">
+                <h3 class="section-title">राजस्थान की प्रमुख आवाज़</h3>
+                <div class="horizontal-cards">
+                    <div class="card">
+                        <img src="https://picsum.photos/300/200?random=3" alt="Story">
+                        <h4>जोधपुर में नई सौर ऊर्जा परियोजना का शिलान्यास</h4>
+                        <span class="time">2 घंटे पहले</span>
+                    </div>
+                    <div class="card">
+                        <img src="https://picsum.photos/300/200?random=4" alt="Story">
+                        <h4>कोटा: कोचिंग छात्रों के लिए नई गाइडलाइन जारी</h4>
+                        <span class="time">4 घंटे पहले</span>
+                    </div>
+                    <div class="card">
+                        <img src="https://picsum.photos/300/200?random=5" alt="Story">
+                        <h4>उदयपुर पर्यटन: इस महीने बना नया रिकॉर्ड</h4>
+                        <span class="time">5 घंटे पहले</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDER 3: WEB STORIES / SHORT VIDEOS -->
+            <section class="stories-section">
+                <h3 class="section-title">शॉर्ट्स व वेब स्टोरीज़</h3>
+                <div class="web-stories-grid">
+                    <div class="story-box">
+                        <img src="https://picsum.photos/200/350?random=6" alt="Story">
+                        <p>रेगिस्तान का बदलता स्वरूप</p>
+                    </div>
+                    <div class="story-box">
+                        <img src="https://picsum.photos/200/350?random=7" alt="Story">
+                        <p>जैसलमेर फोर्ट की 5 अनसुनी बातें</p>
+                    </div>
+                    <div class="story-box">
+                        <img src="https://picsum.photos/200/350?random=8" alt="Story">
+                        <p>राजस्थान का सबसे प्रसिद्ध व्यंजन</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- SIDEBAR -->
+        <aside class="right-sidebar">
+            
+            <!-- PUBLIC POLL WIDGET -->
+            <div class="widget poll-widget">
+                <h3>आज का सवाल</h3>
+                <p>क्या राजस्थान में स्थानीय परिवहन सेवाओं में सुधार की जरूरत है?</p>
+                <div class="poll-options">
+                    <button class="poll-btn">हाँ (Yes)</button>
+                    <button class="poll-btn">नहीं (No)</button>
+                </div>
+            </div>
+
+            <!-- WHATSAPP JOIN WIDGET -->
+            <div class="widget whatsapp-widget">
+                <i class="fab fa-whatsapp"></i>
+                <h3>हमारे व्हाट्सएप चैनल से जुड़ें</h3>
+                <p>ताजा खबरें सीधे अपने फोन पर पाने के लिए अभी जॉइन करें।</p>
+                <a href="#" class="btn btn-whatsapp">जॉइन करें</a>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <!-- 5. FOOTER -->
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-about">
+                <img src="logo.png" alt="आवाज़ राजस्थान">
+                <p>आपकी आवाज़, आपका राजस्थान। हम पहुँचाते हैं आप तक सटीक, निष्पक्ष और त्वरित समाचार।</p>
+            </div>
+            <div class="footer-links">
+                <h4>महत्वपूर्ण लिंक्स</h4>
+                <ul>
+                    <li><a href="#">हमारे बारे में</a></li>
+                    <li><a href="#">संपर्क करें</a></li>
+                    <li><a href="#">गोपनीयता नीति</a></li>
+                    <li><a href="#">डिस्क्लेमर</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h4>सोशल मीडिया</h4>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2026 आवाज़ राजस्थान | सर्वाधिकार सुरक्षित</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+  </html>
+  
