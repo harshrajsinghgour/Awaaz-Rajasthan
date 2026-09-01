@@ -44,3 +44,41 @@ exports.getNewsById = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+// News Edit karna
+exports.updateNews = async (req, res) => {
+  try {
+    const updatedNews = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json({ success: true, data: updatedNews });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// News Delete karna
+exports.deleteNews = async (req, res) => {
+  try {
+    await News.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: 'News deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+// News Edit karna
+exports.updateNews = async (req, res) => {
+  try {
+    const updatedNews = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json({ success: true, data: updatedNews });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// News Delete karna
+exports.deleteNews = async (req, res) => {
+  try {
+    await News.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: 'News deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
