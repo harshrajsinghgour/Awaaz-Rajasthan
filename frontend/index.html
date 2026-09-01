@@ -601,3 +601,109 @@
 
   </div>
 </section>
+<section id="detail-screen" class="page-screen">
+  <div class="container main-layout">
+    
+    <div class="left-content">
+      <div class="article-wrapper">
+        
+        <div class="breadcrumb">
+          <a href="#" onclick="showScreen('home-screen')">होम</a> &gt; 
+          <a href="#" onclick="showScreen('category-screen')">जयपुर</a> &gt; 
+          <span>मुख्य खबर</span>
+        </div>
+
+        <h1 class="article-main-title">जयपुर: बीती रात से हो रही झमाझम बारिश, शहर के निचले इलाकों में भरा पानी</h1>
+
+        <div class="article-meta-bar">
+          <div class="author-info">
+            <i class="fa-solid fa-user-pen text-red"></i>
+            <span>आवाज राजस्थान ब्यूरो</span>
+            <span class="meta-dot">•</span>
+            <span><i class="fa-regular fa-clock"></i> 1 सितंबर 2026 | 11:30 AM</span>
+          </div>
+          
+          <div class="social-share-box">
+            <span>शेयर करें:</span>
+            <a href="#" class="share-icon wa" title="WhatsApp Share"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="#" class="share-icon fb" title="Facebook Share"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="share-icon tw" title="Twitter/X Share"><i class="fa-brands fa-x-twitter"></i></a>
+          </div>
+        </div>
+
+        <div class="article-media">
+          <img src="https://picsum.photos/800/450?random=301" alt="Jaipur Rain News">
+          <p class="img-caption"><i class="fa-solid fa-camera"></i> फोटो: जयपुर के परकोटा क्षेत्र में बारिश के बाद का दृश्य।</p>
+        </div>
+
+        <div class="article-content-body">
+          <p class="lead-text"><strong>जयपुर।</strong> राजधानी में बीती रात से हो रही लगातार बारिश के कारण जनजीवन अस्त-व्यस्त हो गया है। शहर के परकोटा क्षेत्र सहित कई निचले इलाकों में सड़कों पर जलभराव की स्थिति बन गई है।</p>
+          
+          <p>मौसम विभाग ने जयपुर सहित अजमेर, कोटा और उदयपुर संभाग के लिए अगले 48 घंटों का **ऑरेंज अलर्ट** जारी किया है। आपदा प्रबंधन और नगर निगम की टीमों को सतर्क रहने के निर्देश दिए गए हैं।</p>
+
+          <blockquote class="news-quote">
+            "नागरिकों से अपील है कि वे अनावश्यक रूप से जलभराव वाले क्षेत्रों में न जाएं और प्रशासन द्वारा जारी दिशा-निर्देशों का पालन करें।" — जिला कलेक्टर, जयपुर
+          </blockquote>
+
+          <p>बारिश के चलते शहर के मुख्य चौराहों पर ट्रैफिक धीमा पड़ गया है। जेकेलोन अस्पताल और सिंधी कैंप बस स्टैंड के पास पानी भरने से राहगीरों को भारी परेशानियों का सामना करना पड़ रहा है।</p>
+        </div>
+
+        <div class="article-tags-wrapper">
+          <strong><i class="fa-solid fa-tags text-red"></i> टैग्स:</strong>
+          <span class="tag-chip" onclick="showScreen('category-screen')">#जयपुर_बारिश</span>
+          <span class="tag-chip" onclick="showScreen('category-screen')">#मौसम_अपडेट</span>
+          <span class="tag-chip" onclick="showScreen('category-screen')">#राजस्थान_न्यूज़</span>
+        </div>
+
+        <div class="related-news-box mt-20">
+          <h3 class="section-title">संबंधित खबरें</h3>
+          <div class="news-grid-2">
+            <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
+              <img src="https://picsum.photos/150/100?random=302" alt="Related News">
+              <div>
+                <span class="tag-red">मौसम</span>
+                <h4>जोधपुर में भारी बारिश के बाद बांध का जलस्तर बढ़ा</h4>
+                <time>2 घंटे पहले</time>
+              </div>
+            </div>
+            <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
+              <img src="https://picsum.photos/150/100?random=303" alt="Related News">
+              <div>
+                <span class="tag-red">प्रशासन</span>
+                <h4>जयपुर नगर निगम ने शुरू किया कंट्रोल रूम</h4>
+                <time>4 घंटे पहले</time>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comment-section mt-20">
+          <h3>प्रतिक्रिया दें (Comments)</h3>
+          <form class="comment-form" onsubmit="event.preventDefault(); alert('आपकी प्रतिक्रिया पोस्ट कर दी गई है!');">
+            <input type="text" placeholder="आपका नाम" required>
+            <textarea rows="3" placeholder="इस खबर पर अपनी राय लिखें..." required></textarea>
+            <button type="submit" class="btn-main">कमेंट पोस्ट करें</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="right-sidebar">
+      <div class="sidebar-box">
+        <h3 class="side-title">ताज़ा खबरें</h3>
+        <ul class="recent-list">
+          <li onclick="showScreen('detail-screen')">
+            <p>उदयपुर: फतहसागर झील के गेट खोले गए</p>
+            <span class="time-red">20 मिनट पहले</span>
+          </li>
+          <li onclick="showScreen('detail-screen')">
+            <p>कोटा में कोचिंग संस्थानों के लिए नई गाइडलाइन</p>
+            <span class="time-red">1 घंटे पहले</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
