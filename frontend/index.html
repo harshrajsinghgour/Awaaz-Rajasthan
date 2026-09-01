@@ -3,1146 +3,939 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="description"
+        content="आवाज राजस्थान - पूरे राजस्थान की ताज़ा और विश्वसनीय खबरें">
+
+  <meta name="theme-color" content="#c8102e">
+
   <title>आवाज राजस्थान - आपकी आवाज, आपका राजस्थान</title>
+
+  <!-- Main CSS -->
   <link rel="stylesheet" href="style.css">
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Font Awesome Icons -->
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
 
-  <!-- ================= TOP BAR & HEADER ================= -->
+  <!-- =========================================================
+       TOP BAR
+       ========================================================= -->
   <div class="top-bar">
+
     <div class="date-weather">
-      <span><i class="fa-regular fa-calendar-days"></i> मंगलवार, 1 सितंबर 2026</span>
-      <span><i class="fa-solid fa-cloud-sun"></i> जयपुर: 28°C</span>
+      <span>
+        <i class="fa-regular fa-calendar-days"></i>
+        मंगलवार, 1 सितंबर 2026
+      </span>
+
+      <span>
+        <i class="fa-solid fa-cloud-sun"></i>
+        जयपुर: 28°C
+      </span>
     </div>
+
     <div class="top-links">
-      <a href="#" onclick="showScreen('epaper-screen')">ई-पेपर</a>
-      <a href="#" onclick="showScreen('video-screen')">वीडियो</a>
-      <a href="#" onclick="showScreen('contact-screen')">संपर्क करें</a>
-      <a href="#" class="btn-login"><i class="fa-solid fa-user"></i> लॉगिन / रजिस्टर</a>
+
+      <a href="#epaper-screen"
+         onclick="showScreen('epaper-screen'); return false;">
+        ई-पेपर
+      </a>
+
+      <a href="#video-screen"
+         onclick="showScreen('video-screen'); return false;">
+        वीडियो
+      </a>
+
+      <a href="#contact-screen"
+         onclick="showScreen('contact-screen'); return false;">
+        संपर्क करें
+      </a>
+
+      <a href="#login"
+         class="btn-login"
+         onclick="handleLogin(event)">
+        <i class="fa-solid fa-user"></i>
+        लॉगिन / रजिस्टर
+      </a>
+
     </div>
   </div>
 
+
+  <!-- =========================================================
+       MAIN HEADER
+       ========================================================= -->
   <header class="main-header">
-    <div class="logo-area" onclick="showScreen('home-screen')">
-      <!-- Aapka Logo -->
-      <div class="logo-box">
-        <span class="logo-title">आवाज<br>राजस्थान</span>
-      </div>
-      <div class="brand-text">
-        <h1>आवाज राजस्थान</h1>
-        <p>आपकी आवाज, आपका राजस्थान</p>
-      </div>
-    </div>
-    <div class="search-box">
-      <input type="text" id="searchInput" placeholder="खबरें खोजें...">
-      <button onclick="handleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
-    </div>
+
+    <!-- Logo -->
+    <button
+      class="logo-area logo-button"
+      type="button"
+      onclick="showScreen('home-screen')"
+      aria-label="आवाज राजस्थान होम">
+
+      <span class="logo-box">
+        <span class="logo-title">
+          आवाज<br>
+          राजस्थान
+        </span>
+      </span>
+
+      <span class="brand-text">
+
+        <span class="brand-title">
+          आवाज राजस्थान
+        </span>
+
+        <span class="brand-tagline">
+          आपकी आवाज, आपका राजस्थान
+        </span>
+
+      </span>
+
+    </button>
+
+
+    <!-- Search -->
+    <form
+      class="search-box"
+      id="searchForm"
+      onsubmit="handleSearch(event)">
+
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="खबरें खोजें..."
+        aria-label="खबरें खोजें"
+        autocomplete="off">
+
+      <button
+        type="submit"
+        aria-label="खोजें">
+
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+      </button>
+
+    </form>
+
   </header>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
+
+  <!-- =========================================================
+       DESKTOP NAVIGATION
+       ========================================================= -->
+  <nav
+    class="navbar"
+    aria-label="मुख्य नेविगेशन">
+
     <ul class="nav-links">
-      <li><a href="#" class="nav-item active" onclick="showScreen('home-screen')"><i class="fa-solid fa-house"></i> होम</a></li>
-      <li><a href="#" class="nav-item" onclick="showScreen('category-screen')">जयपुर</a></li>
-      <li><a href="#" class="nav-item" onclick="showScreen('category-screen')">जोधपुर</a></li>
-      <li><a href="#" class="nav-item" onclick="showScreen('category-screen')">उदयपुर</a></li>
-      <li><a href="#" class="nav-item" onclick="showScreen('category-screen')">कोटा</a></li>
-      <li><a href="#" class="nav-item" onclick="showScreen('video-screen')">वीडियो</a></li>
-      <li><a href="#" class="nav-item" onclick="showScreen('live-screen')"><span class="live-dot"></span> लाइव टीवी</a></li>
-      <li><a href="#" class="nav-item" onclick="showScreen('epaper-screen')">ई-पेपर</a></li>
+
+      <li>
+        <a
+          href="#home-screen"
+          class="nav-item active"
+          data-screen="home-screen"
+          onclick="showScreen('home-screen'); return false;">
+
+          <i class="fa-solid fa-house"></i>
+          होम
+
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="#category-screen"
+          class="nav-item"
+          data-screen="category-screen"
+          onclick="showScreen('category-screen'); return false;">
+          जयपुर
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="#category-screen"
+          class="nav-item"
+          data-screen="category-screen"
+          onclick="showScreen('category-screen'); return false;">
+          जोधपुर
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="#category-screen"
+          class="nav-item"
+          data-screen="category-screen"
+          onclick="showScreen('category-screen'); return false;">
+          उदयपुर
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="#category-screen"
+          class="nav-item"
+          data-screen="category-screen"
+          onclick="showScreen('category-screen'); return false;">
+          कोटा
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="#video-screen"
+          class="nav-item"
+          data-screen="video-screen"
+          onclick="showScreen('video-screen'); return false;">
+          वीडियो
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="#live-screen"
+          class="nav-item"
+          data-screen="live-screen"
+          onclick="showScreen('live-screen'); return false;">
+
+          <span class="live-dot"></span>
+          लाइव टीवी
+
+        </a>
+      </li>
+
+      <li>
+        <a
+          href="#epaper-screen"
+          class="nav-item"
+          data-screen="epaper-screen"
+          onclick="showScreen('epaper-screen'); return false;">
+          ई-पेपर
+        </a>
+      </li>
+
     </ul>
   </nav>
 
-  <!-- Breaking News Ticker -->
-  <div class="ticker-wrapper">
-    <div class="ticker-badge"><i class="fa-solid fa-bolt"></i> ब्रेकिंग न्यूज़</div>
+
+  <!-- =========================================================
+       BREAKING NEWS TICKER
+       ========================================================= -->
+  <div
+    class="ticker-wrapper"
+    role="status"
+    aria-label="ब्रेकिंग न्यूज़">
+
+    <div class="ticker-badge">
+
+      <i class="fa-solid fa-bolt"></i>
+      ब्रेकिंग न्यूज़
+
+    </div>
+
     <div class="ticker-content">
-      <marquee behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
-        जयपुर में मानसून की दस्तक, कई जिलों में भारी बारिश का अलर्ट जारी | जोधपुर में नहर का पानी बढ़ा | राजस्थान NEET UG काउंसलिंग परिणाम जारी...
-      </marquee>
+
+      <div class="ticker-track">
+
+        जयपुर में मानसून की दस्तक, कई जिलों में भारी बारिश का अलर्ट जारी
+
+        <span>|</span>
+
+        जोधपुर में नहर का पानी बढ़ा
+
+        <span>|</span>
+
+        राजस्थान NEET UG काउंसलिंग परिणाम जारी...
+
+      </div>
+
     </div>
+
   </div>
 
 
-  <!-- ================= 01 & 02. HOME SCREEN (DESKTOP & MOBILE) ================= -->
-  <section id="home-screen" class="page-screen active-screen">
+  <!-- =========================================================
+       SPLASH SCREEN
+       ========================================================= -->
+  <div
+    id="splash-screen"
+    class="splash-container"
+    aria-label="आवाज राजस्थान लोड हो रहा है">
+
+    <div class="splash-content">
+
+      <div class="splash-logo-circle">
+
+        <span class="splash-logo-text">
+          आवाज<br>
+          राजस्थान
+        </span>
+
+      </div>
+
+      <h1 class="splash-title">
+        आवाज राजस्थान
+      </h1>
+
+      <p class="splash-tagline">
+        पूरे राजस्थान की खबर
+      </p>
+
+      <div class="splash-loader">
+        <div class="loader-progress"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================================
+       01. HOME SCREEN
+       ========================================================= -->
+  <section
+    id="home-screen"
+    class="page-screen active-screen">
+
     <div class="container main-layout">
-      <!-- Main Content -->
+
+
+      <!-- ================= LEFT CONTENT ================= -->
       <div class="left-content">
-        <!-- Hero Featured News -->
-        <div class="hero-card" onclick="showScreen('detail-screen')">
-          <span class="category-tag">मुख्य खबर</span>
-          <img src="https://picsum.photos/800/420?random=1" alt="Main News">
+
+
+        <!-- HERO NEWS -->
+        <article
+          class="hero-card"
+          onclick="showScreen('detail-screen')">
+
+          <span class="category-tag">
+            मुख्य खबर
+          </span>
+
+          <img
+            src="https://picsum.photos/800/420?random=101"
+            alt="राजस्थान में मानसून की खबर"
+            loading="lazy">
+
           <div class="hero-overlay">
-            <h2>राजस्थान में मानसून की दस्तक, कई जिलों में झमाझम बारिश शुरू</h2>
-            <p>मौसम विभाग ने अगले 48 घंटे में भारी बारिश की चेतावनी जारी की है। प्रशासन ने निचले इलाकों में अलर्ट घोषित किया।</p>
-            <div class="meta-info">
-              <span><i class="fa-regular fa-clock"></i> 2 घंटे पहले</span>
-              <span><i class="fa-solid fa-location-dot"></i> जयपुर</span>
-            </div>
-          </div>
-        </div>
 
-        <!-- Districts Horizontal Grid -->
-        <div class="section-block">
-          <div class="block-header">
-            <h3>हमारे जिले</h3>
-            <a href="#" class="see-more">सभी जिले देखें <i class="fa-solid fa-angle-right"></i></a>
+            <h2>
+              राजस्थान में मानसून की दस्तक, कई जिलों में झमाझम बारिश शुरू
+            </h2>
+
+            <p>
+              मौसम विभाग ने अगले 48 घंटे में भारी बारिश की चेतावनी जारी की है।
+              प्रशासन ने निचले इलाकों में अलर्ट घोषित किया।
+            </p>
+
+            <div class="meta-info">
+
+              <span>
+                <i class="fa-regular fa-clock"></i>
+                2 घंटे पहले
+              </span>
+
+              <span>
+                <i class="fa-solid fa-location-dot"></i>
+                जयपुर
+              </span>
+
+            </div>
+
           </div>
+
+        </article>
+
+
+        <!-- ================= DISTRICTS ================= -->
+        <div class="section-block mt-20">
+
+          <div class="block-header">
+
+            <h3>
+              <i class="fa-solid fa-map-location-dot text-red"></i>
+              हमारे जिले
+            </h3>
+
+            <a
+              href="#category-screen"
+              class="see-more"
+              onclick="showScreen('category-screen'); return false;">
+
+              सभी जिले
+              <i class="fa-solid fa-angle-right"></i>
+
+            </a>
+
+          </div>
+
+
           <div class="district-scroll">
-            <div class="district-item" onclick="showScreen('category-screen')">
-              <img src="https://picsum.photos/150/100?random=11" alt="Jaipur">
+
+
+            <!-- JAIPUR -->
+            <div
+              class="district-item"
+              onclick="showScreen('category-screen')">
+
+              <img
+                src="https://picsum.photos/150/100?random=102"
+                alt="जयपुर"
+                loading="lazy">
+
               <h4>जयपुर</h4>
-              <p>गुलाबी नगरी की हर खबर</p>
+              <p>गुलाबी नगरी</p>
+
             </div>
-            <div class="district-item" onclick="showScreen('category-screen')">
-              <img src="https://picsum.photos/150/100?random=12" alt="Jodhpur">
+
+
+            <!-- JODHPUR -->
+            <div
+              class="district-item"
+              onclick="showScreen('category-screen')">
+
+              <img
+                src="https://picsum.photos/150/100?random=103"
+                alt="जोधपुर"
+                loading="lazy">
+
               <h4>जोधपुर</h4>
-              <p>ब्लू सिटी की खबरें</p>
+              <p>सूर्य नगरी</p>
+
             </div>
-            <div class="district-item" onclick="showScreen('category-screen')">
-              <img src="https://picsum.photos/150/100?random=13" alt="Udaipur">
+
+
+            <!-- UDAIPUR -->
+            <div
+              class="district-item"
+              onclick="showScreen('category-screen')">
+
+              <img
+                src="https://picsum.photos/150/100?random=104"
+                alt="उदयपुर"
+                loading="lazy">
+
               <h4>उदयपुर</h4>
-              <p>झीलों की नगरी का हाल</p>
+              <p>झीलों की नगरी</p>
+
             </div>
-            <div class="district-item" onclick="showScreen('category-screen')">
-              <img src="https://picsum.photos/150/100?random=14" alt="Kota">
+
+
+            <!-- KOTA -->
+            <div
+              class="district-item"
+              onclick="showScreen('category-screen')">
+
+              <img
+                src="https://picsum.photos/150/100?random=105"
+                alt="कोटा"
+                loading="lazy">
+
               <h4>कोटा</h4>
-              <p>शिक्षा नगरी की हलचल</p>
+              <p>शिक्षा नगरी</p>
+
             </div>
+
           </div>
+
         </div>
 
-        <!-- Grid Cards -->
-        <div class="section-block">
+
+        <!-- ================= SPECIAL NEWS ================= -->
+        <div class="section-block mt-20">
+
           <div class="block-header">
-            <h3>खास खबरें</h3>
+
+            <h3>
+              खास खबरें
+            </h3>
+
           </div>
+
+
           <div class="news-grid-2">
-            <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-              <img src="https://picsum.photos/200/140?random=2" alt="News">
+
+
+            <!-- NEWS 1 -->
+            <article
+              class="news-card-horizontal"
+              onclick="showScreen('detail-screen')">
+
+              <img
+                src="https://picsum.photos/200/140?random=106"
+                alt="राजनीति समाचार"
+                loading="lazy">
+
               <div>
-                <span class="tag-red">राजनीति</span>
-                <h4>राजस्थान में अगले हफ्ते तक भारी बारिश के आसार</h4>
-                <time>3 घंटे पहले | जयपुर</time>
+
+                <span class="tag-red">
+                  राजनीति
+                </span>
+
+                <h4>
+                  राजस्थान में अगले हफ्ते तक विधानसभा सत्र की तैयारियां तेज
+                </h4>
+
+                <time>
+                  <i class="fa-regular fa-clock"></i>
+                  3 घंटे पहले | जयपुर
+                </time>
+
               </div>
-            </div>
-            <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-              <img src="https://picsum.photos/200/140?random=3" alt="News">
+
+            </article>
+
+
+            <!-- NEWS 2 -->
+            <article
+              class="news-card-horizontal"
+              onclick="showScreen('detail-screen')">
+
+              <img
+                src="https://picsum.photos/200/140?random=107"
+                alt="शिक्षा समाचार"
+                loading="lazy">
+
               <div>
-                <span class="tag-red">शिक्षा</span>
-                <h4>NEET UG काउंसलिंग की तारीखों का ऐलान</h4>
-                <time>5 घंटे पहले | अजमेर</time>
+
+                <span class="tag-red">
+                  शिक्षा
+                </span>
+
+                <h4>
+                  NEET UG काउंसलिंग की तारीखों का ऐलान, अजमेर बोर्ड तैयार
+                </h4>
+
+                <time>
+                  <i class="fa-regular fa-clock"></i>
+                  5 घंटे पहले | अजमेर
+                </time>
+
               </div>
-            </div>
+
+            </article>
+
           </div>
+
         </div>
+
       </div>
 
-      <!-- Sidebar -->
-      <div class="right-sidebar">
+
+      <!-- ================= RIGHT SIDEBAR ================= -->
+      <aside class="right-sidebar">
+
+
+        <!-- RECENT NEWS -->
         <div class="sidebar-box">
-          <h3 class="side-title">राजस्थान की ताज़ा खबरें <a href="#">और देखें</a></h3>
+
+          <h3 class="side-title">
+
+            राजस्थान ताज़ा खबरें
+
+            <a
+              href="#category-screen"
+              onclick="showScreen('category-screen'); return false;">
+              और देखें
+            </a>
+
+          </h3>
+
+
           <ul class="recent-list">
+
+
             <li onclick="showScreen('detail-screen')">
-              <p>जयपुर: बिजली गिरने से 2 लोगों की मौत, 3 घायल</p>
-              <span class="time-red">15 मिनट पहले</span>
+
+              <p>
+                जयपुर: बिजली गिरने से 2 लोगों की मौत, 3 घायल
+              </p>
+
+              <span class="time-red">
+                15 मिनट पहले
+              </span>
+
             </li>
+
+
             <li onclick="showScreen('detail-screen')">
-              <p>जोधपुर में नहर का पानी ओवरफ्लो हुआ</p>
-              <span class="time-red">45 मिनट पहले</span>
+
+              <p>
+                जोधपुर में नहर का पानी ओवरफ्लो हुआ
+              </p>
+
+              <span class="time-red">
+                45 मिनट पहले
+              </span>
+
             </li>
+
+
             <li onclick="showScreen('detail-screen')">
-              <p>उदयपुर में पर्यटन सीजन को लेकर तैयारियां शुरू</p>
-              <span class="time-red">1 घंटे पहले</span>
+
+              <p>
+                उदयपुर में पर्यटन सीजन को लेकर तैयारियां तेज
+              </p>
+
+              <span class="time-red">
+                1 घंटे पहले
+              </span>
+
             </li>
+
+
             <li onclick="showScreen('detail-screen')">
-              <p>कोटा कोचिंग स्टूडेंट ने किया टॉप, AIR 45</p>
-              <span class="time-red">2 घंटे पहले</span>
+
+              <p>
+                कोटा कोचिंग छात्र ने किया टॉप, AIR 45 हासिल की
+              </p>
+
+              <span class="time-red">
+                2 घंटे पहले
+              </span>
+
             </li>
+
+
           </ul>
+
         </div>
 
-        <!-- Trending Section -->
+
+        <!-- TRENDING -->
         <div class="sidebar-box mt-20">
-          <h3 class="side-title"><i class="fa-solid fa-fire text-red"></i> ट्रेंडिंग खबरें</h3>
+
+          <h3 class="side-title">
+
+            <i class="fa-solid fa-fire text-red"></i>
+            ट्रेंडिंग विषय
+
+          </h3>
+
+
           <ol class="trending-list">
-            <li onclick="showScreen('detail-screen')">राजस्थान में मानसून की एंट्री</li>
-            <li onclick="showScreen('detail-screen')">जयपुर में तेज बारिश</li>
-            <li onclick="showScreen('detail-screen')">अजमेर में कोटा के छात्र का कमाल</li>
-            <li onclick="showScreen('detail-screen')">पुष्कर मेले की तैयारियां शुरू</li>
+
+            <li onclick="showScreen('detail-screen')">
+              राजस्थान में मानसून अलर्ट
+            </li>
+
+            <li onclick="showScreen('detail-screen')">
+              जयपुर जलभराव अपडेट
+            </li>
+
+            <li onclick="showScreen('detail-screen')">
+              पुष्कर मेला 2026 तैयारियां
+            </li>
+
           </ol>
+
         </div>
-      </div>
+
+      </aside>
+
     </div>
+
   </section>
 
 
-  <!-- ================= 03. KHABAR DETAIL PAGE ================= -->
-  <section id="detail-screen" class="page-screen">
+  <!-- =========================================================
+       02. NEWS DETAIL SCREEN
+       ========================================================= -->
+  <section
+    id="detail-screen"
+    class="page-screen">
+
     <div class="container main-layout">
+
+
       <div class="left-content">
-        <div class="article-container">
-          <div class="breadcrumb">होम &gt; जयपुर &gt; खबर</div>
-          <h1 class="article-title">जयपुर: भारी बारिश से जनजीवन प्रभावित, कई इलाकों में जलभराव</h1>
-          
-          <div class="article-meta">
-            <span><i class="fa-solid fa-user-pen"></i> आवाज राजस्थान न्यूज टीम</span>
-            <span><i class="fa-regular fa-clock"></i> 1 सितंबर 2026 | 10:30 AM</span>
-            <div class="share-buttons">
-              <a href="#" class="share-btn fb"><i class="fa-brands fa-facebook-f"></i></a>
-              <a href="#" class="share-btn tw"><i class="fa-brands fa-x-twitter"></i></a>
-              <a href="#" class="share-btn wa"><i class="fa-brands fa-whatsapp"></i></a>
+
+        <article class="article-wrapper">
+
+
+          <!-- BREADCRUMB -->
+          <div class="breadcrumb">
+
+            <a
+              href="#home-screen"
+              onclick="showScreen('home-screen'); return false;">
+              होम
+            </a>
+
+            &gt;
+
+            <a
+              href="#category-screen"
+              onclick="showScreen('category-screen'); return false;">
+              जयपुर
+            </a>
+
+            &gt;
+
+            <span>
+              मुख्य खबर
+            </span>
+
+          </div>
+
+
+          <!-- ARTICLE TITLE -->
+          <h1 class="article-main-title">
+
+            जयपुर: बीती रात से हो रही झमाझम बारिश,
+            शहर के निचले इलाकों में भरा पानी
+
+          </h1>
+
+
+          <!-- ARTICLE META -->
+          <div class="article-meta-bar">
+
+            <div class="author-info">
+
+              <i class="fa-solid fa-user-pen text-red"></i>
+
+              <span>
+                आवाज राजस्थान ब्यूरो
+              </span>
+
+              <span class="meta-dot">
+                •
+              </span>
+
+              <span>
+                <i class="fa-regular fa-clock"></i>
+                1 सितंबर 2026 | 11:30 AM
+              </span>
+
             </div>
+
+
+            <!-- SHARE -->
+            <div class="social-share-box">
+
+              <span>
+                शेयर करें:
+              </span>
+
+              <a
+                href="#"
+                class="share-icon wa"
+                title="WhatsApp Share"
+                onclick="shareNews('whatsapp'); return false;">
+
+                <i class="fa-brands fa-whatsapp"></i>
+
+              </a>
+
+              <a
+                href="#"
+                class="share-icon fb"
+                title="Facebook Share"
+                onclick="shareNews('facebook'); return false;">
+
+                <i class="fa-brands fa-facebook-f"></i>
+
+              </a>
+
+              <a
+                href="#"
+                class="share-icon tw"
+                title="X Share"
+                onclick="shareNews('twitter'); return false;">
+
+                <i class="fa-brands fa-x-twitter"></i>
+
+              </a>
+
+              <button
+                type="button"
+                class="share-icon copy-link"
+                title="लिंक कॉपी करें"
+                onclick="copyCurrentLink()">
+
+                <i class="fa-solid fa-link"></i>
+
+              </button>
+
+            </div>
+
           </div>
 
-          <div class="article-featured-img">
-            <img src="https://picsum.photos/800/450?random=20" alt="News Detail">
-            <p class="caption">जयपुर के परकोटा क्षेत्र में बारिश के बाद भरा पानी।</p>
+
+          <!-- ARTICLE IMAGE -->
+          <img
+            class="article-main-image"
+            src="https://picsum.photos/900/500?random=201"
+            alt="जयपुर में भारी बारिश"
+            loading="lazy">
+
+
+          <!-- ARTICLE CONTENT -->
+          <div class="article-content">
+
+            <p class="article-lead">
+
+              जयपुर में बीती रात से लगातार हो रही बारिश ने
+              शहर के कई इलाकों में जनजीवन प्रभावित किया है।
+              निचले इलाकों में पानी भरने से लोगों को परेशानी का
+              सामना करना पड़ रहा है।
+
+            </p>
+
+
+            <p>
+
+              मौसम विभाग के अनुसार राजस्थान के कई जिलों में
+              अगले 48 घंटे के दौरान बारिश की गतिविधियां जारी
+              रहने की संभावना है। प्रशासन ने जलभराव वाले
+              क्षेत्रों में निगरानी बढ़ा दी है।
+
+            </p>
+
+
+            <h3>
+              निचले इलाकों में विशेष निगरानी
+            </h3>
+
+            <p>
+
+              नगर निगम की टीमों को जलभराव वाले क्षेत्रों में
+              तैनात किया गया है। पंप सेट की सहायता से पानी
+              निकालने का काम किया जा रहा है।
+
+            </p>
+
+
+            <blockquote>
+
+              प्रशासन ने लोगों से अपील की है कि वे अनावश्यक
+              रूप से जलभराव वाले क्षेत्रों में जाने से बचें।
+
+            </blockquote>
+
+
+            <p>
+
+              अधिकारियों के अनुसार स्थिति पर लगातार नजर रखी
+              जा रही है और आवश्यकता पड़ने पर राहत एवं बचाव
+              दलों को सक्रिय किया जाएगा।
+
+            </p>
+
           </div>
 
-          <div class="article-body">
-            <p><strong>जयपुर।</strong> राजधानी में बीती रात से हो रही लगातार बारिश के कारण जनजीवन अस्त-व्यस्त हो गया है। शहर के कई निचले इलाकों में जलभराव की स्थिति बन गई है। मौसम विभाग ने अगले 48 घंटे में और बारिश की चेतावनी जारी की है।</p>
-            <p>नगर निगम की टीमें जल निकासी के काम में जुट गई हैं। सीवरेज लाइनों की सफाई का काम युद्ध स्तर पर जारी है। प्रशासन ने लोगों से बेवजह घर से बाहर न निकलने की अपील की है।</p>
-          </div>
 
+          <!-- ARTICLE TAGS -->
           <div class="article-tags">
-            <strong>टैग्स:</strong>
-            <span class="tag-pill">जयपुर</span>
-            <span class="tag-pill">बारिश</span>
-            <span class="tag-pill">मानसून</span>
-            <span class="tag-pill">राजस्थान</span>
+
+            <span>
+              #जयपुर
+            </span>
+
+            <span>
+              #बारिश
+            </span>
+
+            <span>
+              #मानसून
+            </span>
+
+            <span>
+              #राजस्थान
+            </span>
+
           </div>
 
-          <!-- Comments / Related Section -->
-          <div class="related-news-section">
-            <h3>आपको यह भी पसंद आ सकता है</h3>
+
+          <!-- RELATED NEWS -->
+          <div class="related-news mt-20">
+
+            <div class="block-header">
+
+              <h3>
+                संबंधित खबरें
+              </h3>
+
+            </div>
+
+
             <div class="news-grid-2">
-              <div class="news-card-horizontal">
-                <img src="https://picsum.photos/150/100?random=21" alt="Related">
-                <div><h4>राजस्थान में अगले हफ्ते तक भारी बारिश का अलर्ट</h4></div>
-              </div>
-              <div class="news-card-horizontal">
-                <img src="https://picsum.photos/150/100?random=22" alt="Related">
-                <div><h4>जयपुर में मौसम हुआ सुहाना, पर्यटकों की उमड़ी भीड़</h4></div>
-              </div>
+
+              <article
+                class="news-card-horizontal"
+                onclick="showScreen('detail-screen')">
+
+                <img
+                  src="https://picsum.photos/200/140?random=202"
+                  alt="संबंधित समाचार"
+                  loading="lazy">
+
+                <div>
+
+                  <span class="tag-red">
+                    राजस्थान
+                  </span>
+
+                  <h4>
+                    राजस्थान के कई जिलों में बारिश का अलर्ट
+                  </h4>
+
+                  <time>
+                    <i class="fa-regular fa-clock"></i>
+                    1 घंटे पहले
+                  </time>
+
+                </div>
+
+              </article>
+
             </div>
+
           </div>
 
-        </div>
+        </article>
+
       </div>
 
-      <div class="right-sidebar">
+
+      <aside class="right-sidebar">
+
         <div class="sidebar-box">
-          <h3 class="side-title">ताज़ा खबरें</h3>
+
+          <h3 class="side-title">
+            राजस्थान ताज़ा खबरें
+          </h3>
+
           <ul class="recent-list">
-            <li><p>जयपुर: बिजली गिरने से हादसा</p><span class="time-red">15 मिनट पहले</span></li>
-            <li><p>जोधपुर में जलस्तर बढ़ा</p><span class="time-red">45 मिनट पहले</span></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
 
+            <li onclick="showScreen('detail-screen')">
 
-  <!-- ================= 04. CATEGORY PAGE (JAIPUR) ================= -->
-  <section id="category-screen" class="page-screen">
-    <div class="container main-layout">
-      <div class="left-content">
-        <div class="category-header">
-          <h2>जयपुर की ताज़ा ख़बरें</h2>
-          <p>गुलाबी नगरी जयपुर की हर छोटी-बड़ी खबर</p>
-        </div>
-        
-        <div class="category-news-list">
-          <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-            <img src="https://picsum.photos/250/160?random=30" alt="News">
-            <div>
-              <span class="tag-red">जयपुर</span>
-              <h3>जयपुर: भारी बारिश से शहर के निचले इलाकों में पानी भरा</h3>
-              <p>जलभराव से ट्रैफिक हुआ प्रभावित, कई जगहों पर गाड़ियां फंसी...</p>
-              <time>2 घंटे पहले</time>
-            </div>
-          </div>
-          <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-            <img src="https://picsum.photos/250/160?random=31" alt="News">
-            <div>
-              <span class="tag-red">जयपुर</span>
-              <h3>जयपुर एयरपोर्ट पर यात्रियों की संख्या में भारी इजाफा</h3>
-              <p>पर्यटन सीजन शुरू होने के साथ ही उड़ानों की संख्या बढ़ाई गई...</p>
-              <time>4 घंटे पहले</time>
-            </div>
-          </div>
-        </div>
-      </div>
+              <p>
+                जयपुर में मौसम का बदला मिजाज
+              </p>
 
-      <div class="right-sidebar">
-        <div class="sidebar-box">
-          <h3 class="side-title">अन्य जिले</h3>
-          <ul class="district-list-links">
-            <li onclick="showScreen('category-screen')">जोधपुर</li>
-            <li onclick="showScreen('category-screen')">उदयपुर</li>
-            <li onclick="showScreen('category-screen')">कोटा</li>
-            <li onclick="showScreen('category-screen')">अजमेर</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
+              <span class="time-red">
+                20 मिनट पहले
+              </span>
 
+            </li>
 
-  <!-- ================= 05. VIDEO PAGE ================= -->
-  <section id="video-screen" class="page-screen">
-    <div class="container">
-      <div class="category-header">
-        <h2><i class="fa-solid fa-circle-play text-red"></i> वीडियो न्यूज़ Bulletin</h2>
-      </div>
-      <div class="video-grid">
-        <div class="video-card">
-          <div class="video-thumb">
-            <img src="https://picsum.photos/400/230?random=40" alt="Video">
-            <span class="play-icon"><i class="fa-solid fa-play"></i></span>
-            <span class="duration">02:15</span>
-          </div>
-          <h4>उदयपुर में लगातार बारिश से झीलें हुई लबालब</h4>
-        </div>
-        <div class="video-card">
-          <div class="video-thumb">
-            <img src="https://picsum.photos/400/230?random=41" alt="Video">
-            <span class="play-icon"><i class="fa-solid fa-play"></i></span>
-            <span class="duration">01:45</span>
-          </div>
-          <h4>बीकानेर में ऊंट महोत्सव की तैयारियां शुरू</h4>
-        </div>
-        <div class="video-card">
-          <div class="video-thumb">
-            <img src="https://picsum.photos/400/230?random=42" alt="Video">
-            <span class="play-icon"><i class="fa-solid fa-play"></i></span>
-            <span class="duration">03:10</span>
-          </div>
-          <h4>जोधपुर में नहर का पानी बहने से हड़कंप</h4>
-        </div>
-      </div>
-    </div>
-  </section>
+            <li onclick="showScreen('detail-screen')">
 
+              <p>
+                जोधपुर में बारिश के बाद नहर का जलस्तर बढ़ा
+              </p>
 
-  <!-- ================= 06. LIVE TV & LIVE UPDATES PAGE ================= -->
-  <section id="live-screen" class="page-screen">
-    <div class="container main-layout">
-      <div class="left-content">
-        <div class="live-player-box">
-          <div class="live-badge-top"><i class="fa-solid fa-tower-broadcast"></i> LIVE STREAMING</div>
-          <div class="video-embed-placeholder">
-            <i class="fa-solid fa-tv fa-4x"></i>
-            <p style="margin-top: 15px;">आवाज राजस्थान - LIVE TV (24x7)</p>
-          </div>
-        </div>
-        <div class="live-updates-timeline mt-20">
-          <h3>लाइव अपडेट्स (Live Blog)</h3>
-          <div class="timeline-item">
-            <span class="time-badge">10:30 AM</span>
-            <div class="timeline-content">
-              <h4>जयपुर में तेज़ बारिश जारी</h4>
-              <p>कलेक्टरेट ने निचले इलाकों के स्कूलों में छुट्टी घोषित की।</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <span class="time-badge">10:00 AM</span>
-            <div class="timeline-content">
-              <h4>उदयपुर की झीलों का जलस्तर बढ़ा</h4>
-              <p>फतहसागर झील के गेट कभी भी खोले जा सकते हैं।</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="right-sidebar">
-        <div class="sidebar-box">
-          <h3 class="side-title">खबरों पर चर्चा</h3>
-          <p style="font-size: 0.9rem; color: #666;">लाइव डिबेट देखने के लिए यूट्यूब चैनल सब्सक्राइब करें।</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ================= 07. SEARCH PAGE ================= -->
-  <section id="search-screen" class="page-screen">
-    <div class="container">
-      <div class="search-header-box">
-        <h2>खोज परिणाम (Search Results)</h2>
-        <p id="searchQueryText">खोजे गए शब्द: "जयपुर बारिश"</p>
-      </div>
-      <div class="category-news-list mt-20">
-        <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-          <img src="https://picsum.photos/200/130?random=50" alt="Search Result">
-          <div>
-            <span class="tag-red">परिणाम 1</span>
-            <h3>जयपुर: भारी बारिश से जनजीवन प्रभावित</h3>
-            <p>2 घंटे पहले</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ================= 08. E-PAPER PAGE ================= -->
-  <section id="epaper-screen" class="page-screen">
-    <div class="container text-center">
-      <div class="epaper-container">
-        <h2>आवाज राजस्थान - आज का ई-पेपर</h2>
-        <p class="mb-15">तारीख चुनिए: <input type="date" value="2026-09-01"></p>
-        
-        <div class="epaper-viewer">
-          <img src="https://picsum.photos/600/850?random=60" alt="E-Paper Page">
-        </div>
-
-        <div class="action-buttons mt-20">
-          <button class="btn-main"><i class="fa-solid fa-download"></i> ई-पेपर PDF डाउनलोड करें</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ================= 09. CONTACT US PAGE ================= -->
-  <section id="contact-screen" class="page-screen">
-    <div class="container main-layout">
-      <div class="left-content">
-        <div class="contact-box">
-          <h2>हमसे संपर्क करें</h2>
-          <p class="mb-20">अपनी खबरें, विज्ञापन या सुझाव भेजने के लिए नीचे फॉर्म भरें:</p>
-          
-          <form onsubmit="event.preventDefault(); alert('संदेश भेज दिया गया है!');">
-            <div class="form-group">
-              <label>आपका नाम</label>
-              <input type="text" required placeholder="नाम लिखें">
-            </div>
-            <div class="form-group">
-              <label>ईमेल या मोबाइल नंबर</label>
-              <input type="text" required placeholder="संपर्क जानकारी">
-            </div>
-            <div class="form-group">
-              <label>संदेश / खबर</label>
-              <textarea rows="5" required placeholder="अपना संदेश यहाँ लिखें..."></textarea>
-            </div>
-            <button type="submit" class="btn-main">संदेश भेजें</button>
-          </form>
-        </div>
-      </div>
-
-      <div class="right-sidebar">
-        <div class="sidebar-box">
-          <h3 class="side-title">हमारा पता</h3>
-          <p><strong>आवाज राजस्थान न्यूज़ नेटवर्क</strong></p>
-          <p>302, मीडिया हाउस, टोंक रोड,</p>
-          <p>जयपुर, राजस्थान - 302018</p>
-          <hr style="margin: 15px 0; border:0; border-top:1px solid #eee;">
-          <p><i class="fa-solid fa-phone"></i> +91 98765 43210</p>
-          <p><i class="fa-solid fa-envelope"></i> info@aawazrajasthan.com</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-
-  <!-- ================= FOOTER ================= -->
-  <footer class="footer">
-    <div class="container footer-grid">
-      <div>
-        <h3>आवाज राजस्थान</h3>
-        <p>राजस्थान का नंबर 1 निष्पक्ष और विश्वसनीय न्यूज़ पोर्टल। हम उठाते हैं आपकी आवाज।</p>
-      </div>
-      <div>
-        <h4>क्विक लिंक्स</h4>
-        <ul>
-          <li><a href="#" onclick="showScreen('home-screen')">होम</a></li>
-          <li><a href="#" onclick="showScreen('category-screen')">जयपुर न्यूज़</a></li>
-          <li><a href="#" onclick="showScreen('epaper-screen')">ई-पेपर</a></li>
-          <li><a href="#" onclick="showScreen('contact-screen')">संपर्क करें</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>सोशल मीडिया</h4>
-        <div class="social-icons">
-          <a href="#"><i class="fa-brands fa-facebook"></i></a>
-          <a href="#"><i class="fa-brands fa-youtube"></i></a>
-          <a href="#"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 आवाज राजस्थान. सर्वाधिकार 
-<div id="splash-screen" class="splash-container">
-  <div class="splash-content">
-    <div class="splash-logo-circle">
-      <span class="splash-logo-text">आवाज<br>राजस्थान</span>
-    </div>
-    <h1 class="splash-title">आवाज राजस्थान</h1>
-    <p class="splash-tagline">पूरे राजस्थान की खबर</p>
-    
-    <div class="splash-loader">
-      <div class="loader-progress"></div>
-    </div>
-  </div>
-</div>
-<section id="home-screen" class="page-screen active-screen">
-  <div class="container main-layout">
-    
-    <div class="left-content">
-      
-      <div class="hero-card" onclick="showScreen('detail-screen')">
-        <span class="category-tag">मुख्य खबर</span>
-        <img src="https://picsum.photos/800/420?random=101" alt="Main News Banner">
-        <div class="hero-overlay">
-          <h2>राजस्थान में मानसून की दस्तक, कई जिलों में झमाझम बारिश शुरू</h2>
-          <p>मौसम विभाग ने अगले 48 घंटे में भारी बारिश की चेतावनी जारी की है। प्रशासन ने निचले इलाकों में अलर्ट घोषित किया।</p>
-          <div class="meta-info">
-            <span><i class="fa-regular fa-clock"></i> 2 घंटे पहले</span>
-            <span><i class="fa-solid fa-location-dot"></i> जयपुर</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-block mt-20">
-        <div class="block-header">
-          <h3><i class="fa-solid fa-map-location-dot text-red"></i> हमारे जिले</h3>
-          <a href="#" class="see-more" onclick="showScreen('category-screen')">सभी जिले <i class="fa-solid fa-angle-right"></i></a>
-        </div>
-        <div class="district-scroll">
-          <div class="district-item" onclick="showScreen('category-screen')">
-            <img src="https://picsum.photos/150/100?random=102" alt="Jaipur">
-            <h4>जयपुर</h4>
-            <p>गुलाबी नगरी</p>
-          </div>
-          <div class="district-item" onclick="showScreen('category-screen')">
-            <img src="https://picsum.photos/150/100?random=103" alt="Jodhpur">
-            <h4>जोधपुर</h4>
-            <p>सूर्य नगरी</p>
-          </div>
-          <div class="district-item" onclick="showScreen('category-screen')">
-            <img src="https://picsum.photos/150/100?random=104" alt="Udaipur">
-            <h4>उदयपुर</h4>
-            <p>झीलों की नगरी</p>
-          </div>
-          <div class="district-item" onclick="showScreen('category-screen')">
-            <img src="https://picsum.photos/150/100?random=105" alt="Kota">
-            <h4>कोटा</h4>
-            <p>शिक्षा नगरी</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="section-block mt-20">
-        <div class="block-header">
-          <h3>खास खबरें</h3>
-        </div>
-        <div class="news-grid-2">
-          <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-            <img src="https://picsum.photos/200/140?random=106" alt="Politics">
-            <div>
-              <span class="tag-red">राजनीति</span>
-              <h4>राजस्थान में अगले हफ्ते तक विधानसभा सत्र की तैयारियां तेज</h4>
-              <time><i class="fa-regular fa-clock"></i> 3 घंटे पहले | जयपुर</time>
-            </div>
-          </div>
-          <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-            <img src="https://picsum.photos/200/140?random=107" alt="Education">
-            <div>
-              <span class="tag-red">शिक्षा</span>
-              <h4>NEET UG काउंसलिंग की तारीखों का ऐलान, अजमेर बोर्ड तैयार</h4>
-              <time><i class="fa-regular fa-clock"></i> 5 घंटे पहले | अजमेर</time>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="right-sidebar">
-      
-      <div class="sidebar-box">
-        <h3 class="side-title">राजस्थान ताज़ा खबरें <a href="#" onclick="showScreen('category-screen')">और देखें</a></h3>
-        <ul class="recent-list">
-          <li onclick="showScreen('detail-screen')">
-            <p>जयपुर: बिजली गिरने से 2 लोगों की मौत, 3 घायल</p>
-            <span class="time-red">15 मिनट पहले</span>
-          </li>
-          <li onclick="showScreen('detail-screen')">
-            <p>जोधपुर में नहर का पानी ओवरफ्लो हुआ</p>
-            <span class="time-red">45 मिनट पहले</span>
-          </li>
-          <li onclick="showScreen('detail-screen')">
-            <p>उदयपुर में पर्यटन सीजन को लेकर तैयारियां तेज</p>
-            <span class="time-red">1 घंटे पहले</span>
-          </li>
-          <li onclick="showScreen('detail-screen')">
-            <p>कोटा कोचिंग छात्र ने किया टॉप, AIR 45 हासिल की</p>
-            <span class="time-red">2 घंटे पहले</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="sidebar-box mt-20">
-        <h3 class="side-title"><i class="fa-solid fa-fire text-red"></i> ट्रेंडिंग विषय</h3>
-        <ol class="trending-list">
-          <li onclick="showScreen('detail-screen')">राजस्थान में मानसून अलर्ट</li>
-          <li onclick="showScreen('detail-screen')">जयपुर जलभराव अपडेट</li>
-          <li onclick="showScreen('detail-screen')">पुष्कर मेला 2026 तैयारियां</li>
-        </ol>
-      </div>
-
-    </div>
-
-  </div>
-</section>
-<section id="detail-screen" class="page-screen">
-  <div class="container main-layout">
-    
-    <div class="left-content">
-      <div class="article-wrapper">
-        
-        <div class="breadcrumb">
-          <a href="#" onclick="showScreen('home-screen')">होम</a> &gt; 
-          <a href="#" onclick="showScreen('category-screen')">जयपुर</a> &gt; 
-          <span>मुख्य खबर</span>
-        </div>
-
-        <h1 class="article-main-title">जयपुर: बीती रात से हो रही झमाझम बारिश, शहर के निचले इलाकों में भरा पानी</h1>
-
-        <div class="article-meta-bar">
-          <div class="author-info">
-            <i class="fa-solid fa-user-pen text-red"></i>
-            <span>आवाज राजस्थान ब्यूरो</span>
-            <span class="meta-dot">•</span>
-            <span><i class="fa-regular fa-clock"></i> 1 सितंबर 2026 | 11:30 AM</span>
-          </div>
-          
-          <div class="social-share-box">
-            <span>शेयर करें:</span>
-            <a href="#" class="share-icon wa" title="WhatsApp Share"><i class="fa-brands fa-whatsapp"></i></a>
-            <a href="#" class="share-icon fb" title="Facebook Share"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" class="share-icon tw" title="Twitter/X Share"><i class="fa-brands fa-x-twitter"></i></a>
-          </div>
-        </div>
-
-        <div class="article-media">
-          <img src="https://picsum.photos/800/450?random=301" alt="Jaipur Rain News">
-          <p class="img-caption"><i class="fa-solid fa-camera"></i> फोटो: जयपुर के परकोटा क्षेत्र में बारिश के बाद का दृश्य।</p>
-        </div>
-
-        <div class="article-content-body">
-          <p class="lead-text"><strong>जयपुर।</strong> राजधानी में बीती रात से हो रही लगातार बारिश के कारण जनजीवन अस्त-व्यस्त हो गया है। शहर के परकोटा क्षेत्र सहित कई निचले इलाकों में सड़कों पर जलभराव की स्थिति बन गई है।</p>
-          
-          <p>मौसम विभाग ने जयपुर सहित अजमेर, कोटा और उदयपुर संभाग के लिए अगले 48 घंटों का **ऑरेंज अलर्ट** जारी किया है। आपदा प्रबंधन और नगर निगम की टीमों को सतर्क रहने के निर्देश दिए गए हैं।</p>
-
-          <blockquote class="news-quote">
-            "नागरिकों से अपील है कि वे अनावश्यक रूप से जलभराव वाले क्षेत्रों में न जाएं और प्रशासन द्वारा जारी दिशा-निर्देशों का पालन करें।" — जिला कलेक्टर, जयपुर
-          </blockquote>
-
-          <p>बारिश के चलते शहर के मुख्य चौराहों पर ट्रैफिक धीमा पड़ गया है। जेकेलोन अस्पताल और सिंधी कैंप बस स्टैंड के पास पानी भरने से राहगीरों को भारी परेशानियों का सामना करना पड़ रहा है।</p>
-        </div>
-
-        <div class="article-tags-wrapper">
-          <strong><i class="fa-solid fa-tags text-red"></i> टैग्स:</strong>
-          <span class="tag-chip" onclick="showScreen('category-screen')">#जयपुर_बारिश</span>
-          <span class="tag-chip" onclick="showScreen('category-screen')">#मौसम_अपडेट</span>
-          <span class="tag-chip" onclick="showScreen('category-screen')">#राजस्थान_न्यूज़</span>
-        </div>
-
-        <div class="related-news-box mt-20">
-          <h3 class="section-title">संबंधित खबरें</h3>
-          <div class="news-grid-2">
-            <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-              <img src="https://picsum.photos/150/100?random=302" alt="Related News">
-              <div>
-                <span class="tag-red">मौसम</span>
-                <h4>जोधपुर में भारी बारिश के बाद बांध का जलस्तर बढ़ा</h4>
-                <time>2 घंटे पहले</time>
-              </div>
-            </div>
-            <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
-              <img src="https://picsum.photos/150/100?random=303" alt="Related News">
-              <div>
-                <span class="tag-red">प्रशासन</span>
-                <h4>जयपुर नगर निगम ने शुरू किया कंट्रोल रूम</h4>
-                <time>4 घंटे पहले</time>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="comment-section mt-20">
-          <h3>प्रतिक्रिया दें (Comments)</h3>
-          <form class="comment-form" onsubmit="event.preventDefault(); alert('आपकी प्रतिक्रिया पोस्ट कर दी गई है!');">
-            <input type="text" placeholder="आपका नाम" required>
-            <textarea rows="3" placeholder="इस खबर पर अपनी राय लिखें..." required></textarea>
-            <button type="submit" class="btn-main">कमेंट पोस्ट करें</button>
-          </form>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="right-sidebar">
-      <div class="sidebar-box">
-        <h3 class="side-title">ताज़ा खबरें</h3>
-        <ul class="recent-list">
-          <li onclick="showScreen('detail-screen')">
-            <p>उदयपुर: फतहसागर झील के गेट खोले गए</p>
-            <span class="time-red">20 मिनट पहले</span>
-          </li>
-          <li onclick="showScreen('detail-screen')">
-            <p>कोटा में कोचिंग संस्थानों के लिए नई गाइडलाइन</p>
-            <span class="time-red">1 घंटे पहले</span>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-  </div>
-</section>
-<section id="category-screen" class="page-screen">
-  <div class="container main-layout">
-    
-    <div class="left-content">
-      
-      <div class="category-header-card">
-        <div class="category-title-wrap">
-          <h2><i class="fa-solid fa-location-dot text-red"></i> जयपुर न्यूज़ (Jaipur News)</h2>
-          <p>गुलाबी नगरी जयपुर और आसपास के क्षेत्रों की हर छोटी-बड़ी खबर</p>
-        </div>
-        
-        <div class="sub-category-pills">
-          <button class="pill-btn active">सभी खबरें</button>
-          <button class="pill-btn">अपराध</button>
-          <button class="pill-btn">राजनीति</button>
-          <button class="pill-btn">प्रशासन</button>
-          <button class="pill-btn">मौसम</button>
-        </div>
-      </div>
-
-      <div class="category-feed-list mt-20">
-        
-        <div class="feed-card" onclick="showScreen('detail-screen')">
-          <div class="feed-img">
-            <img src="https://picsum.photos/300/180?random=401" alt="Jaipur News">
-            <span class="badge-overlay">जयपुर</span>
-          </div>
-          <div class="feed-info">
-            <span class="time-stamp"><i class="fa-regular fa-clock"></i> 30 मिनट पहले</span>
-            <h3>जयपुर: मानसरोवर में नई एलिवेटेड रोड परियोजना को मिली मंजूरी</h3>
-            <p>यातायात को सुगम बनाने के लिए प्रशासन ने 120 करोड़ रुपये के बजट को हरी झंडी दे दी है...</p>
-            <div class="feed-footer">
-              <span><i class="fa-solid fa-share-nodes"></i> शेयर</span>
-              <span class="read-more">पूरी खबर पढ़ें <i class="fa-solid fa-angle-right"></i></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="feed-card" onclick="showScreen('detail-screen')">
-          <div class="feed-img">
-            <img src="https://picsum.photos/300/180?random=402" alt="Jaipur News">
-            <span class="badge-overlay">प्रशासन</span>
-          </div>
-          <div class="feed-info">
-            <span class="time-stamp"><i class="fa-regular fa-clock"></i> 2 घंटे पहले</span>
-            <h3>जयपुर एयरपोर्ट पर यात्रियों की संख्या में रिकॉर्ड बढ़ोतरी</h3>
-            <p>मानसून और पर्यटन सीजन शुरू होने के साथ ही रोजाना आने-जाने वाली उड़ानों की संख्या बढ़ाई गई...</p>
-            <div class="feed-footer">
-              <span><i class="fa-solid fa-share-nodes"></i> शेयर</span>
-              <span class="read-more">पूरी खबर पढ़ें <i class="fa-solid fa-angle-right"></i></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="feed-card" onclick="showScreen('detail-screen')">
-          <div class="feed-img">
-            <img src="https://picsum.photos/300/180?random=403" alt="Jaipur News">
-            <span class="badge-overlay">मौसम</span>
-          </div>
-          <div class="feed-info">
-            <span class="time-stamp"><i class="fa-regular fa-clock"></i> 4 घंटे पहले</span>
-            <h3>जयपुर में भारी बारिश के बाद मौसम विभाग का येलो अलर्ट</h3>
-            <p>मौसम केंद्र जयपुर ने अगले दो दिनों तक रुक-रुक कर बारिश होने की संभावना जताई है...</p>
-            <div class="feed-footer">
-              <span><i class="fa-solid fa-share-nodes"></i> शेयर</span>
-              <span class="read-more">पूरी खबर पढ़ें <i class="fa-solid fa-angle-right"></i></span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="text-center mt-20">
-        <button class="btn-main" style="width: 200px;">और खबरें लोड करें</button>
-      </div>
-
-    </div>
-
-    <div class="right-sidebar">
-      
-      <div class="sidebar-box">
-        <h3 class="side-title">अन्य जिले चुनें</h3>
-        <ul class="district-quick-select">
-          <li onclick="showScreen('category-screen')"><span>जोधपुर</span> <i class="fa-solid fa-chevron-right"></i></li>
-          <li onclick="showScreen('category-screen')"><span>उदयपुर</span> <i class="fa-solid fa-chevron-right"></i></li>
-          <li onclick="showScreen('category-screen')"><span>कोटा</span> <i class="fa-solid fa-chevron-right"></i></li>
-          <li onclick="showScreen('category-screen')"><span>अजमेर</span> <i class="fa-solid fa-chevron-right"></i></li>
-          <li onclick="showScreen('category-screen')"><span>बीकानेर</span> <i class="fa-solid fa-chevron-right"></i></li>
-        </ul>
-      </div>
-
-      <div class="sidebar-box mt-20">
-        <h3 class="side-title">जयपुर की ट्रेंडिंग खबरें</h3>
-        <ul class="recent-list">
-          <li onclick="showScreen('detail-screen')">
-            <p>परकोटा क्षेत्र में जलभराव की समस्या का स्थायी समाधान जल्द</p>
-            <span class="time-red">1 घंटे पहले</span>
-          </li>
-          <li onclick="showScreen('detail-screen')">
-            <p>सांगानेरी गेट के पास नई बस सेवा शुरू</p>
-            <span class="time-red">3 घंटे पहले</span>
-          </li>
-        </ul>
-      </div>
-
-    </div>
-
-  </div>
-</section>
-<section id="video-screen" class="page-screen">
-  <div class="container">
-    
-    <div class="category-header-card mb-20">
-      <div class="category-title-wrap">
-        <h2><i class="fa-solid fa-circle-play text-red"></i> आवाज राजस्थान - वीडियो बुलेटिन</h2>
-        <p>राजस्थान की तमाम बड़ी खबरें देखें वीडियो रूप में</p>
-      </div>
-    </div>
-
-    <div class="main-layout">
-      
-      <div class="left-content">
-        <div class="featured-video-card">
-          <div class="video-player-container">
-            <img src="https://picsum.photos/800/450?random=501" alt="Featured Video News">
-            <div class="play-overlay-btn" onclick="alert('वीडियो प्लेयर लोड हो रहा है...')">
-              <i class="fa-solid fa-play"></i>
-            </div>
-            <span class="video-duration-tag"><i class="fa-solid fa-clock"></i> 03:45</span>
-          </div>
-          <div class="video-info-box">
-            <span class="tag-red">मुख्य बुलेटिन</span>
-            <h2>उदयपुर: झीलों के शहर में मानसून का रौद्र रूप, फतहसागर के खोले गए गेट</h2>
-            <p>उदयपुर में लगातार 12 घंटे की बारिश के बाद फतहसागर और पिछोला झील का जलस्तर खतरे के निशान के पास पहुंचा। देखिए ग्राउंड रिपोर्ट...</p>
-            <div class="meta-info">
-              <span><i class="fa-regular fa-clock"></i> 1 घंटे पहले</span>
-              <span><i class="fa-solid fa-eye"></i> 12.5K व्यूज</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="right-sidebar">
-        <div class="sidebar-box">
-          <h3 class="side-title"><i class="fa-solid fa-list text-red"></i> ताज़ा वीडियो लिस्ट</h3>
-          <div class="video-playlist">
-            
-            <div class="playlist-item" onclick="showScreen('detail-screen')">
-              <div class="playlist-thumb">
-                <img src="https://picsum.photos/120/80?random=502" alt="Playlist Video">
-                <span class="mini-duration">01:30</span>
-              </div>
-              <div class="playlist-text">
-                <h4>जयपुर: परकोटा क्षेत्र का वीडियो रिपोर्ट</h4>
-                <time>30 मिनट पहले</time>
-              </div>
-            </div>
-
-            <div class="playlist-item" onclick="showScreen('detail-screen')">
-              <div class="playlist-thumb">
-                <img src="https://picsum.photos/120/80?random=503" alt="Playlist Video">
-                <span class="mini-duration">02:15</span>
-              </div>
-              <div class="playlist-text">
-                <h4>जोधपुर: मेहरानगढ़ किले पर बदला मौसम</h4>
-                <time>2 घंटे पहले</time>
-              </div>
-            </div>
-
-            <div class="playlist-item" onclick="showScreen('detail-screen')">
-              <div class="playlist-thumb">
-                <img src="https://picsum.photos/120/80?random=504" alt="Playlist Video">
-                <span class="mini-duration">04:10</span>
-              </div>
-              <div class="playlist-text">
-                <h4>कोटा: चंबल नदी का बढ़ा जलस्तर</h4>
-                <time>5 घंटे पहले</time>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="section-block mt-20">
-      <div class="block-header">
-        <h3><i class="fa-solid fa-film text-red"></i> जिलेवार वीडियो रिपोर्ट</h3>
-      </div>
-      <div class="video-grid">
-        
-        <div class="video-card">
-          <div class="video-thumb">
-            <img src="https://picsum.photos/400/230?random=505" alt="Video">
-            <span class="play-icon"><i class="fa-solid fa-play"></i></span>
-            <span class="duration">02:10</span>
-          </div>
-          <div class="video-card-body">
-            <span class="badge-overlay">बीकानेर</span>
-            <h4>बीकानेर: रेगिस्तान में पहली बारिश का वीडियो आया सामने</h4>
-          </div>
-        </div>
-
-        <div class="video-card">
-          <div class="video-thumb">
-            <img src="https://picsum.photos/400/230?random=506" alt="Video">
-            <span class="play-icon"><i class="fa-solid fa-play"></i></span>
-            <span class="duration">01:45</span>
-          </div>
-          <div class="video-card-body">
-            <span class="badge-overlay">अजमेर</span>
-            <h4>अजमेर: आनासागर झील पर उमड़े सैलानी</h4>
-          </div>
-        </div>
-
-        <div class="video-card">
-          <div class="video-thumb">
-            <img src="https://picsum.photos/400/230?random=507" alt="Video">
-            <span class="play-icon"><i class="fa-solid fa-play"></i></span>
-            <span class="duration">03:20</span>
-          </div>
-          <div class="video-card-body">
-            <span class="badge-overlay">भरतपुर</span>
-            <h4>केवलादेव राष्ट्रीय उद्यान में नए पक्षियों का आगमन</h4>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-</section>
-<section id="live-screen" class="page-screen">
-  <div class="container main-layout">
-    
-    <div class="left-content">
-      
-      <div class="live-tv-container">
-        <div class="live-stream-header">
-          <span class="live-badge-pulse"><i class="fa-solid fa-tower-broadcast"></i> LIVE 24x7</span>
-          <span class="stream-title">आवाज राजस्थान - न्यूज़ चैनल</span>
-        </div>
-        
-        <div class="live-video-screen">
-          <div class="tv-overlay-info">
-            <span class="breaking-ticker-live">ब्रेकिंग: जयपुर में भारी बारिश का अलर्ट जारी</span>
-          </div>
-          <div class="tv-play-btn" onclick="alert('लाइव टीवी स्ट्रीम शुरू हो रही है...')">
-            <i class="fa-solid fa-play"></i>
-          </div>
-        </div>
-      </div>
-
-      <div class="live-blog-wrapper mt-20">
-        <div class="block-header">
-          <h3><i class="fa-solid fa-bolt text-red"></i> लाइव अपडेट्स (Live Blog)</h3>
-          <span class="auto-update-text"><i class="fa-solid fa-rotate"></i> ऑटो अपडेट चालू</span>
-        </div>
-
-        <div class="timeline-container">
-          
-          <div class="timeline-card">
-            <div class="time-box">
-              <span class="time-digit">03:30 PM</span>
-              <span class="time-tag-red">अभी-अभी</span>
-            </div>
-            <div class="timeline-body">
-              <h4>जयपुर: नगर निगम का कंट्रोल रूम 24 घंटे एक्टिव</h4>
-              <p>कमिश्नर ने सभी अधिकारियों को फील्ड में रहने के आदेश दिए। जलभराव वाले इलाकों से पंप सेट से पानी निकाला जा रहा है।</p>
-            </div>
-          </div>
-
-          <div class="timeline-card">
-            <div class="time-box">
-              <span class="time-digit">02:15 PM</span>
-            </div>
-            <div class="timeline-body">
-              <h4>उदयपुर: फतहसागर झील के दो गेट 2 फीट खोले गए</h4>
-              <p>पानी की आवक बढ़ने के बाद प्रशासन ने सुरक्षा के कड़े इंतजाम किए। पर्यटकों को किनारों से दूर रहने की चेतावनी।</p>
-            </div>
-          </div>
-
-          <div class="timeline-card">
-            <div class="time-box">
-              <span class="time-digit">01:00 PM</span>
-            </div>
-            <div class="timeline-body">
-              <h4>कोटा: चंबल नदी का बढ़ा जलस्तर</h4>
-              <p>कोटा बैराज से पानी छोड़े जाने के बाद निचले इलाकों में अलर्ट घोषित किया गया है।</p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    <div class="right-sidebar">
-      
-      <div class="sidebar-box">
-        <h3 class="side-title">लाइव डिबेट व शो</h3>
-        <ul class="recent-list">
-          <li onclick="showScreen('detail-screen')">
-            <p><strong>राजस्थान का मुद्दा:</strong> मानसून की तैयारियों पर उठे सवाल</p>
-            <span class="time-red">शाम 8 बजे LIVE</span>
-          </li>
-          <li onclick="showScreen('detail-screen')">
-            <p><strong>विशेष बुलेटिन:</strong> जिलेवार रिपोर्ट</p>
-            <span class="time-red">रात 9 बजे</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="sidebar-box mt-20 text-center" style="background: #fff0f0;">
-        <i class="fa-brands fa-youtube text-red fa-3x mb-15"></i>
-        <h4 style="font-size: 1.1rem; color: var(--secondary-blue);">यूट्यूब पर लाइव देखें</h4>
-        <p style="font-size: 0.85rem; color: var(--text-gray); margin: 8px 0;">ताज़ा खबरों के लिए आधिकारिक यूट्यूब चैनल सब्सक्राइब करें।</p>
-        <button class="btn-main" style="width: 100%; margin-top: 5px;">सब्सक्राइब करें</button>
-      </div>
-
-    </div>
-
-  </div>
-</section>
-<!-- ================= 07. SEARCH RESULTS SCREEN ================= -->
-<section id="search-screen" class="page-screen">
-  <div class="container main-layout">
-    <div class="left-content">
-      <div class="category-header-card">
-        <h2><i class="fa-solid fa-magnifying-glass text-red"></i> खोज परिणाम (Search Results)</h2>
-        <p>परिणाम: "<span id="search-query-text">जयपुर बारिश</span>"</p>
-      </div>
-
-      <div class="category-feed-list mt-20">
-        <div class="feed-card" onclick="showScreen('detail-screen')">
-          <div class="feed-img">
-            <img src="https://picsum.photos/300/180?random=701" alt="Search Result">
-          </div>
-          <div class="feed-info">
-            <span class="time-stamp"><i class="fa-regular fa-clock"></i> 2 घंटे पहले</span>
-            <h3>जयपुर: बारिश के चलते यातायात पुलिस ने जारी की एडवाइजरी</h3>
-            <p>शहर के जलभराव वाले क्षेत्रों में ट्रैफ़िक डाइवर्ट किया गया है...</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="right-sidebar">
-      <div class="sidebar-box">
-        <h3 class="side-title">लोकप्रिय खोजें</h3>
-        <div class="sub-category-pills" style="flex-wrap: wrap;">
-          <button class="pill-btn">मानसून 2026</button>
-          <button class="pill-btn">राजस्थान बजट</button>
-          <button class="pill-btn">जयपुर भर्ती</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= 08. E-PAPER VIEWER SCREEN (WITH WATERMARK) ================= -->
-<section id="epaper-screen" class="page-screen">
-  <div class="container">
-    <div class="epaper-toolbar">
-      <div class="epaper-date-picker">
-        <label for="epaper-date"><strong>ई-पेपर तिथि:</strong></label>
-        <input type="date" id="epaper-date" value="2026-09-01">
-      </div>
-      <div class="epaper-actions">
-        <button class="btn-main" onclick="window.print()"><i class="fa-solid fa-print"></i> प्रिंट करें</button>
-        <button class="btn-main" style="background:#16a34a;"><i class="fa-solid fa-download"></i> PDF डाउनलोड</button>
-      </div>
-    </div>
-
-    <!-- E-Paper Display Box with Central Logo Watermark -->
-    <div class="epaper-viewer-box">
-      <!-- Watermark Element -->
-      <div class="epaper-watermark">
-        <div class="watermark-logo-circle">
-          <span>आवाज<br>राजस्थान</span>
-        </div>
-        <p class="watermark-text">आवाज राजस्थान ई-पेपर</p>
-      </div>
-
-      <!-- Simulated Newspaper Content -->
-      <div class="epaper-page-content">
-        <div class="epaper-header-strip">
-          <h1>आवाज राजस्थान - दैनिक समाचार पत्र</h1>
-          <p>जयपुर संस्करण | वर्ष 1 | अंक 102</p>
-        </div>
-        <div class="epaper-dummy-layout">
-          <div class="epaper-col-main">
-            <h2>जयपुर में बारिश का रिकॉर्ड टूटा, नदियां उफान पर</h2>
-            <img src="https://picsum.photos/700/350?random=801" alt="Epaper News">
-            <p>बीती रात से हो रही झमाझम बारिश से जनजीवन प्रभावित हुआ है...</p>
-          </div>
-          <div class="epaper-col-side">
-            <h3>संक्षिप्त समाचार</h3>
-            <p>• मौसम विभाग ने ऑरेंज अलर्ट जारी किया।</p>
-            <p>• स्कूल-कॉलेजों में छुट्टी का ऐलान।</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= 09. CONTACT US SCREEN ================= -->
-<section id="contact-screen" class="page-screen">
-  <div class="container main-layout">
-    <div class="left-content">
-      <div class="article-wrapper">
-        <h2 class="article-main-title"><i class="fa-solid fa-envelope text-red"></i> संपर्क करें (Contact Us)</h2>
-        <p>हमें अपनी प्रतिक्रिया, शिकायत या विज्ञापन हेतु संदेश भेजें:</p>
-        
-        <form class="comment-form mt-20" onsubmit="event.preventDefault(); alert('आपका संदेश प्राप्त हो गया है!');">
-          <input type="text" placeholder="आपका पूरा नाम" required>
-          <input type="email" placeholder="ईमेल पता" required>
-          <input type="tel" placeholder="मोबाइल नंबर" required>
-          <textarea rows="4" placeholder="अपना संदेश यहाँ लिखें..." required></textarea>
-          <button type="submit" class="btn-main">संदेश भेजें</button>
-        </form>
-      </div>
-    </div>
-
-    <div class="right-sidebar">
-      <div class="sidebar-box">
-        <h3 class="side-title">कार्यालय का पता</h3>
-        <p style="font-size: 0.9rem; color: var(--text-gray); line-height: 1.6;">
-          <strong>आवाज राजस्थान मीडिया ग्रुप</strong><br>
-          एमआई रोड, जयपुर, राजस्थान - 302001<br>
-          <strong>ईमेल:</strong> contact@aawazrajasthan.com<br>
-          <strong>फोन:</strong> +91 141 2345678
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
+              <span class="time-red">
+                45 मिनट पहले
+     
