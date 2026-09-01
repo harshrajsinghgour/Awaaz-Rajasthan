@@ -1267,3 +1267,113 @@ a {
 @media (max-width: 768px) {
   .live-video-screen { height: 220px; }
 }
+/* ================= 08. E-PAPER & WATERMARK STYLES ================= */
+.epaper-toolbar {
+  background: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.epaper-viewer-box {
+  position: relative;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+  min-height: 600px;
+}
+
+/* Central Watermark Overlay */
+.epaper-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  pointer-events: none;
+  opacity: 0.08; /* Subtle & Professional Watermark Opacity */
+  user-select: none;
+  text-align: center;
+  z-index: 10;
+}
+
+.watermark-logo-circle {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: var(--primary-red);
+  border: 8px solid var(--secondary-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.watermark-logo-circle span {
+  color: white;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.watermark-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--secondary-blue);
+  margin-top: 10px;
+}
+
+/* Newspaper Layout Simulation */
+.epaper-page-content {
+  position: relative;
+  z-index: 1;
+}
+
+.epaper-header-strip {
+  text-align: center;
+  border-bottom: 3px double #000;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.epaper-header-strip h1 {
+  font-size: 2.2rem;
+  color: var(--secondary-blue);
+}
+
+.epaper-dummy-layout {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr;
+  gap: 20px;
+}
+
+.epaper-col-main img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+  .epaper-toolbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .epaper-dummy-layout {
+    grid-template-columns: 1fr;
+  }
+  .watermark-logo-circle {
+    width: 160px;
+    height: 160px;
+  }
+  .watermark-logo-circle span {
+    font-size: 1.5rem;
+  }
+  }
+  
