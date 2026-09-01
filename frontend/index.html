@@ -707,3 +707,112 @@
 
   </div>
 </section>
+<section id="category-screen" class="page-screen">
+  <div class="container main-layout">
+    
+    <div class="left-content">
+      
+      <div class="category-header-card">
+        <div class="category-title-wrap">
+          <h2><i class="fa-solid fa-location-dot text-red"></i> जयपुर न्यूज़ (Jaipur News)</h2>
+          <p>गुलाबी नगरी जयपुर और आसपास के क्षेत्रों की हर छोटी-बड़ी खबर</p>
+        </div>
+        
+        <div class="sub-category-pills">
+          <button class="pill-btn active">सभी खबरें</button>
+          <button class="pill-btn">अपराध</button>
+          <button class="pill-btn">राजनीति</button>
+          <button class="pill-btn">प्रशासन</button>
+          <button class="pill-btn">मौसम</button>
+        </div>
+      </div>
+
+      <div class="category-feed-list mt-20">
+        
+        <div class="feed-card" onclick="showScreen('detail-screen')">
+          <div class="feed-img">
+            <img src="https://picsum.photos/300/180?random=401" alt="Jaipur News">
+            <span class="badge-overlay">जयपुर</span>
+          </div>
+          <div class="feed-info">
+            <span class="time-stamp"><i class="fa-regular fa-clock"></i> 30 मिनट पहले</span>
+            <h3>जयपुर: मानसरोवर में नई एलिवेटेड रोड परियोजना को मिली मंजूरी</h3>
+            <p>यातायात को सुगम बनाने के लिए प्रशासन ने 120 करोड़ रुपये के बजट को हरी झंडी दे दी है...</p>
+            <div class="feed-footer">
+              <span><i class="fa-solid fa-share-nodes"></i> शेयर</span>
+              <span class="read-more">पूरी खबर पढ़ें <i class="fa-solid fa-angle-right"></i></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feed-card" onclick="showScreen('detail-screen')">
+          <div class="feed-img">
+            <img src="https://picsum.photos/300/180?random=402" alt="Jaipur News">
+            <span class="badge-overlay">प्रशासन</span>
+          </div>
+          <div class="feed-info">
+            <span class="time-stamp"><i class="fa-regular fa-clock"></i> 2 घंटे पहले</span>
+            <h3>जयपुर एयरपोर्ट पर यात्रियों की संख्या में रिकॉर्ड बढ़ोतरी</h3>
+            <p>मानसून और पर्यटन सीजन शुरू होने के साथ ही रोजाना आने-जाने वाली उड़ानों की संख्या बढ़ाई गई...</p>
+            <div class="feed-footer">
+              <span><i class="fa-solid fa-share-nodes"></i> शेयर</span>
+              <span class="read-more">पूरी खबर पढ़ें <i class="fa-solid fa-angle-right"></i></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="feed-card" onclick="showScreen('detail-screen')">
+          <div class="feed-img">
+            <img src="https://picsum.photos/300/180?random=403" alt="Jaipur News">
+            <span class="badge-overlay">मौसम</span>
+          </div>
+          <div class="feed-info">
+            <span class="time-stamp"><i class="fa-regular fa-clock"></i> 4 घंटे पहले</span>
+            <h3>जयपुर में भारी बारिश के बाद मौसम विभाग का येलो अलर्ट</h3>
+            <p>मौसम केंद्र जयपुर ने अगले दो दिनों तक रुक-रुक कर बारिश होने की संभावना जताई है...</p>
+            <div class="feed-footer">
+              <span><i class="fa-solid fa-share-nodes"></i> शेयर</span>
+              <span class="read-more">पूरी खबर पढ़ें <i class="fa-solid fa-angle-right"></i></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="text-center mt-20">
+        <button class="btn-main" style="width: 200px;">और खबरें लोड करें</button>
+      </div>
+
+    </div>
+
+    <div class="right-sidebar">
+      
+      <div class="sidebar-box">
+        <h3 class="side-title">अन्य जिले चुनें</h3>
+        <ul class="district-quick-select">
+          <li onclick="showScreen('category-screen')"><span>जोधपुर</span> <i class="fa-solid fa-chevron-right"></i></li>
+          <li onclick="showScreen('category-screen')"><span>उदयपुर</span> <i class="fa-solid fa-chevron-right"></i></li>
+          <li onclick="showScreen('category-screen')"><span>कोटा</span> <i class="fa-solid fa-chevron-right"></i></li>
+          <li onclick="showScreen('category-screen')"><span>अजमेर</span> <i class="fa-solid fa-chevron-right"></i></li>
+          <li onclick="showScreen('category-screen')"><span>बीकानेर</span> <i class="fa-solid fa-chevron-right"></i></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-box mt-20">
+        <h3 class="side-title">जयपुर की ट्रेंडिंग खबरें</h3>
+        <ul class="recent-list">
+          <li onclick="showScreen('detail-screen')">
+            <p>परकोटा क्षेत्र में जलभराव की समस्या का स्थायी समाधान जल्द</p>
+            <span class="time-red">1 घंटे पहले</span>
+          </li>
+          <li onclick="showScreen('detail-screen')">
+            <p>सांगानेरी गेट के पास नई बस सेवा शुरू</p>
+            <span class="time-red">3 घंटे पहले</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+</section>
