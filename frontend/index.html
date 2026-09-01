@@ -491,3 +491,113 @@
     </div>
   </div>
 </div>
+<section id="home-screen" class="page-screen active-screen">
+  <div class="container main-layout">
+    
+    <div class="left-content">
+      
+      <div class="hero-card" onclick="showScreen('detail-screen')">
+        <span class="category-tag">मुख्य खबर</span>
+        <img src="https://picsum.photos/800/420?random=101" alt="Main News Banner">
+        <div class="hero-overlay">
+          <h2>राजस्थान में मानसून की दस्तक, कई जिलों में झमाझम बारिश शुरू</h2>
+          <p>मौसम विभाग ने अगले 48 घंटे में भारी बारिश की चेतावनी जारी की है। प्रशासन ने निचले इलाकों में अलर्ट घोषित किया।</p>
+          <div class="meta-info">
+            <span><i class="fa-regular fa-clock"></i> 2 घंटे पहले</span>
+            <span><i class="fa-solid fa-location-dot"></i> जयपुर</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block mt-20">
+        <div class="block-header">
+          <h3><i class="fa-solid fa-map-location-dot text-red"></i> हमारे जिले</h3>
+          <a href="#" class="see-more" onclick="showScreen('category-screen')">सभी जिले <i class="fa-solid fa-angle-right"></i></a>
+        </div>
+        <div class="district-scroll">
+          <div class="district-item" onclick="showScreen('category-screen')">
+            <img src="https://picsum.photos/150/100?random=102" alt="Jaipur">
+            <h4>जयपुर</h4>
+            <p>गुलाबी नगरी</p>
+          </div>
+          <div class="district-item" onclick="showScreen('category-screen')">
+            <img src="https://picsum.photos/150/100?random=103" alt="Jodhpur">
+            <h4>जोधपुर</h4>
+            <p>सूर्य नगरी</p>
+          </div>
+          <div class="district-item" onclick="showScreen('category-screen')">
+            <img src="https://picsum.photos/150/100?random=104" alt="Udaipur">
+            <h4>उदयपुर</h4>
+            <p>झीलों की नगरी</p>
+          </div>
+          <div class="district-item" onclick="showScreen('category-screen')">
+            <img src="https://picsum.photos/150/100?random=105" alt="Kota">
+            <h4>कोटा</h4>
+            <p>शिक्षा नगरी</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block mt-20">
+        <div class="block-header">
+          <h3>खास खबरें</h3>
+        </div>
+        <div class="news-grid-2">
+          <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
+            <img src="https://picsum.photos/200/140?random=106" alt="Politics">
+            <div>
+              <span class="tag-red">राजनीति</span>
+              <h4>राजस्थान में अगले हफ्ते तक विधानसभा सत्र की तैयारियां तेज</h4>
+              <time><i class="fa-regular fa-clock"></i> 3 घंटे पहले | जयपुर</time>
+            </div>
+          </div>
+          <div class="news-card-horizontal" onclick="showScreen('detail-screen')">
+            <img src="https://picsum.photos/200/140?random=107" alt="Education">
+            <div>
+              <span class="tag-red">शिक्षा</span>
+              <h4>NEET UG काउंसलिंग की तारीखों का ऐलान, अजमेर बोर्ड तैयार</h4>
+              <time><i class="fa-regular fa-clock"></i> 5 घंटे पहले | अजमेर</time>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="right-sidebar">
+      
+      <div class="sidebar-box">
+        <h3 class="side-title">राजस्थान ताज़ा खबरें <a href="#" onclick="showScreen('category-screen')">और देखें</a></h3>
+        <ul class="recent-list">
+          <li onclick="showScreen('detail-screen')">
+            <p>जयपुर: बिजली गिरने से 2 लोगों की मौत, 3 घायल</p>
+            <span class="time-red">15 मिनट पहले</span>
+          </li>
+          <li onclick="showScreen('detail-screen')">
+            <p>जोधपुर में नहर का पानी ओवरफ्लो हुआ</p>
+            <span class="time-red">45 मिनट पहले</span>
+          </li>
+          <li onclick="showScreen('detail-screen')">
+            <p>उदयपुर में पर्यटन सीजन को लेकर तैयारियां तेज</p>
+            <span class="time-red">1 घंटे पहले</span>
+          </li>
+          <li onclick="showScreen('detail-screen')">
+            <p>कोटा कोचिंग छात्र ने किया टॉप, AIR 45 हासिल की</p>
+            <span class="time-red">2 घंटे पहले</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-box mt-20">
+        <h3 class="side-title"><i class="fa-solid fa-fire text-red"></i> ट्रेंडिंग विषय</h3>
+        <ol class="trending-list">
+          <li onclick="showScreen('detail-screen')">राजस्थान में मानसून अलर्ट</li>
+          <li onclick="showScreen('detail-screen')">जयपुर जलभराव अपडेट</li>
+          <li onclick="showScreen('detail-screen')">पुष्कर मेला 2026 तैयारियां</li>
+        </ol>
+      </div>
+
+    </div>
+
+  </div>
+</section>
