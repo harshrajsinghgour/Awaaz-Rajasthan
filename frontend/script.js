@@ -54,3 +54,7 @@ function handleSearch() {
     alert('कृपया खोजने के लिए कुछ लिखें!');
   }
 }
+// Ensure Home screen is active by default on launch
+document.addEventListener('DOMContentLoaded', () => {
+  showScreen('home-screen');
+});
