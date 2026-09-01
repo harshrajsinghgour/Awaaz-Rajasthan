@@ -492,3 +492,172 @@ a {
   to { width: 100%; }
   }
   
+/* ================= HOME PAGE STYLES ================= */
+.main-layout {
+  display: grid;
+  grid-template-columns: 2.8fr 1.2fr;
+  gap: 25px;
+}
+
+/* Hero Section Banner */
+.hero-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.hero-card:hover {
+  transform: translateY(-3px);
+}
+
+.hero-card img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(15, 27, 41, 0.95));
+  color: var(--white);
+  padding: 25px 20px 15px;
+}
+
+.hero-overlay h2 {
+  font-size: 1.6rem;
+  margin: 8px 0;
+  line-height: 1.3;
+}
+
+.hero-overlay p {
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  margin-bottom: 10px;
+}
+
+.meta-info {
+  font-size: 0.8rem;
+  color: #d1d5db;
+  display: flex;
+  gap: 15px;
+}
+
+/* District Grid Cards */
+.district-scroll {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.district-item {
+  background: var(--white);
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.district-item:hover {
+  border-color: var(--primary-red);
+  box-shadow: 0 2px 8px rgba(200, 16, 46, 0.15);
+}
+
+.district-item img {
+  width: 100%;
+  height: 75px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.district-item h4 {
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: var(--secondary-blue);
+}
+
+.district-item p {
+  font-size: 0.75rem;
+  color: var(--text-gray);
+}
+
+/* Horizontal News Card */
+.news-card-horizontal {
+  display: flex;
+  gap: 12px;
+  background: var(--white);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.news-card-horizontal:hover {
+  border-color: var(--primary-red);
+}
+
+.news-card-horizontal img {
+  width: 110px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.news-card-horizontal h4 {
+  font-size: 0.95rem;
+  line-height: 1.3;
+  margin: 4px 0;
+}
+
+.news-card-horizontal time {
+  font-size: 0.75rem;
+  color: var(--text-gray);
+}
+
+/* Trending List Numbering */
+.trending-list {
+  padding-left: 20px;
+  color: var(--primary-red);
+  font-weight: bold;
+}
+
+.trending-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  color: var(--text-dark);
+  font-weight: normal;
+  font-size: 0.9rem;
+}
+
+.trending-list li:hover {
+  color: var(--primary-red);
+}
+
+/* Responsive Rules for Mobile UI */
+@media (max-width: 768px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+  .hero-card img {
+    height: 240px;
+  }
+  .hero-overlay h2 {
+    font-size: 1.2rem;
+  }
+  .district-scroll {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .news-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
