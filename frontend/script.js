@@ -2187,3 +2187,36 @@ document.querySelectorAll(
 /* =========================================================
    23. PREVENT EMPTY LINKS
    =================================
+const API_URL = 'http://localhost:5000/api/news';
+
+// Fetch Latest News for Frontend Display
+async function fetchNews(category = '') {
+  try {
+    const response = await fetch(`${API_URL}?category=${category}`);
+    const data = await response.json();
+    
+    if (data.success) {
+      renderNewsCard(data.data);
+    }
+  } catch (error) {
+    console.error('Error fetching news:', error);
+  }
+}
+
+function renderNewsCard(newsList) {
+  const container = document.getElementById('news-container');
+  if (!container) return;
+
+  container.innerHTML = newsList.map(news => `
+    <div class="news-card">
+      <img src="${news.imageUrl ? 'http://localhost:5000' + news.imageUrl : 'placeholder.jpg'}" alt="${news.title}">
+      <span class="category">${news.category}</span>
+      <h3>${news.title}</h3>
+      <p>${news.content.substring(0, 100)}...</p>
+      <small>Views: ${news.views}</small>
+    </div>
+  `).join('');
+}
+
+// Call on load
+document.addEventListener('DOMContentLoaded', () => fetchNews());
