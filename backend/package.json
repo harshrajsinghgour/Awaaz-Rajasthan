@@ -1,0 +1,9 @@
+express
+mongoose
+dotenv
+cors
+jsonwebtoken
+bcryptjs
+multer
+helmet
+express-rate-limit
