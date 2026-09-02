@@ -1,46 +1,164 @@
-const jwt = require('jsonwebtoken');
+"use strict";
 
-module.exports = function (req, res, next) {
-  const token = req.header('Authorization');
-  if (!token) return res.status(401).json({ message: 'Access Denied. No Token Provided.' });
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
+
+// ========================================
+// AUTHENTICATION
+// ========================================
+// Login के बाद मिले JWT token को verify करता है
+
+const protect = async (req, res, next) => {
   try {
-    const verified = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET || 'secretkey');
-    req.user = verified;
-    next();
-  } catch (err) {
-    res.status(400).json({ message: 'Invalid Token' });
-  }
-};
-const jwt = require('jsonwebtoken');
+    let token = null;
 
-exports.protect = (req, res, next) => {
-  let token;
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    token = req.headers.authorization.split(' ')[1];
-  }
+    // Authorization: Bearer TOKEN
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer ")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
-  if (!token) {
-    return res.status(401).json({ success: false, message: 'Not authorized, token missing' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({ success: false, message: 'Token verification failed' });
-  }
-};
-
-exports.authorize = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
+    if (!token) {
+      return res.status(401).json({
         success: false,
-        message: `User role '${req.user.role}' is not authorized`
+        message: "Authentication required. कृपया पहले login करें।"
       });
     }
+
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "JWT_SECRET server पर configure नहीं है।"
+      });
+    }
+
+    // Token verify
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    if (!decoded || !decoded.id) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid authentication token"
+      });
+    }
+
+    // Database से current user लेना
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User account नहीं मिला"
+      });
+    }
+
+    // Account active है या नहीं
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "आपका account inactive है"
+      });
+    }
+
+    // Request में user information attach
+    req.user = {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+
+    next();
+
+  } catch (error) {
+
+    // JWT expired
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({
+        success: false,
+        message: "Login session expire हो गया है। कृपया दोबारा login करें।"
+      });
+    }
+
+    // JWT invalid
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid authentication token"
+      });
+    }
+
+    next(error);
+  }
+};
+
+
+// ========================================
+// AUTHORIZATION
+// ========================================
+// User के role के आधार पर access control
+
+const authorize = (...allowedRoles) => {
+  return (req, res, next) => {
+
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required"
+      });
+    }
+
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: "आपको इस action की permission नहीं है"
+      });
+    }
+
     next();
   };
+};
+
+
+// ========================================
+// ADMIN ONLY
+// ========================================
+
+const adminOnly = authorize("admin");
+
+
+// ========================================
+// EDITOR + ADMIN
+// ========================================
+
+const editorOnly = authorize(
+  "admin",
+  "editor"
+);
+
+
+// ========================================
+// NEWS TEAM
+// ADMIN + EDITOR + REPORTER
+// ========================================
+
+const newsTeamOnly = authorize(
+  "admin",
+  "editor",
+  "reporter"
+);
+
+
+module.exports = {
+  protect,
+  authorize,
+  adminOnly,
+  editorOnly,
+  newsTeamOnly
 };
