@@ -1,3 +1,5 @@
+cd ~/Awaaz-Rajasthan
+cat > backend/server.js << 'EOF'
 "use strict";
 
 const express = require("express");
@@ -161,7 +163,6 @@ app.use(
 );
 
 // Contact
-// अगर contactRoutes.js मौजूद है तो इसे use किया जाएगा
 const contactRoutesPath = path.join(
     __dirname,
     "routes",
@@ -176,8 +177,6 @@ if (fs.existsSync(contactRoutesPath)) {
 }
 
 // Site features
-// Live TV, Live Blog और E-paper जैसी future/frontend services
-// के लिए route support
 const siteRoutesPath = path.join(
     __dirname,
     "routes",
@@ -210,7 +209,6 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
     console.error("SERVER ERROR:", err);
 
-    // Multer file upload error
     if (err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({
             success: false,
@@ -218,7 +216,6 @@ app.use((err, req, res, next) => {
         });
     }
 
-    // Validation error
     if (err.name === "ValidationError") {
         return res.status(400).json({
             success: false,
@@ -229,7 +226,6 @@ app.use((err, req, res, next) => {
         });
     }
 
-    // MongoDB invalid ObjectId
     if (err.name === "CastError") {
         return res.status(400).json({
             success: false,
@@ -277,7 +273,6 @@ server.on("error", (error) => {
             error
         );
     }
-
     process.exit(1);
 });
 
@@ -287,7 +282,6 @@ server.on("error", (error) => {
 
 const shutdown = (signal) => {
     console.log(`\n${signal} received.`);
-
     server.close(() => {
         console.log("HTTP server बंद हो गया।");
         process.exit(0);
@@ -303,3 +297,6 @@ process.on("SIGTERM", () => {
 });
 
 module.exports = app;
+EOF
+
+cat backend/server.js
