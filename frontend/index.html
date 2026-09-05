@@ -1,90 +1,144 @@
 <!DOCTYPE html>
 <html lang="hi">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="description"
-        content="आवाज राजस्थान - पूरे राजस्थान की ताज़ा और विश्वसनीय खबरें">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <meta name="theme-color" content="#c8102e">
+  <meta
+    name="description"
+    content="आवाज राजस्थान - पूरे राजस्थान की ताज़ा, विश्वसनीय और जिलेवार खबरें"
+  >
 
-  <title>आवाज राजस्थान - आपकी आवाज, आपका राजस्थान</title>
+  <meta
+    name="theme-color"
+    content="#c8102e"
+  >
+
+  <title>
+    आवाज राजस्थान - आपकी आवाज, आपका राजस्थान
+  </title>
 
   <!-- Main CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
-  <!-- Font Awesome Icons -->
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Font Awesome -->
+  <link
+    rel="preconnect"
+    href="https://cdnjs.cloudflare.com"
+  >
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  >
 </head>
+
 
 <body>
 
-  <!-- =========================================================
+
+  <!-- =====================================================
        TOP BAR
-       ========================================================= -->
+       ===================================================== -->
+
   <div class="top-bar">
 
     <div class="date-weather">
+
       <span>
         <i class="fa-regular fa-calendar-days"></i>
-        मंगलवार, 1 सितंबर 2026
+        <span id="current-date">
+          आज
+        </span>
       </span>
 
       <span>
-        <i class="fa-solid fa-cloud-sun"></i>
-        जयपुर: 28°C
+        <i class="fa-solid fa-location-dot"></i>
+        राजस्थान
       </span>
+
     </div>
+
 
     <div class="top-links">
 
-      <a href="#epaper-screen"
-         onclick="showScreen('epaper-screen'); return false;">
+      <a
+        href="#epaper-screen"
+        onclick="showScreen('epaper-screen'); return false;"
+      >
         ई-पेपर
       </a>
 
-      <a href="#video-screen"
-         onclick="showScreen('video-screen'); return false;">
+
+      <a
+        href="#video-screen"
+        onclick="showScreen('video-screen'); return false;"
+      >
         वीडियो
       </a>
 
-      <a href="#contact-screen"
-         onclick="showScreen('contact-screen'); return false;">
+
+      <a
+        href="#contact-screen"
+        onclick="showScreen('contact-screen'); return false;"
+      >
         संपर्क करें
       </a>
 
-      <a href="#login"
-         class="btn-login"
-         onclick="handleLogin(event)">
+
+      <a
+        href="#login"
+        class="btn-login"
+        onclick="handleLogin(event)"
+      >
+
         <i class="fa-solid fa-user"></i>
-        लॉगिन / रजिस्टर
+
+        <span id="login-button-text">
+          लॉगिन / रजिस्टर
+        </span>
+
       </a>
 
     </div>
+
   </div>
 
 
-  <!-- =========================================================
+
+  <!-- =====================================================
        MAIN HEADER
-       ========================================================= -->
+       ===================================================== -->
+
   <header class="main-header">
 
-    <!-- Logo -->
+
+    <!-- LOGO -->
+
     <button
-      class="logo-area logo-button"
       type="button"
+      class="logo-area logo-button"
       onclick="showScreen('home-screen')"
-      aria-label="आवाज राजस्थान होम">
+      aria-label="आवाज राजस्थान होम"
+    >
 
       <span class="logo-box">
+
         <span class="logo-title">
           आवाज<br>
           राजस्थान
         </span>
+
       </span>
+
 
       <span class="brand-text">
 
@@ -101,22 +155,29 @@
     </button>
 
 
-    <!-- Search -->
+
+    <!-- SEARCH -->
+
     <form
       class="search-box"
       id="searchForm"
-      onsubmit="handleSearch(event)">
+      onsubmit="handleSearch(event)"
+    >
 
       <input
         type="search"
         id="searchInput"
+        name="q"
         placeholder="खबरें खोजें..."
         aria-label="खबरें खोजें"
-        autocomplete="off">
+        autocomplete="off"
+      >
+
 
       <button
         type="submit"
-        aria-label="खोजें">
+        aria-label="खोजें"
+      >
 
         <i class="fa-solid fa-magnifying-glass"></i>
 
@@ -127,133 +188,196 @@
   </header>
 
 
-  <!-- =========================================================
-       DESKTOP NAVIGATION
-       ========================================================= -->
+
+  <!-- =====================================================
+       MAIN NAVIGATION
+       ===================================================== -->
+
   <nav
     class="navbar"
-    aria-label="मुख्य नेविगेशन">
+    aria-label="मुख्य नेविगेशन"
+  >
 
     <ul class="nav-links">
 
+
+      <!-- HOME -->
+
       <li>
+
         <a
           href="#home-screen"
           class="nav-item active"
           data-screen="home-screen"
-          onclick="showScreen('home-screen'); return false;">
+          onclick="showScreen('home-screen'); return false;"
+        >
 
           <i class="fa-solid fa-house"></i>
+
           होम
 
         </a>
+
       </li>
 
+
+
+      <!-- JAIPUR -->
+
       <li>
+
         <a
           href="#category-screen"
           class="nav-item"
-          data-screen="category-screen"
-          onclick="showScreen('category-screen'); return false;">
+          data-district="जयपुर"
+          onclick="loadDistrictNews('जयपुर'); return false;"
+        >
           जयपुर
         </a>
+
       </li>
 
+
+
+      <!-- JODHPUR -->
+
       <li>
+
         <a
           href="#category-screen"
           class="nav-item"
-          data-screen="category-screen"
-          onclick="showScreen('category-screen'); return false;">
+          data-district="जोधपुर"
+          onclick="loadDistrictNews('जोधपुर'); return false;"
+        >
           जोधपुर
         </a>
+
       </li>
 
+
+
+      <!-- UDAIPUR -->
+
       <li>
+
         <a
           href="#category-screen"
           class="nav-item"
-          data-screen="category-screen"
-          onclick="showScreen('category-screen'); return false;">
+          data-district="उदयपुर"
+          onclick="loadDistrictNews('उदयपुर'); return false;"
+        >
           उदयपुर
         </a>
+
       </li>
 
+
+
+      <!-- KOTA -->
+
       <li>
+
         <a
           href="#category-screen"
           class="nav-item"
-          data-screen="category-screen"
-          onclick="showScreen('category-screen'); return false;">
+          data-district="कोटा"
+          onclick="loadDistrictNews('कोटा'); return false;"
+        >
           कोटा
         </a>
+
       </li>
 
+
+
+      <!-- VIDEO -->
+
       <li>
+
         <a
           href="#video-screen"
           class="nav-item"
           data-screen="video-screen"
-          onclick="showScreen('video-screen'); return false;">
+          onclick="showScreen('video-screen'); return false;"
+        >
+
           वीडियो
+
         </a>
+
       </li>
 
+
+
+      <!-- LIVE TV -->
+
       <li>
+
         <a
           href="#live-screen"
           class="nav-item"
           data-screen="live-screen"
-          onclick="showScreen('live-screen'); return false;">
+          onclick="showScreen('live-screen'); return false;"
+        >
 
           <span class="live-dot"></span>
+
           लाइव टीवी
 
         </a>
+
       </li>
 
+
+
+      <!-- E-PAPER -->
+
       <li>
+
         <a
           href="#epaper-screen"
           class="nav-item"
           data-screen="epaper-screen"
-          onclick="showScreen('epaper-screen'); return false;">
+          onclick="showScreen('epaper-screen'); return false;"
+        >
+
           ई-पेपर
+
         </a>
+
       </li>
 
+
     </ul>
+
   </nav>
 
 
-  <!-- =========================================================
+
+  <!-- =====================================================
        BREAKING NEWS TICKER
-       ========================================================= -->
+       ===================================================== -->
+
   <div
     class="ticker-wrapper"
     role="status"
-    aria-label="ब्रेकिंग न्यूज़">
+    aria-label="ब्रेकिंग न्यूज़"
+  >
 
     <div class="ticker-badge">
 
       <i class="fa-solid fa-bolt"></i>
+
       ब्रेकिंग न्यूज़
 
     </div>
+
 
     <div class="ticker-content">
 
       <div class="ticker-track">
 
-        जयपुर में मानसून की दस्तक, कई जिलों में भारी बारिश का अलर्ट जारी
-
-        <span>|</span>
-
-        जोधपुर में नहर का पानी बढ़ा
-
-        <span>|</span>
-
-        राजस्थान NEET UG काउंसलिंग परिणाम जारी...
+        राजस्थान की ताज़ा खबरें लोड हो रही हैं...
 
       </div>
 
@@ -262,186 +386,361 @@
   </div>
 
 
-  <!-- =========================================================
+
+  <!-- =====================================================
        SPLASH SCREEN
-       ========================================================= -->
+       ===================================================== -->
+
   <div
     id="splash-screen"
     class="splash-container"
-    aria-label="आवाज राजस्थान लोड हो रहा है">
+    aria-label="आवाज राजस्थान लोड हो रहा है"
+  >
 
     <div class="splash-content">
+
 
       <div class="splash-logo-circle">
 
         <span class="splash-logo-text">
+
           आवाज<br>
           राजस्थान
+
         </span>
 
       </div>
 
+
       <h1 class="splash-title">
+
         आवाज राजस्थान
+
       </h1>
 
+
       <p class="splash-tagline">
+
         पूरे राजस्थान की खबर
+
       </p>
 
+
       <div class="splash-loader">
+
         <div class="loader-progress"></div>
+
       </div>
+
 
     </div>
 
   </div>
 
 
-  <!-- =========================================================
-       01. HOME SCREEN
-       ========================================================= -->
+
+  <!-- =====================================================
+       HOME SCREEN START
+       ===================================================== -->
+
   <section
     id="home-screen"
-    class="page-screen active-screen">
+    class="page-screen active-screen"
+  >
 
     <div class="container main-layout">
 
 
-      <!-- ================= LEFT CONTENT ================= -->
+      <!-- LEFT CONTENT -->
+
       <div class="left-content">
 
 
         <!-- HERO NEWS -->
-        <article
+
+        <div
           class="hero-card"
-          onclick="showScreen('detail-screen')">
+          id="hero-news-card"
+        >
 
           <span class="category-tag">
             मुख्य खबर
           </span>
 
+
           <img
+            id="hero-news-image"
             src="https://picsum.photos/800/420?random=101"
-            alt="राजस्थान में मानसून की खबर"
-            loading="lazy">
+            alt="मुख्य खबर"
+          >
+
 
           <div class="hero-overlay">
 
-            <h2>
-              राजस्थान में मानसून की दस्तक, कई जिलों में झमाझम बारिश शुरू
+
+            <h2 id="hero-news-title">
+
+              राजस्थान की ताज़ा खबरें
+
             </h2>
 
-            <p>
-              मौसम विभाग ने अगले 48 घंटे में भारी बारिश की चेतावनी जारी की है।
-              प्रशासन ने निचले इलाकों में अलर्ट घोषित किया।
+
+            <p id="hero-news-summary">
+
+              राजस्थान की महत्वपूर्ण खबरें यहां दिखाई जाएंगी।
+
             </p>
+
 
             <div class="meta-info">
 
-              <span>
+
+              <span id="hero-news-time">
+
                 <i class="fa-regular fa-clock"></i>
-                2 घंटे पहले
+
+                अभी
+
               </span>
 
-              <span>
+
+              <span id="hero-news-location">
+
                 <i class="fa-solid fa-location-dot"></i>
-                जयपुर
+
+                राजस्थान
+
               </span>
+
 
             </div>
 
+
           </div>
 
-        </article>
+        </div>
 
 
-        <!-- ================= DISTRICTS ================= -->
+
+        <!-- =================================================
+             DISTRICTS
+             ================================================= -->
+
         <div class="section-block mt-20">
+
 
           <div class="block-header">
 
+
             <h3>
+
               <i class="fa-solid fa-map-location-dot text-red"></i>
+
               हमारे जिले
+
             </h3>
+
 
             <a
               href="#category-screen"
               class="see-more"
-              onclick="showScreen('category-screen'); return false;">
+              onclick="showScreen('category-screen'); return false;"
+            >
 
               सभी जिले
+
               <i class="fa-solid fa-angle-right"></i>
 
             </a>
 
+
           </div>
+
 
 
           <div class="district-scroll">
 
 
             <!-- JAIPUR -->
+
             <div
               class="district-item"
-              onclick="showScreen('category-screen')">
+              data-district="जयपुर"
+              onclick="loadDistrictNews('जयपुर')"
+            >
 
               <img
                 src="https://picsum.photos/150/100?random=102"
                 alt="जयपुर"
-                loading="lazy">
+                loading="lazy"
+              >
 
-              <h4>जयपुर</h4>
-              <p>गुलाबी नगरी</p>
+              <h4>
+                जयपुर
+              </h4>
+
+              <p>
+                गुलाबी नगरी
+              </p>
 
             </div>
 
 
+
             <!-- JODHPUR -->
+
             <div
               class="district-item"
-              onclick="showScreen('category-screen')">
+              data-district="जोधपुर"
+              onclick="loadDistrictNews('जोधपुर')"
+            >
 
               <img
                 src="https://picsum.photos/150/100?random=103"
                 alt="जोधपुर"
-                loading="lazy">
+                loading="lazy"
+              >
 
-              <h4>जोधपुर</h4>
-              <p>सूर्य नगरी</p>
+              <h4>
+                जोधपुर
+              </h4>
+
+              <p>
+                सूर्य नगरी
+              </p>
 
             </div>
 
 
+
             <!-- UDAIPUR -->
+
             <div
               class="district-item"
-              onclick="showScreen('category-screen')">
+              data-district="उदयपुर"
+              onclick="loadDistrictNews('उदयपुर')"
+            >
 
               <img
                 src="https://picsum.photos/150/100?random=104"
                 alt="उदयपुर"
-                loading="lazy">
+                loading="lazy"
+              >
 
-              <h4>उदयपुर</h4>
-              <p>झीलों की नगरी</p>
+              <h4>
+                उदयपुर
+              </h4>
+
+              <p>
+                झीलों की नगरी
+              </p>
 
             </div>
 
 
+
             <!-- KOTA -->
+
             <div
               class="district-item"
-              onclick="showScreen('category-screen')">
+              data-district="कोटा"
+              onclick="loadDistrictNews('कोटा')"
+            >
 
               <img
                 src="https://picsum.photos/150/100?random=105"
                 alt="कोटा"
-                loading="lazy">
+                loading="lazy"
+              >
 
-              <h4>कोटा</h4>
-              <p>शिक्षा नगरी</p>
+              <h4>
+                कोटा
+              </h4>
+
+              <p>
+                शिक्षा नगरी
+              </p>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             LATEST NEWS
+             ================================================= -->
+
+        <div class="section-block mt-20">
+
+
+          <div class="block-header">
+
+
+            <h3>
+
+              <i class="fa-solid fa-newspaper text-red"></i>
+
+              ताज़ा खबरें
+
+            </h3>
+
+
+            <a
+              href="#latest-screen"
+              class="see-more"
+              onclick="showScreen('latest-screen'); return false;"
+            >
+
+              सभी खबरें
+
+              <i class="fa-solid fa-angle-right"></i>
+
+            </a>
+
+
+          </div>
+
+
+          <div
+            class="news-grid-2"
+            id="home-news-grid"
+          >
+
+            <div class="news-card-horizontal">
+
+
+              <img
+                src="https://picsum.photos/200/140?random=106"
+                alt="समाचार"
+              >
+
+
+              <div>
+
+                <span class="tag-red">
+                  राजस्थान
+                </span>
+
+
+                <h4>
+                  राजस्थान की ताज़ा खबरें लोड हो रही हैं...
+                </h4>
+
+
+                <time>
+
+                  <i class="fa-regular fa-clock"></i>
+
+                  अभी
+
+                </time>
+
+
+              </div>
 
             </div>
 
@@ -450,79 +749,1083 @@
         </div>
 
 
-        <!-- ================= SPECIAL NEWS ================= -->
-        <div class="section-block mt-20">
+      </div>
 
-          <div class="block-header">
 
-            <h3>
-              खास खबरें
+
+      <!-- =================================================
+           HOME SIDEBAR
+           ================================================= -->
+
+      <div class="right-sidebar">
+
+
+        <!-- RECENT NEWS -->
+
+        <div class="sidebar-box">
+
+
+          <h3 class="side-title">
+
+
+            <span>
+              राजस्थान ताज़ा खबरें
+            </span>
+
+
+            <a
+              href="#latest-screen"
+              onclick="showScreen('latest-screen'); return false;"
+            >
+              और देखें
+            </a>
+
+
+          </h3>
+
+
+          <ul
+            class="recent-list"
+            id="recent-news-list"
+          >
+
+            <li>
+
+              <p>
+                ताज़ा खबरें लोड हो रही हैं...
+              </p>
+
+              <span class="time-red">
+                अभी
+              </span>
+
+            </li>
+
+          </ul>
+
+
+        </div>
+
+
+
+        <!-- TRENDING -->
+
+        <div class="sidebar-box mt-20">
+
+
+          <h3 class="side-title">
+
+            <span>
+
+              <i class="fa-solid fa-fire text-red"></i>
+
+              ट्रेंडिंग विषय
+
+            </span>
+
+          </h3>
+
+
+          <ol
+            class="trending-list"
+            id="trending-news-list"
+          >
+
+            <li>
+              राजस्थान की ताज़ा खबरें
+            </li>
+
+          </ol>
+
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+    </section>
+      <!-- =====================================================
+       LATEST NEWS SCREEN
+       ===================================================== -->
+  <section id="latest-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+        <div>
+          <span class="heading-small">
+            <i class="fa-solid fa-newspaper"></i>
+            राजस्थान समाचार
+          </span>
+
+          <h1>
+            ताज़ा खबरें
+          </h1>
+
+          <p>
+            पूरे राजस्थान से पल-पल की महत्वपूर्ण खबरें
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+      </div>
+
+      <div class="news-layout">
+
+        <!-- MAIN NEWS AREA -->
+        <main class="news-main">
+
+          <div
+            class="news-grid"
+            id="latest-news-grid"
+          >
+
+            <div class="loading-card">
+              <div class="loading-spinner"></div>
+              <p>ताज़ा खबरें लोड हो रही हैं...</p>
+            </div>
+
+          </div>
+
+          <!-- LOAD MORE -->
+          <div class="load-more-wrapper">
+            <button
+              type="button"
+              id="load-more-news"
+              class="load-more-btn"
+            >
+              <i class="fa-solid fa-rotate"></i>
+              और खबरें देखें
+            </button>
+          </div>
+
+        </main>
+
+        <!-- SIDEBAR -->
+        <aside class="news-sidebar">
+
+          <!-- BREAKING NEWS -->
+          <div class="sidebar-box">
+
+            <h3 class="side-title">
+              <span>
+                <i class="fa-solid fa-bolt text-red"></i>
+                ब्रेकिंग न्यूज़
+              </span>
             </h3>
+
+            <div
+              class="breaking-side-list"
+              id="latest-breaking-list"
+            >
+
+              <div class="side-loading">
+                ब्रेकिंग न्यूज़ लोड हो रही हैं...
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- TRENDING -->
+          <div class="sidebar-box mt-20">
+
+            <h3 class="side-title">
+              <span>
+                <i class="fa-solid fa-fire text-red"></i>
+                ट्रेंडिंग खबरें
+              </span>
+            </h3>
+
+            <ol
+              class="trending-list"
+              id="latest-trending-list"
+            >
+
+              <li>
+                खबरें लोड हो रही हैं...
+              </li>
+
+            </ol>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       CATEGORY / DISTRICT NEWS SCREEN
+       ===================================================== -->
+  <section id="category-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-location-dot"></i>
+            जिला समाचार
+          </span>
+
+          <h1 id="category-page-title">
+            राजस्थान
+          </h1>
+
+          <p id="category-page-description">
+            जिले की ताज़ा और महत्वपूर्ण खबरें
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <!-- DISTRICT FILTER -->
+      <div class="district-filter">
+
+        <button
+          type="button"
+          class="district-filter-btn active"
+          data-district-filter="सभी"
+          onclick="loadDistrictNews('')"
+        >
+          सभी
+        </button>
+
+        <button
+          type="button"
+          class="district-filter-btn"
+          data-district-filter="जयपुर"
+          onclick="loadDistrictNews('जयपुर')"
+        >
+          जयपुर
+        </button>
+
+        <button
+          type="button"
+          class="district-filter-btn"
+          data-district-filter="जोधपुर"
+          onclick="loadDistrictNews('जोधपुर')"
+        >
+          जोधपुर
+        </button>
+
+        <button
+          type="button"
+          class="district-filter-btn"
+          data-district-filter="उदयपुर"
+          onclick="loadDistrictNews('उदयपुर')"
+        >
+          उदयपुर
+        </button>
+
+        <button
+          type="button"
+          class="district-filter-btn"
+          data-district-filter="कोटा"
+          onclick="loadDistrictNews('कोटा')"
+        >
+          कोटा
+        </button>
+
+        <button
+          type="button"
+          class="district-filter-btn"
+          data-district-filter="अजमेर"
+          onclick="loadDistrictNews('अजमेर')"
+        >
+          अजमेर
+        </button>
+
+        <button
+          type="button"
+          class="district-filter-btn"
+          data-district-filter="अलवर"
+          onclick="loadDistrictNews('अलवर')"
+        >
+          अलवर
+        </button>
+
+        <button
+          type="button"
+          class="district-filter-btn"
+          data-district-filter="बीकानेर"
+          onclick="loadDistrictNews('बीकानेर')"
+        >
+          बीकानेर
+        </button>
+
+      </div>
+
+
+      <div class="news-layout">
+
+        <!-- DISTRICT NEWS -->
+        <main class="news-main">
+
+          <div
+            class="news-grid"
+            id="category-news-grid"
+          >
+
+            <div class="loading-card">
+
+              <div class="loading-spinner"></div>
+
+              <p>
+                जिले की खबरें लोड हो रही हैं...
+              </p>
+
+            </div>
+
+          </div>
+
+        </main>
+
+
+        <!-- DISTRICT SIDEBAR -->
+        <aside class="news-sidebar">
+
+          <div class="sidebar-box">
+
+            <h3 class="side-title">
+
+              <span>
+                <i class="fa-solid fa-location-dot text-red"></i>
+                जिले की ताज़ा खबरें
+              </span>
+
+            </h3>
+
+            <ul
+              class="recent-list"
+              id="category-recent-list"
+            >
+
+              <li>
+                <p>खबरें लोड हो रही हैं...</p>
+                <span class="time-red">अभी</span>
+              </li>
+
+            </ul>
 
           </div>
 
 
-          <div class="news-grid-2">
+          <div class="sidebar-box mt-20">
+
+            <h3 class="side-title">
+
+              <span>
+                <i class="fa-solid fa-fire text-red"></i>
+                राजस्थान ट्रेंडिंग
+              </span>
+
+            </h3>
+
+            <ol
+              class="trending-list"
+              id="category-trending-list"
+            >
+
+              <li>
+                राजस्थान की ताज़ा खबरें
+              </li>
+
+            </ol>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+    </div>
+
+  </section>
 
 
-            <!-- NEWS 1 -->
-            <article
-              class="news-card-horizontal"
-              onclick="showScreen('detail-screen')">
+  <!-- =====================================================
+       NEWS DETAIL SCREEN
+       ===================================================== -->
+  <section id="news-detail-screen" class="page-screen">
 
-              <img
-                src="https://picsum.photos/200/140?random=106"
-                alt="राजनीति समाचार"
-                loading="lazy">
+    <div class="container">
 
-              <div>
+      <!-- BACK BUTTON -->
+      <div class="detail-topbar">
 
-                <span class="tag-red">
-                  राजनीति
-                </span>
+        <button
+          type="button"
+          class="back-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+          वापस
+        </button>
 
-                <h4>
-                  राजस्थान में अगले हफ्ते तक विधानसभा सत्र की तैयारियां तेज
-                </h4>
+        <div class="detail-actions">
 
-                <time>
-                  <i class="fa-regular fa-clock"></i>
-                  3 घंटे पहले | जयपुर
-                </time>
+          <button
+            type="button"
+            class="icon-action-btn"
+            id="detail-share-btn"
+            title="शेयर करें"
+          >
+            <i class="fa-solid fa-share-nodes"></i>
+          </button>
 
-              </div>
+          <button
+            type="button"
+            class="icon-action-btn"
+            id="detail-print-btn"
+            title="प्रिंट करें"
+          >
+            <i class="fa-solid fa-print"></i>
+          </button>
 
-            </article>
+        </div>
+
+      </div>
 
 
-            <!-- NEWS 2 -->
-            <article
-              class="news-card-horizontal"
-              onclick="showScreen('detail-screen')">
+      <article
+        class="news-detail"
+        id="news-detail-content"
+      >
 
-              <img
-                src="https://picsum.photos/200/140?random=107"
-                alt="शिक्षा समाचार"
-                loading="lazy">
+        <!-- CATEGORY -->
+        <div class="detail-category">
+          <span id="detail-category">
+            राजस्थान
+          </span>
 
-              <div>
+          <span
+            class="detail-breaking"
+            id="detail-breaking"
+            hidden
+          >
+            <i class="fa-solid fa-bolt"></i>
+            ब्रेकिंग
+          </span>
+        </div>
 
-                <span class="tag-red">
-                  शिक्षा
-                </span>
 
-                <h4>
-                  NEET UG काउंसलिंग की तारीखों का ऐलान, अजमेर बोर्ड तैयार
-                </h4>
+        <!-- TITLE -->
+        <h1 id="detail-title">
+          राजस्थान की ताज़ा खबर
+        </h1>
 
-                <time>
-                  <i class="fa-regular fa-clock"></i>
-                  5 घंटे पहले | अजमेर
-                </time>
 
-              </div>
+        <!-- SUMMARY -->
+        <p
+          class="detail-summary"
+          id="detail-summary"
+        >
+          खबर की जानकारी यहां दिखाई जाएगी।
+        </p>
 
-            </article>
+
+        <!-- META -->
+        <div class="detail-meta">
+
+          <span id="detail-author">
+            <i class="fa-solid fa-user"></i>
+            आवाज राजस्थान
+          </span>
+
+          <span id="detail-date">
+            <i class="fa-regular fa-calendar"></i>
+            आज
+          </span>
+
+          <span id="detail-location">
+            <i class="fa-solid fa-location-dot"></i>
+            राजस्थान
+          </span>
+
+          <span id="detail-views">
+            <i class="fa-solid fa-eye"></i>
+            0 views
+          </span>
+
+        </div>
+
+
+        <!-- FEATURE IMAGE -->
+        <div class="detail-image-wrapper">
+
+          <img
+            id="detail-image"
+            src="https://picsum.photos/1000/550?random=201"
+            alt="समाचार"
+          >
+
+        </div>
+
+
+        <!-- CONTENT -->
+        <div
+          class="detail-body"
+          id="detail-body"
+        >
+
+          <p>
+            समाचार की पूरी जानकारी यहां दिखाई जाएगी।
+          </p>
+
+        </div>
+
+
+        <!-- TAGS -->
+        <div
+          class="detail-tags"
+          id="detail-tags"
+        >
+        </div>
+
+
+        <!-- SHARE -->
+        <div class="detail-share-box">
+
+          <span>
+            यह खबर शेयर करें
+          </span>
+
+          <div class="share-buttons">
+
+            <button
+              type="button"
+              class="share-btn whatsapp"
+              data-share="whatsapp"
+              aria-label="WhatsApp पर शेयर करें"
+            >
+              <i class="fa-brands fa-whatsapp"></i>
+            </button>
+
+            <button
+              type="button"
+              class="share-btn facebook"
+              data-share="facebook"
+              aria-label="Facebook पर शेयर करें"
+            >
+              <i class="fa-brands fa-facebook-f"></i>
+            </button>
+
+            <button
+              type="button"
+              class="share-btn twitter"
+              data-share="twitter"
+              aria-label="X पर शेयर करें"
+            >
+              <i class="fa-brands fa-x-twitter"></i>
+            </button>
+
+            <button
+              type="button"
+              class="share-btn copy-link"
+              data-share="copy"
+              aria-label="लिंक कॉपी करें"
+            >
+              <i class="fa-solid fa-link"></i>
+            </button>
+
+          </div>
+
+        </div>
+
+      </article>
+
+
+      <!-- RELATED NEWS -->
+      <div class="related-news-section">
+
+        <div class="section-heading">
+
+          <h2>
+            <i class="fa-solid fa-newspaper text-red"></i>
+            संबंधित खबरें
+          </h2>
+
+        </div>
+
+        <div
+          class="news-grid-3"
+          id="related-news-grid"
+        >
+
+          <div class="loading-card">
+
+            <div class="loading-spinner"></div>
+
+            <p>
+              संबंधित खबरें लोड हो रही हैं...
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       SEARCH SCREEN
+       ===================================================== -->
+  <section id="search-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            समाचार खोज
+          </span>
+
+          <h1>
+            खोज परिणाम
+          </h1>
+
+          <p id="search-result-text">
+            अपनी पसंद की खबर खोजें
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <!-- SEARCH FORM -->
+      <div class="large-search-box">
+
+        <form
+          id="largeSearchForm"
+          onsubmit="handleSearch(event)"
+        >
+
+          <input
+            type="search"
+            id="largeSearchInput"
+            placeholder="जैसे: जयपुर, शिक्षा, मौसम, भर्ती..."
+            autocomplete="off"
+          >
+
+          <button type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            खोजें
+          </button>
+
+        </form>
+
+      </div>
+
+
+      <!-- SEARCH RESULTS -->
+      <div
+        class="search-results-grid news-grid"
+        id="search-results-grid"
+      >
+
+        <div class="empty-state">
+
+          <div class="empty-icon">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+
+          <h3>
+            खबर खोजें
+          </h3>
+
+          <p>
+            ऊपर दिए गए बॉक्स में अपनी खोज लिखें।
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+    <!-- =====================================================
+       VIDEO SCREEN
+       ===================================================== -->
+  <section id="video-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+          <span class="heading-small">
+            <i class="fa-solid fa-play"></i>
+            वीडियो न्यूज़
+          </span>
+
+          <h1>
+            राजस्थान वीडियो
+          </h1>
+
+          <p>
+            राजस्थान की खबरें वीडियो के रूप में देखें
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <!-- FEATURED VIDEO -->
+      <div class="featured-video-card">
+
+        <div
+          class="video-placeholder"
+          id="featured-video-container"
+        >
+
+          <div class="video-placeholder-icon">
+            <i class="fa-solid fa-play"></i>
+          </div>
+
+          <h2>
+            राजस्थान की ताज़ा वीडियो खबरें
+          </h2>
+
+          <p>
+            वीडियो न्यूज़ जल्द यहां दिखाई जाएंगी।
+          </p>
+
+          <button
+            type="button"
+            class="primary-btn"
+            id="featured-video-btn"
+          >
+            <i class="fa-solid fa-play"></i>
+            वीडियो देखें
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- VIDEO GRID -->
+      <div class="section-heading mt-30">
+
+        <h2>
+          <i class="fa-solid fa-video text-red"></i>
+          लेटेस्ट वीडियो
+        </h2>
+
+      </div>
+
+      <div
+        class="video-grid"
+        id="video-news-grid"
+      >
+
+        <article class="video-card">
+
+          <div class="video-thumb">
+
+            <img
+              src="https://picsum.photos/400/225?random=301"
+              alt="राजस्थान वीडियो खबर"
+              loading="lazy"
+            >
+
+            <span class="video-play">
+              <i class="fa-solid fa-play"></i>
+            </span>
+
+            <span class="video-duration">
+              02:35
+            </span>
+
+          </div>
+
+          <div class="video-card-content">
+
+            <span class="tag-red">
+              राजस्थान
+            </span>
+
+            <h3>
+              राजस्थान की महत्वपूर्ण खबरें
+            </h3>
+
+            <p>
+              ताज़ा घटनाओं और महत्वपूर्ण समाचारों की जानकारी।
+            </p>
+
+            <time>
+              <i class="fa-regular fa-clock"></i>
+              अभी
+            </time>
+
+          </div>
+
+        </article>
+
+
+        <article class="video-card">
+
+          <div class="video-thumb">
+
+            <img
+              src="https://picsum.photos/400/225?random=302"
+              alt="जयपुर वीडियो खबर"
+              loading="lazy"
+            >
+
+            <span class="video-play">
+              <i class="fa-solid fa-play"></i>
+            </span>
+
+            <span class="video-duration">
+              03:20
+            </span>
+
+          </div>
+
+          <div class="video-card-content">
+
+            <span class="tag-red">
+              जयपुर
+            </span>
+
+            <h3>
+              जयपुर की बड़ी खबरें
+            </h3>
+
+            <p>
+              राजधानी जयपुर से जुड़ी महत्वपूर्ण खबरें।
+            </p>
+
+            <time>
+              <i class="fa-regular fa-clock"></i>
+              आज
+            </time>
+
+          </div>
+
+        </article>
+
+
+        <article class="video-card">
+
+          <div class="video-thumb">
+
+            <img
+              src="https://picsum.photos/400/225?random=303"
+              alt="जोधपुर वीडियो खबर"
+              loading="lazy"
+            >
+
+            <span class="video-play">
+              <i class="fa-solid fa-play"></i>
+            </span>
+
+            <span class="video-duration">
+              01:48
+            </span>
+
+          </div>
+
+          <div class="video-card-content">
+
+            <span class="tag-red">
+              जोधपुर
+            </span>
+
+            <h3>
+              जोधपुर से बड़ी खबर
+            </h3>
+
+            <p>
+              सूर्य नगरी से जुड़ी ताज़ा खबरें।
+            </p>
+
+            <time>
+              <i class="fa-regular fa-clock"></i>
+              आज
+            </time>
+
+          </div>
+
+        </article>
+
+
+        <article class="video-card">
+
+          <div class="video-thumb">
+
+            <img
+              src="https://picsum.photos/400/225?random=304"
+              alt="उदयपुर वीडियो खबर"
+              loading="lazy"
+            >
+
+            <span class="video-play">
+              <i class="fa-solid fa-play"></i>
+            </span>
+
+            <span class="video-duration">
+              04:10
+            </span>
+
+          </div>
+
+          <div class="video-card-content">
+
+            <span class="tag-red">
+              उदयपुर
+            </span>
+
+            <h3>
+              उदयपुर की ताज़ा खबरें
+            </h3>
+
+            <p>
+              झीलों की नगरी से महत्वपूर्ण समाचार।
+            </p>
+
+            <time>
+              <i class="fa-regular fa-clock"></i>
+              आज
+            </time>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       LIVE TV SCREEN
+       ===================================================== -->
+  <section id="live-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small live-heading">
+            <span class="live-dot"></span>
+            LIVE
+          </span>
+
+          <h1>
+            आवाज राजस्थान लाइव टीवी
+          </h1>
+
+          <p>
+            राजस्थान की खबरें लाइव देखें
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <!-- LIVE PLAYER -->
+      <div class="live-tv-wrapper">
+
+        <div
+          class="live-player"
+          id="live-tv-player"
+        >
+
+          <div class="live-screen-placeholder">
+
+            <div class="live-tv-icon">
+              <span class="live-dot"></span>
+              <i class="fa-solid fa-tv"></i>
+            </div>
+
+            <h2>
+              लाइव टीवी
+            </h2>
+
+            <p id="live-tv-status">
+              लाइव स्ट्रीम लोड हो रही है...
+            </p>
+
+            <button
+              type="button"
+              class="primary-btn"
+              id="start-live-tv"
+            >
+              <i class="fa-solid fa-play"></i>
+              लाइव देखें
+            </button>
 
           </div>
 
@@ -531,240 +1834,785 @@
       </div>
 
 
-      <!-- ================= RIGHT SIDEBAR ================= -->
-      <aside class="right-sidebar">
+      <!-- LIVE INFORMATION -->
+      <div class="live-info-grid">
 
+        <div class="info-card">
 
-        <!-- RECENT NEWS -->
-        <div class="sidebar-box">
+          <div class="info-card-icon">
+            <i class="fa-solid fa-tower-broadcast"></i>
+          </div>
 
-          <h3 class="side-title">
+          <div>
 
-            राजस्थान ताज़ा खबरें
+            <h3>
+              लाइव प्रसारण
+            </h3>
 
-            <a
-              href="#category-screen"
-              onclick="showScreen('category-screen'); return false;">
-              और देखें
-            </a>
+            <p>
+              राजस्थान की प्रमुख खबरों का लाइव अपडेट।
+            </p>
 
-          </h3>
-
-
-          <ul class="recent-list">
-
-
-            <li onclick="showScreen('detail-screen')">
-
-              <p>
-                जयपुर: बिजली गिरने से 2 लोगों की मौत, 3 घायल
-              </p>
-
-              <span class="time-red">
-                15 मिनट पहले
-              </span>
-
-            </li>
-
-
-            <li onclick="showScreen('detail-screen')">
-
-              <p>
-                जोधपुर में नहर का पानी ओवरफ्लो हुआ
-              </p>
-
-              <span class="time-red">
-                45 मिनट पहले
-              </span>
-
-            </li>
-
-
-            <li onclick="showScreen('detail-screen')">
-
-              <p>
-                उदयपुर में पर्यटन सीजन को लेकर तैयारियां तेज
-              </p>
-
-              <span class="time-red">
-                1 घंटे पहले
-              </span>
-
-            </li>
-
-
-            <li onclick="showScreen('detail-screen')">
-
-              <p>
-                कोटा कोचिंग छात्र ने किया टॉप, AIR 45 हासिल की
-              </p>
-
-              <span class="time-red">
-                2 घंटे पहले
-              </span>
-
-            </li>
-
-
-          </ul>
+          </div>
 
         </div>
 
 
-        <!-- TRENDING -->
-        <div class="sidebar-box mt-20">
+        <div class="info-card">
 
-          <h3 class="side-title">
+          <div class="info-card-icon">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
 
-            <i class="fa-solid fa-fire text-red"></i>
-            ट्रेंडिंग विषय
+          <div>
 
-          </h3>
+            <h3>
+              ब्रेकिंग न्यूज़
+            </h3>
 
+            <p>
+              महत्वपूर्ण खबरों की जानकारी सबसे पहले।
+            </p>
 
-          <ol class="trending-list">
-
-            <li onclick="showScreen('detail-screen')">
-              राजस्थान में मानसून अलर्ट
-            </li>
-
-            <li onclick="showScreen('detail-screen')">
-              जयपुर जलभराव अपडेट
-            </li>
-
-            <li onclick="showScreen('detail-screen')">
-              पुष्कर मेला 2026 तैयारियां
-            </li>
-
-          </ol>
+          </div>
 
         </div>
 
-      </aside>
+
+        <div class="info-card">
+
+          <div class="info-card-icon">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+
+          <div>
+
+            <h3>
+              पूरा राजस्थान
+            </h3>
+
+            <p>
+              राजस्थान के अलग-अलग जिलों से समाचार।
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- LIVE BLOG LINK -->
+      <div class="live-blog-card">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-pen-to-square"></i>
+            लाइव अपडेट
+          </span>
+
+          <h2>
+            लाइव ब्लॉग पढ़ें
+          </h2>
+
+          <p>
+            घटनाओं से जुड़े लगातार अपडेट यहां देखें।
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn"
+          onclick="showScreen('live-blog-screen')"
+        >
+          लाइव ब्लॉग
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+      </div>
 
     </div>
 
   </section>
 
 
-  <!-- =========================================================
-       02. NEWS DETAIL SCREEN
-       ========================================================= -->
-  <section
-    id="detail-screen"
-    class="page-screen">
+  <!-- =====================================================
+       LIVE BLOG SCREEN
+       ===================================================== -->
+  <section id="live-blog-screen" class="page-screen">
 
-    <div class="container main-layout">
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-pen-to-square"></i>
+            LIVE BLOG
+          </span>
+
+          <h1>
+            राजस्थान लाइव अपडेट
+          </h1>
+
+          <p>
+            घटनाओं से जुड़े लगातार अपडेट
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
 
 
-      <div class="left-content">
+      <div
+        class="live-blog-container"
+        id="live-blog-list"
+      >
 
-        <article class="article-wrapper">
+        <div class="live-blog-empty">
+
+          <div class="empty-icon">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </div>
+
+          <h3>
+            लाइव अपडेट जल्द शुरू होंगे
+          </h3>
+
+          <p>
+            इस सेक्शन में महत्वपूर्ण घटनाओं के लगातार अपडेट दिखाई देंगे।
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
 
 
-          <!-- BREADCRUMB -->
-          <div class="breadcrumb">
+  <!-- =====================================================
+       E-PAPER SCREEN
+       ===================================================== -->
+  <section id="epaper-screen" class="page-screen">
 
-            <a
-              href="#home-screen"
-              onclick="showScreen('home-screen'); return false;">
-              होम
-            </a>
+    <div class="container">
 
-            &gt;
+      <div class="page-heading">
 
-            <a
-              href="#category-screen"
-              onclick="showScreen('category-screen'); return false;">
-              जयपुर
-            </a>
+        <div>
 
-            &gt;
+          <span class="heading-small">
+            <i class="fa-solid fa-newspaper"></i>
+            डिजिटल अखबार
+          </span>
 
-            <span>
-              मुख्य खबर
+          <h1>
+            आज का ई-पेपर
+          </h1>
+
+          <p>
+            आवाज राजस्थान का डिजिटल संस्करण पढ़ें
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <!-- EPAPER CARD -->
+      <div class="epaper-container">
+
+        <div class="epaper-cover">
+
+          <div class="epaper-logo">
+            आवाज<br>
+            <span>राजस्थान</span>
+          </div>
+
+          <div class="epaper-date">
+            <i class="fa-regular fa-calendar-days"></i>
+            <span id="epaper-date">
+              आज का संस्करण
             </span>
+          </div>
+
+          <div class="epaper-cover-title">
+            आज की प्रमुख खबरें
+          </div>
+
+          <div class="epaper-cover-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+        </div>
+
+
+        <div class="epaper-info">
+
+          <span class="heading-small">
+            <i class="fa-solid fa-book-open"></i>
+            ई-पेपर
+          </span>
+
+          <h2>
+            आज का डिजिटल संस्करण पढ़ें
+          </h2>
+
+          <p>
+            राजस्थान की प्रमुख खबरों का डिजिटल संस्करण एक ही जगह पढ़ें।
+          </p>
+
+          <div class="epaper-actions">
+
+            <button
+              type="button"
+              class="primary-btn"
+              id="open-epaper-btn"
+            >
+              <i class="fa-solid fa-book-open"></i>
+              ई-पेपर खोलें
+            </button>
+
+            <button
+              type="button"
+              class="secondary-btn"
+              id="download-epaper-btn"
+            >
+              <i class="fa-solid fa-download"></i>
+              डाउनलोड
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- EPAPER NOTICE -->
+      <div class="notice-box">
+
+        <i class="fa-solid fa-circle-info"></i>
+
+        <p>
+          ई-पेपर का लिंक उपलब्ध होने पर यह सेक्शन अपने आप अपडेट किया जा सकता है।
+        </p>
+
+      </div>
+
+    </div>
+
+                </section>
+                  <!-- =====================================================
+       CONTACT SCREEN
+       ===================================================== -->
+  <section id="contact-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-envelope"></i>
+            संपर्क
+          </span>
+
+          <h1>
+            हमसे संपर्क करें
+          </h1>
+
+          <p>
+            आपकी राय, सुझाव और सवाल हमारे लिए महत्वपूर्ण हैं।
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <div class="contact-layout">
+
+        <!-- CONTACT INFORMATION -->
+        <div class="contact-info">
+
+          <div class="contact-info-header">
+
+            <span class="heading-small">
+              <i class="fa-solid fa-headset"></i>
+              आवाज राजस्थान
+            </span>
+
+            <h2>
+              हम आपकी आवाज सुनना चाहते हैं
+            </h2>
+
+            <p>
+              खबर से जुड़ी जानकारी, सुझाव, शिकायत या किसी अन्य विषय के लिए
+              हमें संदेश भेजें।
+            </p>
 
           </div>
 
 
-          <!-- ARTICLE TITLE -->
-          <h1 class="article-main-title">
+          <div class="contact-info-list">
 
-            जयपुर: बीती रात से हो रही झमाझम बारिश,
-            शहर के निचले इलाकों में भरा पानी
+            <div class="contact-info-item">
 
-          </h1>
+              <div class="contact-icon">
+                <i class="fa-solid fa-envelope"></i>
+              </div>
 
+              <div>
+                <h4>
+                  ई-मेल
+                </h4>
 
-          <!-- ARTICLE META -->
-          <div class="article-meta-bar">
-
-            <div class="author-info">
-
-              <i class="fa-solid fa-user-pen text-red"></i>
-
-              <span>
-                आवाज राजस्थान ब्यूरो
-              </span>
-
-              <span class="meta-dot">
-                •
-              </span>
-
-              <span>
-                <i class="fa-regular fa-clock"></i>
-                1 सितंबर 2026 | 11:30 AM
-              </span>
+                <p>
+                  info@aawazrajasthan.com
+                </p>
+              </div>
 
             </div>
 
 
-            <!-- SHARE -->
-            <div class="social-share-box">
+            <div class="contact-info-item">
 
-              <span>
-                शेयर करें:
-              </span>
+              <div class="contact-icon">
+                <i class="fa-solid fa-phone"></i>
+              </div>
+
+              <div>
+                <h4>
+                  संपर्क नंबर
+                </h4>
+
+                <p>
+                  +91 XXXXX XXXXX
+                </p>
+              </div>
+
+            </div>
+
+
+            <div class="contact-info-item">
+
+              <div class="contact-icon">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+
+              <div>
+                <h4>
+                  स्थान
+                </h4>
+
+                <p>
+                  राजस्थान, भारत
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- SOCIAL LINKS -->
+          <div class="contact-social">
+
+            <h4>
+              सोशल मीडिया
+            </h4>
+
+            <div class="social-icons">
 
               <a
                 href="#"
-                class="share-icon wa"
-                title="WhatsApp Share"
-                onclick="shareNews('whatsapp'); return false;">
-
-                <i class="fa-brands fa-whatsapp"></i>
-
-              </a>
-
-              <a
-                href="#"
-                class="share-icon fb"
-                title="Facebook Share"
-                onclick="shareNews('facebook'); return false;">
-
+                aria-label="Facebook"
+                data-social="facebook"
+              >
                 <i class="fa-brands fa-facebook-f"></i>
-
               </a>
 
               <a
                 href="#"
-                class="share-icon tw"
-                title="X Share"
-                onclick="shareNews('twitter'); return false;">
-
-                <i class="fa-brands fa-x-twitter"></i>
-
+                aria-label="Instagram"
+                data-social="instagram"
+              >
+                <i class="fa-brands fa-instagram"></i>
               </a>
+
+              <a
+                href="#"
+                aria-label="YouTube"
+                data-social="youtube"
+              >
+                <i class="fa-brands fa-youtube"></i>
+              </a>
+
+              <a
+                href="#"
+                aria-label="X"
+                data-social="twitter"
+              >
+                <i class="fa-brands fa-x-twitter"></i>
+              </a>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- CONTACT FORM -->
+        <div class="contact-form-box">
+
+          <div class="form-header">
+
+            <h2>
+              संदेश भेजें
+            </h2>
+
+            <p>
+              नीचे दी गई जानकारी भरकर हमें संदेश भेजें।
+            </p>
+
+          </div>
+
+
+          <form
+            id="contactForm"
+            class="contact-form"
+          >
+
+            <!-- NAME -->
+            <div class="form-group">
+
+              <label for="contact-name">
+                नाम
+                <span>*</span>
+              </label>
+
+              <div class="input-with-icon">
+
+                <i class="fa-solid fa-user"></i>
+
+                <input
+                  type="text"
+                  id="contact-name"
+                  name="name"
+                  placeholder="अपना नाम लिखें"
+                  autocomplete="name"
+                  required
+                >
+
+              </div>
+
+            </div>
+
+
+            <!-- EMAIL -->
+            <div class="form-group">
+
+              <label for="contact-email">
+                ई-मेल
+                <span>*</span>
+              </label>
+
+              <div class="input-with-icon">
+
+                <i class="fa-solid fa-envelope"></i>
+
+                <input
+                  type="email"
+                  id="contact-email"
+                  name="email"
+                  placeholder="अपना ई-मेल लिखें"
+                  autocomplete="email"
+                  required
+                >
+
+              </div>
+
+            </div>
+
+
+            <!-- MOBILE -->
+            <div class="form-group">
+
+              <label for="contact-mobile">
+                मोबाइल नंबर
+              </label>
+
+              <div class="input-with-icon">
+
+                <i class="fa-solid fa-phone"></i>
+
+                <input
+                  type="tel"
+                  id="contact-mobile"
+                  name="mobile"
+                  placeholder="10 अंकों का मोबाइल नंबर"
+                  autocomplete="tel"
+                  maxlength="10"
+                >
+
+              </div>
+
+            </div>
+
+
+            <!-- SUBJECT -->
+            <div class="form-group">
+
+              <label for="contact-subject">
+                विषय
+                <span>*</span>
+              </label>
+
+              <div class="input-with-icon">
+
+                <i class="fa-solid fa-tag"></i>
+
+                <select
+                  id="contact-subject"
+                  name="subject"
+                  required
+                >
+
+                  <option value="">
+                    विषय चुनें
+                  </option>
+
+                  <option value="समाचार संबंधी सुझाव">
+                    समाचार संबंधी सुझाव
+                  </option>
+
+                  <option value="गलत जानकारी">
+                    गलत जानकारी की सूचना
+                  </option>
+
+                  <option value="विज्ञापन">
+                    विज्ञापन
+                  </option>
+
+                  <option value="शिकायत">
+                    शिकायत
+                  </option>
+
+                  <option value="अन्य">
+                    अन्य
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+
+            <!-- MESSAGE -->
+            <div class="form-group">
+
+              <label for="contact-message">
+                संदेश
+                <span>*</span>
+              </label>
+
+              <div class="input-with-icon textarea-wrapper">
+
+                <i class="fa-solid fa-message"></i>
+
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows="6"
+                  placeholder="अपना संदेश लिखें..."
+                  required
+                ></textarea>
+
+              </div>
+
+            </div>
+
+
+            <!-- SUBMIT -->
+            <button
+              type="submit"
+              class="primary-btn contact-submit-btn"
+              id="contact-submit-btn"
+            >
+              <i class="fa-solid fa-paper-plane"></i>
+              संदेश भेजें
+            </button>
+
+          </form>
+
+
+          <!-- CONTACT SUCCESS -->
+          <div
+            id="contact-success"
+            class="form-success"
+            hidden
+          >
+
+            <div class="success-icon">
+              <i class="fa-solid fa-check"></i>
+            </div>
+
+            <h3>
+              संदेश सफलतापूर्वक भेज दिया गया
+            </h3>
+
+            <p>
+              आपका संदेश हमें प्राप्त हो गया है। धन्यवाद।
+            </p>
+
+            <button
+              type="button"
+              class="secondary-btn"
+              onclick="document.getElementById('contactForm').reset(); document.getElementById('contact-success').hidden = true; document.getElementById('contactForm').hidden = false;"
+            >
+              नया संदेश भेजें
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       LOGIN SCREEN
+       ===================================================== -->
+  <section id="login-screen" class="page-screen">
+
+    <div class="container auth-container">
+
+      <div class="auth-card">
+
+        <!-- AUTH HEADER -->
+        <div class="auth-header">
+
+          <div class="auth-logo">
+            <span>
+              आवाज
+            </span>
+            <span>
+              राजस्थान
+            </span>
+          </div>
+
+          <h1>
+            लॉगिन करें
+          </h1>
+
+          <p>
+            अपने अकाउंट में लॉगिन करके आगे बढ़ें।
+          </p>
+
+        </div>
+
+
+        <!-- LOGIN FORM -->
+        <form
+          id="loginForm"
+          class="auth-form"
+        >
+
+          <!-- EMAIL -->
+          <div class="form-group">
+
+            <label for="login-email">
+              ई-मेल
+            </label>
+
+            <div class="input-with-icon">
+
+              <i class="fa-solid fa-envelope"></i>
+
+              <input
+                type="email"
+                id="login-email"
+                name="email"
+                placeholder="ई-मेल दर्ज करें"
+                autocomplete="email"
+                required
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- PASSWORD -->
+          <div class="form-group">
+
+            <label for="login-password">
+              पासवर्ड
+            </label>
+
+            <div class="input-with-icon password-input">
+
+              <i class="fa-solid fa-lock"></i>
+
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                placeholder="पासवर्ड दर्ज करें"
+                autocomplete="current-password"
+                required
+              >
 
               <button
                 type="button"
-                class="share-icon copy-link"
-                title="लिंक कॉपी करें"
-                onclick="copyCurrentLink()">
-
-                <i class="fa-solid fa-link"></i>
-
+                class="password-toggle"
+                id="login-password-toggle"
+                aria-label="पासवर्ड दिखाएं"
+              >
+                <i class="fa-solid fa-eye"></i>
               </button>
 
             </div>
@@ -772,170 +2620,2221 @@
           </div>
 
 
-          <!-- ARTICLE IMAGE -->
-          <img
-            class="article-main-image"
-            src="https://picsum.photos/900/500?random=201"
-            alt="जयपुर में भारी बारिश"
-            loading="lazy">
+          <!-- REMEMBER -->
+          <div class="auth-options">
 
+            <label class="checkbox-label">
 
-          <!-- ARTICLE CONTENT -->
-          <div class="article-content">
+              <input
+                type="checkbox"
+                id="remember-login"
+                name="remember"
+              >
 
-            <p class="article-lead">
+              <span>
+                मुझे याद रखें
+              </span>
 
-              जयपुर में बीती रात से लगातार हो रही बारिश ने
-              शहर के कई इलाकों में जनजीवन प्रभावित किया है।
-              निचले इलाकों में पानी भरने से लोगों को परेशानी का
-              सामना करना पड़ रहा है।
+            </label>
 
-            </p>
-
-
-            <p>
-
-              मौसम विभाग के अनुसार राजस्थान के कई जिलों में
-              अगले 48 घंटे के दौरान बारिश की गतिविधियां जारी
-              रहने की संभावना है। प्रशासन ने जलभराव वाले
-              क्षेत्रों में निगरानी बढ़ा दी है।
-
-            </p>
-
-
-            <h3>
-              निचले इलाकों में विशेष निगरानी
-            </h3>
-
-            <p>
-
-              नगर निगम की टीमों को जलभराव वाले क्षेत्रों में
-              तैनात किया गया है। पंप सेट की सहायता से पानी
-              निकालने का काम किया जा रहा है।
-
-            </p>
-
-
-            <blockquote>
-
-              प्रशासन ने लोगों से अपील की है कि वे अनावश्यक
-              रूप से जलभराव वाले क्षेत्रों में जाने से बचें।
-
-            </blockquote>
-
-
-            <p>
-
-              अधिकारियों के अनुसार स्थिति पर लगातार नजर रखी
-              जा रही है और आवश्यकता पड़ने पर राहत एवं बचाव
-              दलों को सक्रिय किया जाएगा।
-
-            </p>
+            <button
+              type="button"
+              class="text-btn"
+              id="forgot-password-btn"
+            >
+              पासवर्ड भूल गए?
+            </button>
 
           </div>
 
 
-          <!-- ARTICLE TAGS -->
-          <div class="article-tags">
+          <!-- LOGIN BUTTON -->
+          <button
+            type="submit"
+            class="primary-btn auth-submit-btn"
+            id="login-submit-btn"
+          >
+            <i class="fa-solid fa-right-to-bracket"></i>
+            लॉगिन करें
+          </button>
 
+        </form>
+
+
+        <!-- AUTH MESSAGE -->
+        <div
+          id="login-message"
+          class="auth-message"
+          hidden
+        ></div>
+
+
+        <!-- REGISTER LINK -->
+        <div class="auth-footer">
+
+          <p>
+            अभी अकाउंट नहीं है?
+            <button
+              type="button"
+              class="text-btn"
+              id="show-register-btn"
+            >
+              रजिस्टर करें
+            </button>
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       REGISTER SCREEN
+       ===================================================== -->
+  <section id="register-screen" class="page-screen">
+
+    <div class="container auth-container">
+
+      <div class="auth-card">
+
+        <div class="auth-header">
+
+          <div class="auth-logo">
             <span>
-              #जयपुर
+              आवाज
             </span>
-
             <span>
-              #बारिश
+              राजस्थान
             </span>
-
-            <span>
-              #मानसून
-            </span>
-
-            <span>
-              #राजस्थान
-            </span>
-
           </div>
 
+          <h1>
+            नया अकाउंट बनाएं
+          </h1>
 
-          <!-- RELATED NEWS -->
-          <div class="related-news mt-20">
+          <p>
+            आवाज राजस्थान से जुड़ने के लिए रजिस्टर करें।
+          </p>
 
-            <div class="block-header">
+        </div>
 
-              <h3>
-                संबंधित खबरें
-              </h3>
+
+        <!-- REGISTER FORM -->
+        <form
+          id="registerForm"
+          class="auth-form"
+        >
+
+          <!-- NAME -->
+          <div class="form-group">
+
+            <label for="register-name">
+              नाम
+            </label>
+
+            <div class="input-with-icon">
+
+              <i class="fa-solid fa-user"></i>
+
+              <input
+                type="text"
+                id="register-name"
+                name="name"
+                placeholder="अपना नाम दर्ज करें"
+                autocomplete="name"
+                required
+              >
 
             </div>
 
+          </div>
 
-            <div class="news-grid-2">
 
-              <article
-                class="news-card-horizontal"
-                onclick="showScreen('detail-screen')">
+          <!-- EMAIL -->
+          <div class="form-group">
 
-                <img
-                  src="https://picsum.photos/200/140?random=202"
-                  alt="संबंधित समाचार"
-                  loading="lazy">
+            <label for="register-email">
+              ई-मेल
+            </label>
 
-                <div>
+            <div class="input-with-icon">
 
-                  <span class="tag-red">
-                    राजस्थान
-                  </span>
+              <i class="fa-solid fa-envelope"></i>
 
-                  <h4>
-                    राजस्थान के कई जिलों में बारिश का अलर्ट
-                  </h4>
-
-                  <time>
-                    <i class="fa-regular fa-clock"></i>
-                    1 घंटे पहले
-                  </time>
-
-                </div>
-
-              </article>
+              <input
+                type="email"
+                id="register-email"
+                name="email"
+                placeholder="अपना ई-मेल दर्ज करें"
+                autocomplete="email"
+                required
+              >
 
             </div>
 
           </div>
 
-        </article>
+
+          <!-- MOBILE -->
+          <div class="form-group">
+
+            <label for="register-mobile">
+              मोबाइल नंबर
+            </label>
+
+            <div class="input-with-icon">
+
+              <i class="fa-solid fa-phone"></i>
+
+              <input
+                type="tel"
+                id="register-mobile"
+                name="phone"
+                placeholder="मोबाइल नंबर"
+                autocomplete="tel"
+                maxlength="10"
+              >
+
+            </div>
+
+          </div>
+
+
+          <!-- PASSWORD -->
+          <div class="form-group">
+
+            <label for="register-password">
+              पासवर्ड
+            </label>
+
+            <div class="input-with-icon password-input">
+
+              <i class="fa-solid fa-lock"></i>
+
+              <input
+                type="password"
+                id="register-password"
+                name="password"
+                placeholder="कम से कम 6 अक्षर"
+                autocomplete="new-password"
+                minlength="6"
+                required
+              >
+
+              <button
+                type="button"
+                class="password-toggle"
+                id="register-password-toggle"
+                aria-label="पासवर्ड दिखाएं"
+              >
+                <i class="fa-solid fa-eye"></i>
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- CONFIRM PASSWORD -->
+          <div class="form-group">
+
+            <label for="register-confirm-password">
+              पासवर्ड दोबारा दर्ज करें
+            </label>
+
+            <div class="input-with-icon password-input">
+
+              <i class="fa-solid fa-lock"></i>
+
+              <input
+                type="password"
+                id="register-confirm-password"
+                name="confirmPassword"
+                placeholder="पासवर्ड दोबारा दर्ज करें"
+                autocomplete="new-password"
+                minlength="6"
+                required
+              >
+
+              <button
+                type="button"
+                class="password-toggle"
+                id="register-confirm-password-toggle"
+                aria-label="पासवर्ड दिखाएं"
+              >
+                <i class="fa-solid fa-eye"></i>
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- TERMS -->
+          <label class="checkbox-label terms-checkbox">
+
+            <input
+              type="checkbox"
+              id="register-terms"
+              name="terms"
+              required
+            >
+
+            <span>
+              मैं वेबसाइट की शर्तों और गोपनीयता नीति से सहमत हूं।
+            </span>
+
+          </label>
+
+
+          <!-- REGISTER BUTTON -->
+          <button
+            type="submit"
+            class="primary-btn auth-submit-btn"
+            id="register-submit-btn"
+          >
+            <i class="fa-solid fa-user-plus"></i>
+            अकाउंट बनाएं
+          </button>
+
+        </form>
+
+
+        <!-- REGISTER MESSAGE -->
+        <div
+          id="register-message"
+          class="auth-message"
+          hidden
+        ></div>
+
+
+        <!-- LOGIN LINK -->
+        <div class="auth-footer">
+
+          <p>
+            पहले से अकाउंट है?
+            <button
+              type="button"
+              class="text-btn"
+              id="show-login-btn"
+            >
+              लॉगिन करें
+            </button>
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+    <!-- =====================================================
+       PROFILE SCREEN
+       ===================================================== -->
+  <section id="profile-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-user"></i>
+            मेरा अकाउंट
+          </span>
+
+          <h1>
+            प्रोफाइल
+          </h1>
+
+          <p>
+            अपनी प्रोफाइल और अकाउंट की जानकारी देखें।
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
 
       </div>
 
 
-      <aside class="right-sidebar">
+      <div class="profile-layout">
 
-        <div class="sidebar-box">
+        <!-- PROFILE CARD -->
+        <div class="profile-card">
 
-          <h3 class="side-title">
-            राजस्थान ताज़ा खबरें
+          <div class="profile-avatar-wrapper">
+
+            <div
+              class="profile-avatar"
+              id="profile-avatar"
+            >
+              <i class="fa-solid fa-user"></i>
+            </div>
+
+            <button
+              type="button"
+              class="avatar-edit-btn"
+              id="avatar-edit-btn"
+              aria-label="प्रोफाइल फोटो बदलें"
+            >
+              <i class="fa-solid fa-camera"></i>
+            </button>
+
+          </div>
+
+
+          <h2 id="profile-name">
+            यूज़र
+          </h2>
+
+          <p id="profile-email">
+            ई-मेल
+          </p>
+
+          <span
+            class="profile-role"
+            id="profile-role"
+          >
+            यूज़र
+          </span>
+
+
+          <div class="profile-actions">
+
+            <button
+              type="button"
+              class="primary-btn"
+              id="edit-profile-btn"
+            >
+              <i class="fa-solid fa-pen"></i>
+              प्रोफाइल एडिट करें
+            </button>
+
+            <button
+              type="button"
+              class="logout-btn"
+              id="logout-btn"
+            >
+              <i class="fa-solid fa-right-from-bracket"></i>
+              लॉगआउट
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- PROFILE INFORMATION -->
+        <div class="profile-details">
+
+          <div class="content-card">
+
+            <div class="content-card-header">
+
+              <div>
+
+                <span class="heading-small">
+                  <i class="fa-solid fa-circle-info"></i>
+                  अकाउंट जानकारी
+                </span>
+
+                <h2>
+                  व्यक्तिगत जानकारी
+                </h2>
+
+              </div>
+
+            </div>
+
+
+            <div class="profile-info-grid">
+
+              <div class="profile-info-item">
+
+                <span>
+                  <i class="fa-solid fa-user"></i>
+                  नाम
+                </span>
+
+                <strong id="profile-info-name">
+                  -
+                </strong>
+
+              </div>
+
+
+              <div class="profile-info-item">
+
+                <span>
+                  <i class="fa-solid fa-envelope"></i>
+                  ई-मेल
+                </span>
+
+                <strong id="profile-info-email">
+                  -
+                </strong>
+
+              </div>
+
+
+              <div class="profile-info-item">
+
+                <span>
+                  <i class="fa-solid fa-phone"></i>
+                  मोबाइल
+                </span>
+
+                <strong id="profile-info-phone">
+                  -
+                </strong>
+
+              </div>
+
+
+              <div class="profile-info-item">
+
+                <span>
+                  <i class="fa-solid fa-user-shield"></i>
+                  भूमिका
+                </span>
+
+                <strong id="profile-info-role">
+                  -
+                </strong>
+
+              </div>
+
+
+              <div class="profile-info-item">
+
+                <span>
+                  <i class="fa-regular fa-calendar"></i>
+                  अकाउंट बनाया गया
+                </span>
+
+                <strong id="profile-info-created">
+                  -
+                </strong>
+
+              </div>
+
+
+              <div class="profile-info-item">
+
+                <span>
+                  <i class="fa-solid fa-clock"></i>
+                  अंतिम लॉगिन
+                </span>
+
+                <strong id="profile-info-login">
+                  -
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ACCOUNT SETTINGS -->
+          <div class="content-card mt-20">
+
+            <div class="content-card-header">
+
+              <div>
+
+                <span class="heading-small">
+                  <i class="fa-solid fa-gear"></i>
+                  सेटिंग्स
+                </span>
+
+                <h2>
+                  अकाउंट सेटिंग्स
+                </h2>
+
+              </div>
+
+            </div>
+
+
+            <div class="settings-list">
+
+              <button
+                type="button"
+                class="settings-item"
+                id="change-password-btn"
+              >
+
+                <span class="settings-icon">
+                  <i class="fa-solid fa-key"></i>
+                </span>
+
+                <span class="settings-text">
+
+                  <strong>
+                    पासवर्ड बदलें
+                  </strong>
+
+                  <small>
+                    अपने अकाउंट का पासवर्ड अपडेट करें
+                  </small>
+
+                </span>
+
+                <i class="fa-solid fa-angle-right"></i>
+
+              </button>
+
+
+              <button
+                type="button"
+                class="settings-item"
+                id="notification-settings-btn"
+              >
+
+                <span class="settings-icon">
+                  <i class="fa-solid fa-bell"></i>
+                </span>
+
+                <span class="settings-text">
+
+                  <strong>
+                    नोटिफिकेशन
+                  </strong>
+
+                  <small>
+                    खबरों से जुड़े अपडेट प्राप्त करें
+                  </small>
+
+                </span>
+
+                <i class="fa-solid fa-angle-right"></i>
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       ABOUT SCREEN
+       ===================================================== -->
+  <section id="about-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-circle-info"></i>
+            हमारे बारे में
+          </span>
+
+          <h1>
+            आवाज राजस्थान
+          </h1>
+
+          <p>
+            आपकी आवाज, आपका राजस्थान
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <div class="about-content">
+
+        <div class="about-hero">
+
+          <div class="about-logo">
+            <span>
+              आवाज
+            </span>
+            <span>
+              राजस्थान
+            </span>
+          </div>
+
+          <div>
+
+            <span class="heading-small">
+              राजस्थान की अपनी न्यूज़ वेबसाइट
+            </span>
+
+            <h2>
+              पूरे राजस्थान की खबर,
+              एक जगह
+            </h2>
+
+            <p>
+              आवाज राजस्थान का उद्देश्य राजस्थान के अलग-अलग जिलों से
+              महत्वपूर्ण, ताज़ा और उपयोगी समाचार पाठकों तक पहुंचाना है।
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="about-grid">
+
+          <div class="about-card">
+
+            <div class="about-card-icon">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+
+            <h3>
+              जिला फोकस
+            </h3>
+
+            <p>
+              राजस्थान के जिलों से जुड़ी खबरों को प्रमुखता के साथ
+              प्रस्तुत किया जाता है।
+            </p>
+
+          </div>
+
+
+          <div class="about-card">
+
+            <div class="about-card-icon">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+
+            <h3>
+              ताज़ा अपडेट
+            </h3>
+
+            <p>
+              महत्वपूर्ण घटनाओं और समाचारों के नए अपडेट समय पर
+              उपलब्ध कराने का प्रयास।
+            </p>
+
+          </div>
+
+
+          <div class="about-card">
+
+            <div class="about-card-icon">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <h3>
+              विश्वसनीयता
+            </h3>
+
+            <p>
+              समाचारों को जिम्मेदारी और स्पष्टता के साथ प्रस्तुत करने
+              पर हमारा फोकस है।
+            </p>
+
+          </div>
+
+
+          <div class="about-card">
+
+            <div class="about-card-icon">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+            </div>
+
+            <h3>
+              मोबाइल फ्रेंडली
+            </h3>
+
+            <p>
+              वेबसाइट को मोबाइल, टैबलेट और डेस्कटॉप पर आसानी से
+              इस्तेमाल करने के लिए तैयार किया गया है।
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- MISSION -->
+        <div class="about-section">
+
+          <div class="about-section-icon">
+            <i class="fa-solid fa-bullseye"></i>
+          </div>
+
+          <div>
+
+            <h2>
+              हमारा उद्देश्य
+            </h2>
+
+            <p>
+              राजस्थान के पाठकों को स्थानीय स्तर से लेकर पूरे राज्य
+              तक की महत्वपूर्ण खबरों को सरल, तेज और उपयोगी तरीके से
+              उपलब्ध कराना।
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- COVERAGE -->
+        <div class="about-section">
+
+          <div class="about-section-icon">
+            <i class="fa-solid fa-map"></i>
+          </div>
+
+          <div>
+
+            <h2>
+              हमारा कवरेज
+            </h2>
+
+            <p>
+              राजस्थान के शहरों, जिलों, शिक्षा, रोजगार, राजनीति,
+              मौसम, प्रशासन, खेल और अन्य महत्वपूर्ण क्षेत्रों से
+              जुड़ी खबरें।
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       PRIVACY POLICY SCREEN
+       ===================================================== -->
+  <section id="privacy-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-shield-halved"></i>
+            गोपनीयता
+          </span>
+
+          <h1>
+            गोपनीयता नीति
+          </h1>
+
+          <p>
+            आपकी जानकारी की सुरक्षा हमारे लिए महत्वपूर्ण है।
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <div class="policy-content">
+
+        <div class="policy-card">
+
+          <h2>
+            1. परिचय
+          </h2>
+
+          <p>
+            आवाज राजस्थान अपने उपयोगकर्ताओं की गोपनीयता का सम्मान
+            करता है। यह नीति बताती है कि वेबसाइट का उपयोग करते समय
+            जानकारी किस प्रकार संभाली जा सकती है।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            2. जानकारी
+          </h2>
+
+          <p>
+            संपर्क फॉर्म या अकाउंट से संबंधित सुविधाओं का उपयोग करते
+            समय नाम, ई-मेल और अन्य आवश्यक जानकारी ली जा सकती है।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            3. जानकारी का उपयोग
+          </h2>
+
+          <p>
+            प्राप्त जानकारी का उपयोग वेबसाइट की सेवाओं को संचालित,
+            बेहतर और सुरक्षित बनाने के लिए किया जा सकता है।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            4. डेटा सुरक्षा
+          </h2>
+
+          <p>
+            उपयोगकर्ता की जानकारी को सुरक्षित रखने के लिए उचित
+            तकनीकी और प्रशासनिक उपाय अपनाने का प्रयास किया जाता है।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            5. बाहरी वेबसाइट
+          </h2>
+
+          <p>
+            वेबसाइट पर अन्य वेबसाइटों या सेवाओं के लिंक उपलब्ध हो
+            सकते हैं। उनके अपने नियम और गोपनीयता नीतियां हो सकती हैं।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            6. नीति में बदलाव
+          </h2>
+
+          <p>
+            आवश्यकता के अनुसार इस नीति में बदलाव किया जा सकता है।
+            बदलाव होने पर इस पेज पर नई जानकारी उपलब्ध कराई जाएगी।
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       TERMS SCREEN
+       ===================================================== -->
+  <section id="terms-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="page-heading">
+
+        <div>
+
+          <span class="heading-small">
+            <i class="fa-solid fa-file-contract"></i>
+            नियम एवं शर्तें
+          </span>
+
+          <h1>
+            नियम और शर्तें
+          </h1>
+
+          <p>
+            वेबसाइट के उपयोग से पहले इन नियमों को पढ़ें।
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="back-home-btn"
+          onclick="showScreen('home-screen')"
+        >
+          <i class="fa-solid fa-house"></i>
+          होम
+        </button>
+
+      </div>
+
+
+      <div class="policy-content">
+
+        <div class="policy-card">
+
+          <h2>
+            1. वेबसाइट का उपयोग
+          </h2>
+
+          <p>
+            उपयोगकर्ता वेबसाइट का उपयोग कानून और लागू नियमों के
+            अनुरूप ही करेगा।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            2. समाचार सामग्री
+          </h2>
+
+          <p>
+            वेबसाइट पर उपलब्ध समाचार और अन्य सामग्री जानकारी के
+            उद्देश्य से प्रकाशित की जाती है। महत्वपूर्ण मामलों में
+            आधिकारिक स्रोत से जानकारी की पुष्टि करना उचित है।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            3. उपयोगकर्ता अकाउंट
+          </h2>
+
+          <p>
+            अकाउंट की जानकारी सुरक्षित रखना उपयोगकर्ता की जिम्मेदारी
+            है। किसी अन्य व्यक्ति के अकाउंट का अनधिकृत उपयोग नहीं
+            किया जाना चाहिए।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            4. अनुचित सामग्री
+          </h2>
+
+          <p>
+            वेबसाइट के संपर्क माध्यमों का उपयोग अपमानजनक, अवैध या
+            स्पैम सामग्री भेजने के लिए नहीं किया जाना चाहिए।
+          </p>
+
+        </div>
+
+
+        <div class="policy-card">
+
+          <h2>
+            5. नियमों में बदलाव
+          </h2>
+
+          <p>
+            वेबसाइट की सुविधाओं और नियमों में आवश्यकता के अनुसार
+            बदलाव किया जा सकता है।
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       NO RESULTS / 404 SCREEN
+       ===================================================== -->
+  <section id="not-found-screen" class="page-screen">
+
+    <div class="container">
+
+      <div class="not-found">
+
+        <div class="not-found-icon">
+          <i class="fa-solid fa-newspaper"></i>
+        </div>
+
+        <div class="not-found-number">
+          404
+        </div>
+
+        <h1>
+          पेज नहीं मिला
+        </h1>
+
+        <p>
+          जिस पेज या खबर को आप खोज रहे हैं, वह उपलब्ध नहीं है।
+        </p>
+
+        <div class="not-found-actions">
+
+          <button
+            type="button"
+            class="primary-btn"
+            onclick="showScreen('home-screen')"
+          >
+            <i class="fa-solid fa-house"></i>
+            होम पर जाएं
+          </button>
+
+          <button
+            type="button"
+            class="secondary-btn"
+            onclick="showScreen('latest-screen')"
+          >
+            <i class="fa-solid fa-newspaper"></i>
+            ताज़ा खबरें
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+    <!-- =====================================================
+       MOBILE MENU OVERLAY
+       ===================================================== -->
+  <div
+    class="mobile-menu-overlay"
+    id="mobile-menu-overlay"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- =====================================================
+       MOBILE MENU
+       ===================================================== -->
+  <aside
+    class="mobile-menu"
+    id="mobile-menu"
+    aria-hidden="true"
+  >
+
+    <div class="mobile-menu-header">
+
+      <div class="mobile-menu-brand">
+
+        <div class="mobile-menu-logo">
+          आवाज<br>
+          राजस्थान
+        </div>
+
+        <div>
+          <strong>
+            आवाज राजस्थान
+          </strong>
+
+          <small>
+            आपकी आवाज, आपका राजस्थान
+          </small>
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="mobile-menu-close"
+        id="mobile-menu-close"
+        aria-label="मेन्यू बंद करें"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+    </div>
+
+
+    <!-- MOBILE SEARCH -->
+    <div class="mobile-menu-search">
+
+      <form
+        id="mobileSearchForm"
+        onsubmit="handleSearch(event)"
+      >
+
+        <input
+          type="search"
+          id="mobileSearchInput"
+          placeholder="खबरें खोजें..."
+          autocomplete="off"
+        >
+
+        <button
+          type="submit"
+          aria-label="खोजें"
+        >
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+
+      </form>
+
+    </div>
+
+
+    <!-- MOBILE NAV -->
+    <nav
+      class="mobile-nav"
+      aria-label="मोबाइल नेविगेशन"
+    >
+
+      <button
+        type="button"
+        class="mobile-nav-item active"
+        onclick="showScreen('home-screen'); closeMobileMenu();"
+      >
+        <span>
+          <i class="fa-solid fa-house"></i>
+          होम
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        onclick="loadDistrictNews('जयपुर'); closeMobileMenu();"
+      >
+        <span>
+          <i class="fa-solid fa-location-dot"></i>
+          जयपुर
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        onclick="loadDistrictNews('जोधपुर'); closeMobileMenu();"
+      >
+        <span>
+          <i class="fa-solid fa-location-dot"></i>
+          जोधपुर
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        onclick="loadDistrictNews('उदयपुर'); closeMobileMenu();"
+      >
+        <span>
+          <i class="fa-solid fa-location-dot"></i>
+          उदयपुर
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        onclick="loadDistrictNews('कोटा'); closeMobileMenu();"
+      >
+        <span>
+          <i class="fa-solid fa-location-dot"></i>
+          कोटा
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        onclick="showScreen('latest-screen'); closeMobileMenu();"
+      >
+        <span>
+          <i class="fa-solid fa-newspaper"></i>
+          ताज़ा खबरें
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        onclick="showScreen('video-screen'); closeMobileMenu();"
+      >
+        <span>
+          <i class="fa-solid fa-video"></i>
+          वीडियो
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        onclick="showScreen('live-screen'); closeMobileMenu();"
+      >
+        <span>
+          <span class="live-dot"></span>
+          लाइव टीवी
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+
+      <button
+        type="button"
+        class="mobile-nav-item"
+        onclick="showScreen('epaper-screen'); closeMobileMenu();"
+      >
+        <span>
+          <i class="fa-solid fa-book-open"></i>
+          ई-पेपर
+        </span>
+
+        <i class="fa-solid fa-angle-right"></i>
+      </button>
+
+    </nav>
+
+
+    <!-- MOBILE QUICK LINKS -->
+    <div class="mobile-quick-links">
+
+      <button
+        type="button"
+        onclick="showScreen('about-screen'); closeMobileMenu();"
+      >
+        <i class="fa-solid fa-circle-info"></i>
+        हमारे बारे में
+      </button>
+
+      <button
+        type="button"
+        onclick="showScreen('contact-screen'); closeMobileMenu();"
+      >
+        <i class="fa-solid fa-envelope"></i>
+        संपर्क करें
+      </button>
+
+      <button
+        type="button"
+        onclick="showScreen('privacy-screen'); closeMobileMenu();"
+      >
+        <i class="fa-solid fa-shield-halved"></i>
+        गोपनीयता नीति
+      </button>
+
+      <button
+        type="button"
+        onclick="showScreen('terms-screen'); closeMobileMenu();"
+      >
+        <i class="fa-solid fa-file-contract"></i>
+        नियम और शर्तें
+      </button>
+
+    </div>
+
+
+    <!-- MOBILE LOGIN -->
+    <div class="mobile-menu-footer">
+
+      <button
+        type="button"
+        class="mobile-login-btn"
+        onclick="handleLogin(event); closeMobileMenu();"
+      >
+        <i class="fa-solid fa-user"></i>
+
+        <span id="mobile-login-text">
+          लॉगिन / रजिस्टर
+        </span>
+
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =====================================================
+       SHARE MODAL
+       ===================================================== -->
+  <div
+    class="modal-overlay"
+    id="share-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="share-modal-title"
+    hidden
+  >
+
+    <div class="modal-card share-modal-card">
+
+      <button
+        type="button"
+        class="modal-close"
+        id="share-modal-close"
+        aria-label="बंद करें"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+
+      <div class="modal-icon">
+        <i class="fa-solid fa-share-nodes"></i>
+      </div>
+
+
+      <h2 id="share-modal-title">
+        खबर शेयर करें
+      </h2>
+
+      <p>
+        इस खबर को अपने दोस्तों और परिवार के साथ शेयर करें।
+      </p>
+
+
+      <div class="share-modal-buttons">
+
+        <button
+          type="button"
+          class="modal-share-btn whatsapp"
+          data-share="whatsapp"
+        >
+          <i class="fa-brands fa-whatsapp"></i>
+          WhatsApp
+        </button>
+
+
+        <button
+          type="button"
+          class="modal-share-btn facebook"
+          data-share="facebook"
+        >
+          <i class="fa-brands fa-facebook-f"></i>
+          Facebook
+        </button>
+
+
+        <button
+          type="button"
+          class="modal-share-btn twitter"
+          data-share="twitter"
+        >
+          <i class="fa-brands fa-x-twitter"></i>
+          X
+        </button>
+
+
+        <button
+          type="button"
+          class="modal-share-btn copy-link"
+          data-share="copy"
+        >
+          <i class="fa-solid fa-link"></i>
+          लिंक कॉपी करें
+        </button>
+
+      </div>
+
+
+      <div class="share-url-box">
+
+        <input
+          type="text"
+          id="share-url-input"
+          readonly
+          aria-label="शेयर लिंक"
+        >
+
+        <button
+          type="button"
+          id="copy-share-url"
+          aria-label="लिंक कॉपी करें"
+        >
+          <i class="fa-regular fa-copy"></i>
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       LOGIN REQUIRED MODAL
+       ===================================================== -->
+  <div
+    class="modal-overlay"
+    id="login-required-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="login-required-title"
+    hidden
+  >
+
+    <div class="modal-card">
+
+      <button
+        type="button"
+        class="modal-close"
+        id="login-required-close"
+        aria-label="बंद करें"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+
+      <div class="modal-icon">
+        <i class="fa-solid fa-user-lock"></i>
+      </div>
+
+
+      <h2 id="login-required-title">
+        लॉगिन आवश्यक है
+      </h2>
+
+      <p>
+        इस सुविधा का उपयोग करने के लिए पहले अपने अकाउंट में लॉगिन करें।
+      </p>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="primary-btn"
+          onclick="closeModal('login-required-modal'); showScreen('login-screen');"
+        >
+          <i class="fa-solid fa-right-to-bracket"></i>
+          लॉगिन करें
+        </button>
+
+        <button
+          type="button"
+          class="secondary-btn"
+          onclick="closeModal('login-required-modal'); showScreen('register-screen');"
+        >
+          <i class="fa-solid fa-user-plus"></i>
+          रजिस्टर करें
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       CONFIRM LOGOUT MODAL
+       ===================================================== -->
+  <div
+    class="modal-overlay"
+    id="logout-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="logout-modal-title"
+    hidden
+  >
+
+    <div class="modal-card">
+
+      <button
+        type="button"
+        class="modal-close"
+        id="logout-modal-close"
+        aria-label="बंद करें"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+
+      <div class="modal-icon warning-icon">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </div>
+
+
+      <h2 id="logout-modal-title">
+        लॉगआउट करें?
+      </h2>
+
+      <p>
+        क्या आप अपने अकाउंट से लॉगआउट करना चाहते हैं?
+      </p>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="secondary-btn"
+          onclick="closeModal('logout-modal')"
+        >
+          रद्द करें
+        </button>
+
+        <button
+          type="button"
+          class="danger-btn"
+          id="confirm-logout-btn"
+        >
+          <i class="fa-solid fa-right-from-bracket"></i>
+          लॉगआउट
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       IMAGE / VIDEO VIEWER MODAL
+       ===================================================== -->
+  <div
+    class="modal-overlay media-modal"
+    id="media-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="मीडिया देखें"
+    hidden
+  >
+
+    <div class="media-modal-content">
+
+      <button
+        type="button"
+        class="media-modal-close"
+        id="media-modal-close"
+        aria-label="बंद करें"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+
+      <div
+        id="media-modal-body"
+        class="media-modal-body"
+      >
+
+        <div class="media-loading">
+          <div class="loading-spinner"></div>
+          <p>
+            लोड हो रहा है...
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       LOADING OVERLAY
+       ===================================================== -->
+  <div
+    id="loading-overlay"
+    class="loading-overlay"
+    hidden
+    aria-live="polite"
+    aria-busy="true"
+  >
+
+    <div class="loading-box">
+
+      <div class="loading-spinner large"></div>
+
+      <p id="loading-text">
+        कृपया प्रतीक्षा करें...
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       TOAST NOTIFICATION
+       ===================================================== -->
+  <div
+    id="toast-container"
+    class="toast-container"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+
+    <!-- JavaScript यहां notifications बनाएगा -->
+
+  </div>
+
+
+  <!-- =====================================================
+       COOKIE / PRIVACY NOTICE
+       ===================================================== -->
+  <div
+    id="cookie-notice"
+    class="cookie-notice"
+    hidden
+  >
+
+    <div class="cookie-content">
+
+      <div class="cookie-icon">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+
+      <div class="cookie-text">
+
+        <h3>
+          आपकी गोपनीयता
+        </h3>
+
+        <p>
+          हम वेबसाइट को बेहतर अनुभव देने के लिए आवश्यक तकनीकों का
+          उपयोग कर सकते हैं।
+        </p>
+
+      </div>
+
+      <div class="cookie-actions">
+
+        <button
+          type="button"
+          class="primary-btn"
+          id="cookie-accept"
+        >
+          ठीक है
+        </button>
+
+        <button
+          type="button"
+          class="text-btn"
+          onclick="showScreen('privacy-screen');"
+        >
+          अधिक जानकारी
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       NEWSLETTER / UPDATE MODAL
+       ===================================================== -->
+  <div
+    class="modal-overlay"
+    id="newsletter-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="newsletter-title"
+    hidden
+  >
+
+    <div class="modal-card newsletter-card">
+
+      <button
+        type="button"
+        class="modal-close"
+        id="newsletter-close"
+        aria-label="बंद करें"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+
+      <div class="modal-icon">
+        <i class="fa-solid fa-bell"></i>
+      </div>
+
+
+      <h2 id="newsletter-title">
+        ताज़ा खबरों के अपडेट पाएं
+      </h2>
+
+      <p>
+        महत्वपूर्ण समाचारों और राजस्थान के नए अपडेट से जुड़े रहें।
+      </p>
+
+
+      <form
+        id="newsletterForm"
+        class="newsletter-form"
+      >
+
+        <div class="input-with-icon">
+
+          <i class="fa-solid fa-envelope"></i>
+
+          <input
+            type="email"
+            id="newsletter-email"
+            name="email"
+            placeholder="अपना ई-मेल दर्ज करें"
+            autocomplete="email"
+            required
+          >
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="primary-btn"
+        >
+          <i class="fa-solid fa-bell"></i>
+          अपडेट पाएं
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+    <!-- =====================================================
+       MOBILE MENU BUTTON
+       ===================================================== -->
+  <button
+    type="button"
+    class="mobile-menu-toggle"
+    id="mobile-menu-toggle"
+    aria-label="मेन्यू खोलें"
+    aria-controls="mobile-menu"
+    aria-expanded="false"
+  >
+    <i class="fa-solid fa-bars"></i>
+  </button>
+
+
+  <!-- =====================================================
+       MAIN FOOTER
+       ===================================================== -->
+  <footer class="site-footer">
+
+    <div class="container">
+
+      <div class="footer-grid">
+
+        <!-- BRAND -->
+        <div class="footer-column footer-brand">
+
+          <div class="footer-logo">
+            <span class="footer-logo-main">
+              आवाज
+            </span>
+
+            <span class="footer-logo-sub">
+              राजस्थान
+            </span>
+          </div>
+
+          <p class="footer-description">
+            आपकी आवाज, आपका राजस्थान।
+            पूरे राजस्थान की ताज़ा और महत्वपूर्ण खबरें
+            एक ही जगह।
+          </p>
+
+
+          <!-- SOCIAL -->
+          <div class="footer-social">
+
+            <a
+              href="#"
+              aria-label="Facebook"
+              data-social="facebook"
+            >
+              <i class="fa-brands fa-facebook-f"></i>
+            </a>
+
+            <a
+              href="#"
+              aria-label="Instagram"
+              data-social="instagram"
+            >
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+
+            <a
+              href="#"
+              aria-label="YouTube"
+              data-social="youtube"
+            >
+              <i class="fa-brands fa-youtube"></i>
+            </a>
+
+            <a
+              href="#"
+              aria-label="X"
+              data-social="twitter"
+            >
+              <i class="fa-brands fa-x-twitter"></i>
+            </a>
+
+          </div>
+
+        </div>
+
+
+        <!-- QUICK LINKS -->
+        <div class="footer-column">
+
+          <h3>
+            महत्वपूर्ण लिंक
           </h3>
 
-          <ul class="recent-list">
+          <ul>
 
-            <li onclick="showScreen('detail-screen')">
-
-              <p>
-                जयपुर में मौसम का बदला मिजाज
-              </p>
-
-              <span class="time-red">
-                20 मिनट पहले
-              </span>
-
+            <li>
+              <a
+                href="#home-screen"
+                onclick="showScreen('home-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                होम
+              </a>
             </li>
 
-            <li onclick="showScreen('detail-screen')">
+            <li>
+              <a
+                href="#latest-screen"
+                onclick="showScreen('latest-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                ताज़ा खबरें
+              </a>
+            </li>
 
-              <p>
-                जोधपुर में बारिश के बाद नहर का जलस्तर बढ़ा
-              </p>
+            <li>
+              <a
+                href="#video-screen"
+                onclick="showScreen('video-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                वीडियो
+              </a>
+            </li>
 
-              <span class="time-red">
-                45 मिनट पहले
-     
+            <li>
+              <a
+                href="#live-screen"
+                onclick="showScreen('live-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                लाइव टीवी
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#epaper-screen"
+                onclick="showScreen('epaper-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                ई-पेपर
+              </a>
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <!-- DISTRICTS -->
+        <div class="footer-column">
+
+          <h3>
+            जिले
+          </h3>
+
+          <ul>
+
+            <li>
+              <a
+                href="#category-screen"
+                onclick="loadDistrictNews('जयपुर'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                जयपुर
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#category-screen"
+                onclick="loadDistrictNews('जोधपुर'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                जोधपुर
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#category-screen"
+                onclick="loadDistrictNews('उदयपुर'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                उदयपुर
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#category-screen"
+                onclick="loadDistrictNews('कोटा'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                कोटा
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#category-screen"
+                onclick="showScreen('category-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                सभी जिले
+              </a>
+            </li>
+
+          </ul>
+
+        </div>
+
+
+        <!-- INFORMATION -->
+        <div class="footer-column">
+
+          <h3>
+            जानकारी
+          </h3>
+
+          <ul>
+
+            <li>
+              <a
+                href="#about-screen"
+                onclick="showScreen('about-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                हमारे बारे में
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#contact-screen"
+                onclick="showScreen('contact-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                संपर्क करें
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#privacy-screen"
+                onclick="showScreen('privacy-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                गोपनीयता नीति
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#terms-screen"
+                onclick="showScreen('terms-screen'); return false;"
+              >
+                <i class="fa-solid fa-angle-right"></i>
+                नियम और शर्तें
+              </a>
+            </li>
+
+          </ul>
+
+        </div>
+
+      </div>
+
+
+      <!-- FOOTER CONTACT BAR -->
+      <div class="footer-contact-bar">
+
+        <div class="footer-contact-item">
+
+          <i class="fa-solid fa-location-dot"></i>
+
+          <span>
+            राजस्थान, भारत
+          </span>
+
+        </div>
+
+
+        <div class="footer-contact-item">
+
+          <i class="fa-solid fa-envelope"></i>
+
+          <span>
+            info@aawazrajasthan.com
+          </span>
+
+        </div>
+
+
+        <div class="footer-contact-item">
+
+          <i class="fa-solid fa-phone"></i>
+
+          <span>
+            +91 XXXXX XXXXX
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- COPYRIGHT -->
+      <div class="footer-bottom">
+
+        <p>
+          ©
+          <span id="current-year">
+            2026
+          </span>
+          आवाज राजस्थान। सर्वाधिकार सुरक्षित।
+        </p>
+
+        <p class="footer-made">
+          राजस्थान की खबरों के लिए
+          <strong>
+            आवाज राजस्थान
+          </strong>
+        </p>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+
+  <!-- =====================================================
+       GLOBAL HIDDEN DATA
+       ===================================================== -->
+
+  <input
+    type="hidden"
+    id="current-news-id"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="current-district"
+    value=""
+  >
+
+  <input
+    type="hidden"
+    id="current-category"
+    value=""
+  >
+
+
+  <!-- =====================================================
+       SCREEN READER LIVE MESSAGE
+       ===================================================== -->
+
+  <div
+    id="aria-live-message"
+    class="sr-only"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+       ===================================================== -->
+
+  <script src="script.js"></script>
+
+
+  <!-- =====================================================
+       PAGE END
+       ===================================================== -->
+
+</body>
+
+</html>
