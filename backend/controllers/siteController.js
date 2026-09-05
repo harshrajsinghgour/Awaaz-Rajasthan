@@ -1,6 +1,5 @@
 "use strict";
 
-
 // ========================================
 // LIVE TV
 // GET /api/site/live-tv
@@ -51,14 +50,6 @@ exports.getLiveTV = async (req, res, next) => {
 
 exports.getLiveBlog = async (req, res, next) => {
   try {
-    /*
-      फिलहाल Live Blog को static configuration
-      से serve किया जा रहा है।
-
-      बाद में इसे MongoDB collection से जोड़कर
-      real-time admin updates भी किए जा सकते हैं।
-    */
-
     const liveBlog = {
       enabled:
         process.env.LIVE_BLOG_ENABLED === "true",
@@ -172,12 +163,4 @@ exports.getSiteConfig = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-
-module.exports = {
-  getLiveTV,
-  getLiveBlog,
-  getEPaper,
-  getSiteConfig
 };
