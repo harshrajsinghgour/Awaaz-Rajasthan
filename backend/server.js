@@ -63,7 +63,14 @@ app.use(
     cors({
         origin: FRONTEND_URL,
         credentials: true,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        methods: [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE",
+            "OPTIONS"
+        ],
         allowedHeaders: [
             "Content-Type",
             "Authorization"
@@ -82,7 +89,8 @@ const apiLimiter = rateLimit({
     legacyHeaders: false,
     message: {
         success: false,
-        message: "बहुत अधिक requests भेजी गई हैं। कृपया कुछ देर बाद प्रयास करें।"
+        message:
+            "बहुत अधिक requests भेजी गई हैं। कृपया कुछ देर बाद प्रयास करें।"
     }
 });
 
@@ -148,20 +156,63 @@ app.get("/api/health", (req, res) => {
    API ROUTES
 ========================================================= */
 
-// Authentication
+// ========================================================
+// PUBLIC AUTHENTICATION
+// ========================================================
+
 app.use(
     "/api/auth",
     require("./routes/authRoutes")
 );
 
-// News
+
+// ========================================================
+// ADMIN / OWNER AUTHENTICATION & MANAGEMENT
+// ========================================================
+// अलग AdminUser system
+//
+// Login:
+// POST /api/admin/login
+//
+// Current admin:
+// GET /api/admin/me
+//
+// Admin management:
+// /api/admin/admins
+//
+// Owner और Admin permissions backend पर
+// adminMiddleware.js द्वारा verify होंगी.
+// ========================================================
+
+const adminRoutesPath = path.join(
+    __dirname,
+    "routes",
+    "adminRoutes.js"
+);
+
+if (fs.existsSync(adminRoutesPath)) {
+    app.use(
+        "/api/admin",
+        require("./routes/adminRoutes")
+    );
+}
+
+
+// ========================================================
+// NEWS
+// ========================================================
+
 app.use(
     "/api/news",
     require("./routes/newsRoutes")
 );
 
-// Contact
+
+// ========================================================
+// CONTACT
+// ========================================================
 // अगर contactRoutes.js मौजूद है तो इसे use किया जाएगा
+
 const contactRoutesPath = path.join(
     __dirname,
     "routes",
@@ -175,9 +226,13 @@ if (fs.existsSync(contactRoutesPath)) {
     );
 }
 
-// Site features
-// Live TV, Live Blog और E-paper जैसी future/frontend services
-// के लिए route support
+
+// ========================================================
+// SITE FEATURES
+// ========================================================
+// Live TV, Live Blog और E-paper जैसी
+// frontend/site services के लिए route support
+
 const siteRoutesPath = path.join(
     __dirname,
     "routes",
@@ -255,9 +310,18 @@ const server = app.listen(PORT, () => {
     console.log("       आवाज राजस्थान BACKEND");
     console.log("==========================================");
     console.log(`🚀 Server: http://localhost:${PORT}`);
-    console.log(`📰 News API: http://localhost:${PORT}/api/news`);
-    console.log(`🔐 Auth API: http://localhost:${PORT}/api/auth`);
-    console.log(`❤️ Health: http://localhost:${PORT}/api/health`);
+    console.log(
+        `📰 News API: http://localhost:${PORT}/api/news`
+    );
+    console.log(
+        `🔐 Auth API: http://localhost:${PORT}/api/auth`
+    );
+    console.log(
+        `👑 Admin API: http://localhost:${PORT}/api/admin`
+    );
+    console.log(
+        `❤️ Health: http://localhost:${PORT}/api/health`
+    );
     console.log("==========================================");
     console.log("");
 });
