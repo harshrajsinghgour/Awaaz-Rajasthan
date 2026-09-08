@@ -1,0 +1,5722 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <meta
+    name="description"
+    content="आवाज राजस्थान Admin Panel"
+  />
+
+  <meta
+    name="theme-color"
+    content="#b71c1c"
+  />
+
+  <title>Admin Panel | आवाज राजस्थान</title>
+
+  <!-- Google Font -->
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  />
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Admin CSS -->
+  <link
+    rel="stylesheet"
+    href="./admin.css"
+  />
+</head>
+
+<body>
+
+  <!-- ==========================================
+       ADMIN LOGIN SCREEN
+       ========================================== -->
+
+  <div
+    id="admin-login-screen"
+    class="admin-login-screen"
+  >
+
+    <div class="admin-login-wrapper">
+
+      <!-- Login Brand -->
+      <div class="admin-login-brand">
+
+        <div class="admin-login-logo">
+          <span class="logo-main">आवाज</span>
+          <span class="logo-sub">राजस्थान</span>
+        </div>
+
+        <div class="admin-login-brand-text">
+          <h1>आवाज राजस्थान</h1>
+          <p>News Administration Panel</p>
+        </div>
+
+      </div>
+
+
+      <!-- Login Card -->
+      <div class="admin-login-card">
+
+        <div class="admin-login-card-header">
+
+          <div class="admin-login-icon">
+            <span>🔐</span>
+          </div>
+
+          <div>
+            <h2>Admin Login</h2>
+            <p>
+              अपने Admin ID या Email से लॉगिन करें
+            </p>
+          </div>
+
+        </div>
+
+
+        <!-- Login Error -->
+        <div
+          id="admin-login-error"
+          class="admin-login-error"
+          role="alert"
+          aria-live="polite"
+          hidden
+        ></div>
+
+
+        <!-- Login Form -->
+        <form
+          id="admin-login-form"
+          class="admin-login-form"
+          autocomplete="on"
+        >
+
+          <!-- Admin ID / Email -->
+          <div class="form-group">
+
+            <label
+              for="admin-login-id"
+            >
+              Admin ID / Email
+            </label>
+
+            <div class="input-wrapper">
+
+              <span
+                class="input-icon"
+                aria-hidden="true"
+              >
+                👤
+              </span>
+
+              <input
+                type="text"
+                id="admin-login-id"
+                name="adminId"
+                placeholder="OWNER-001 या admin@example.com"
+                autocomplete="username"
+                maxlength="150"
+                required
+              />
+
+            </div>
+
+          </div>
+
+
+          <!-- Password -->
+          <div class="form-group">
+
+            <label
+              for="admin-login-password"
+            >
+              Password
+            </label>
+
+            <div class="input-wrapper password-input-wrapper">
+
+              <span
+                class="input-icon"
+                aria-hidden="true"
+              >
+                🔑
+              </span>
+
+              <input
+                type="password"
+                id="admin-login-password"
+                name="password"
+                placeholder="अपना password दर्ज करें"
+                autocomplete="current-password"
+                minlength="8"
+                maxlength="150"
+                required
+              />
+
+              <button
+                type="button"
+                id="toggle-login-password"
+                class="password-toggle"
+                aria-label="Password दिखाएँ"
+                title="Password दिखाएँ"
+              >
+                👁️
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- Login Button -->
+          <button
+            type="submit"
+            id="admin-login-button"
+            class="admin-login-button"
+          >
+
+            <span
+              class="button-icon"
+              aria-hidden="true"
+            >
+              🔓
+            </span>
+
+            <span class="button-text">
+              Admin Login
+            </span>
+
+            <span
+              class="button-loader"
+              aria-hidden="true"
+              hidden
+            >
+              ⏳
+            </span>
+
+          </button>
+
+        </form>
+
+
+        <!-- Login Footer -->
+        <div class="admin-login-footer">
+
+          <span>
+            🔒 सुरक्षित Admin Access
+          </span>
+
+          <span class="footer-separator">
+            •
+          </span>
+
+          <span>
+            आवाज राजस्थान
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Login Bottom Text -->
+      <div class="admin-login-bottom">
+
+        <p>
+          © <span id="admin-login-year"></span>
+          आवाज राजस्थान
+        </p>
+
+        <p>
+          केवल अधिकृत Admin और Owner के लिए
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ==========================================
+       ADMIN PANEL
+       Part 2 आगे से जारी होगा
+       ========================================== -->
+
+  <div
+    id="admin-panel"
+    class="admin-panel"
+    hidden
+  >
+        <!-- ==========================================
+         ADMIN SIDEBAR
+         ========================================== -->
+
+    <aside
+      id="admin-sidebar"
+      class="admin-sidebar"
+    >
+
+      <!-- Sidebar Brand -->
+      <div class="sidebar-brand">
+
+        <div class="sidebar-logo">
+          <span class="sidebar-logo-main">आवाज</span>
+          <span class="sidebar-logo-sub">राजस्थान</span>
+        </div>
+
+        <div class="sidebar-brand-info">
+          <strong>Admin Panel</strong>
+          <span>News Management</span>
+        </div>
+
+      </div>
+
+
+      <!-- Admin Profile Mini -->
+      <div class="sidebar-admin-profile">
+
+        <div class="sidebar-admin-avatar">
+          <span id="sidebar-admin-avatar-text">A</span>
+        </div>
+
+        <div class="sidebar-admin-info">
+
+          <strong id="sidebar-admin-name">
+            Admin
+          </strong>
+
+          <span id="sidebar-admin-role">
+            Administrator
+          </span>
+
+        </div>
+
+        <span
+          class="admin-status-dot"
+          title="Online"
+          aria-label="Online"
+        ></span>
+
+      </div>
+
+
+      <!-- Sidebar Navigation -->
+      <nav
+        class="admin-navigation"
+        aria-label="Admin Navigation"
+      >
+
+        <!-- Main -->
+        <div class="nav-group">
+
+          <div class="nav-group-title">
+            MAIN
+          </div>
+
+
+          <!-- Dashboard -->
+          <button
+            type="button"
+            class="nav-item active"
+            data-section="dashboard"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              📊
+            </span>
+
+            <span class="nav-label">
+              Dashboard
+            </span>
+
+          </button>
+
+
+          <!-- News -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="news"
+            data-permission="news.create"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              📰
+            </span>
+
+            <span class="nav-label">
+              News
+            </span>
+
+            <span
+              class="nav-arrow"
+              aria-hidden="true"
+            >
+              ›
+            </span>
+
+          </button>
+
+
+          <!-- Breaking News -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="breaking"
+            data-permission="breaking.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              🚨
+            </span>
+
+            <span class="nav-label">
+              Breaking News
+            </span>
+
+          </button>
+
+
+          <!-- Trending -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="trending"
+            data-permission="trending.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              🔥
+            </span>
+
+            <span class="nav-label">
+              Trending
+            </span>
+
+          </button>
+
+
+          <!-- Video -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="video"
+            data-permission="video.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              🎥
+            </span>
+
+            <span class="nav-label">
+              Video
+            </span>
+
+          </button>
+
+        </div>
+
+
+        <!-- Live & Media -->
+        <div class="nav-group">
+
+          <div class="nav-group-title">
+            LIVE & MEDIA
+          </div>
+
+
+          <!-- Live TV -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="live-tv"
+            data-permission="live-tv.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              📺
+            </span>
+
+            <span class="nav-label">
+              Live TV
+            </span>
+
+            <span
+              class="live-indicator"
+              aria-label="Live"
+            >
+              LIVE
+            </span>
+
+          </button>
+
+
+          <!-- Live Blog -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="live-blog"
+            data-permission="live-blog.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              🔴
+            </span>
+
+            <span class="nav-label">
+              Live Blog
+            </span>
+
+          </button>
+
+
+          <!-- ePaper -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="epaper"
+            data-permission="epaper.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              📄
+            </span>
+
+            <span class="nav-label">
+              ePaper
+            </span>
+
+          </button>
+
+        </div>
+
+
+        <!-- Management -->
+        <div class="nav-group">
+
+          <div class="nav-group-title">
+            MANAGEMENT
+          </div>
+
+
+          <!-- Contacts -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="contacts"
+            data-permission="contact.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              ✉️
+            </span>
+
+            <span class="nav-label">
+              Contacts
+            </span>
+
+            <span
+              id="contact-count-badge"
+              class="nav-count"
+              hidden
+            >
+              0
+            </span>
+
+          </button>
+
+
+          <!-- Users -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="users"
+            data-permission="users.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              👥
+            </span>
+
+            <span class="nav-label">
+              Users
+            </span>
+
+          </button>
+
+
+          <!-- Admins -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="admins"
+            data-permission="admin.manage"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              🛡️
+            </span>
+
+            <span class="nav-label">
+              Admins
+            </span>
+
+          </button>
+
+
+          <!-- Settings -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="settings"
+            data-permission="site.settings"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              ⚙️
+            </span>
+
+            <span class="nav-label">
+              Site Settings
+            </span>
+
+          </button>
+
+        </div>
+
+
+        <!-- Account -->
+        <div class="nav-group">
+
+          <div class="nav-group-title">
+            ACCOUNT
+          </div>
+
+
+          <!-- Profile -->
+          <button
+            type="button"
+            class="nav-item"
+            data-section="profile"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              👤
+            </span>
+
+            <span class="nav-label">
+              My Profile
+            </span>
+
+          </button>
+
+
+          <!-- Logout -->
+          <button
+            type="button"
+            id="admin-logout-button"
+            class="nav-item nav-item-danger"
+          >
+
+            <span
+              class="nav-icon"
+              aria-hidden="true"
+            >
+              🚪
+            </span>
+
+            <span class="nav-label">
+              Logout
+            </span>
+
+          </button>
+
+        </div>
+
+      </nav>
+
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+
+        <div class="sidebar-footer-status">
+
+          <span class="status-dot"></span>
+
+          <span>
+            System Online
+          </span>
+
+        </div>
+
+        <div class="sidebar-footer-version">
+          Admin v1.0.0
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- ==========================================
+         SIDEBAR MOBILE OVERLAY
+         ========================================== -->
+
+    <div
+      id="admin-sidebar-overlay"
+      class="admin-sidebar-overlay"
+      hidden
+    ></div>
+
+
+    <!-- ==========================================
+         ADMIN MAIN CONTENT
+         Part 3 आगे से जारी होगा
+         ========================================== -->
+
+    <main
+      id="admin-main"
+      class="admin-main"
+    >
+            <!-- ==========================================
+           ADMIN TOP HEADER
+           ========================================== -->
+
+      <header
+        id="admin-header"
+        class="admin-header"
+      >
+
+        <!-- Mobile Menu Button -->
+        <button
+          type="button"
+          id="admin-mobile-menu-button"
+          class="mobile-menu-button"
+          aria-label="Menu खोलें"
+          title="Menu"
+        >
+          ☰
+        </button>
+
+
+        <!-- Header Left -->
+        <div class="admin-header-left">
+
+          <div class="admin-page-heading">
+
+            <span
+              class="admin-breadcrumb"
+              id="admin-breadcrumb"
+            >
+              Admin
+            </span>
+
+            <h1 id="admin-page-title">
+              Dashboard
+            </h1>
+
+            <p id="admin-page-description">
+              आवाज राजस्थान का प्रशासनिक डैशबोर्ड
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <!-- Header Right -->
+        <div class="admin-header-right">
+
+          <!-- Website Preview -->
+          <a
+            href="../index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="header-action-button"
+            title="Website खोलें"
+          >
+
+            <span
+              class="header-action-icon"
+              aria-hidden="true"
+            >
+              🌐
+            </span>
+
+            <span class="header-action-text">
+              Website
+            </span>
+
+          </a>
+
+
+          <!-- Notifications -->
+          <button
+            type="button"
+            id="admin-notification-button"
+            class="header-icon-button"
+            title="Notifications"
+            aria-label="Notifications"
+          >
+
+            <span
+              aria-hidden="true"
+            >
+              🔔
+            </span>
+
+            <span
+              id="admin-notification-badge"
+              class="header-notification-badge"
+              hidden
+            >
+              0
+            </span>
+
+          </button>
+
+
+          <!-- Admin Header Profile -->
+          <button
+            type="button"
+            id="admin-header-profile-button"
+            class="admin-header-profile"
+            title="My Profile"
+          >
+
+            <span
+              id="header-admin-avatar"
+              class="header-admin-avatar"
+            >
+              A
+            </span>
+
+            <span class="header-admin-details">
+
+              <strong
+                id="header-admin-name"
+              >
+                Admin
+              </strong>
+
+              <small
+                id="header-admin-role"
+              >
+                Administrator
+              </small>
+
+            </span>
+
+            <span
+              class="header-profile-arrow"
+              aria-hidden="true"
+            >
+              ▾
+            </span>
+
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <!-- ==========================================
+           ADMIN CONTENT AREA
+           ========================================== -->
+
+      <div
+        id="admin-content"
+        class="admin-content"
+      >
+
+
+        <!-- ======================================
+             DASHBOARD SECTION
+             ====================================== -->
+
+        <section
+          id="section-dashboard"
+          class="admin-section active"
+          data-section-content="dashboard"
+        >
+
+          <!-- Dashboard Welcome -->
+          <div class="dashboard-welcome">
+
+            <div class="dashboard-welcome-content">
+
+              <span class="welcome-label">
+                आवाज राजस्थान Admin
+              </span>
+
+              <h2>
+                Welcome back,
+                <span id="dashboard-admin-name">
+                  Admin
+                </span>
+                👋
+              </h2>
+
+              <p>
+                आज की खबरों, वेबसाइट गतिविधियों और
+                कंटेंट को एक ही जगह से मैनेज करें।
+              </p>
+
+            </div>
+
+            <div class="dashboard-welcome-icon">
+              📰
+            </div>
+
+          </div>
+
+
+          <!-- Dashboard Stats -->
+          <div
+            id="dashboard-stats"
+            class="dashboard-stats"
+          >
+
+            <!-- Total News -->
+            <div
+              class="stat-card"
+              data-stat="total-news"
+            >
+
+              <div class="stat-card-icon stat-news-icon">
+                📰
+              </div>
+
+              <div class="stat-card-content">
+
+                <span class="stat-card-label">
+                  Total News
+                </span>
+
+                <strong
+                  id="stat-total-news"
+                  class="stat-card-value"
+                >
+                  0
+                </strong>
+
+                <span class="stat-card-meta">
+                  प्रकाशित/सभी खबरें
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <!-- Published -->
+            <div
+              class="stat-card"
+              data-stat="published-news"
+            >
+
+              <div class="stat-card-icon stat-published-icon">
+                ✅
+              </div>
+
+              <div class="stat-card-content">
+
+                <span class="stat-card-label">
+                  Published
+                </span>
+
+                <strong
+                  id="stat-published-news"
+                  class="stat-card-value"
+                >
+                  0
+                </strong>
+
+                <span class="stat-card-meta">
+                  Live news
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <!-- Drafts -->
+            <div
+              class="stat-card"
+              data-stat="draft-news"
+            >
+
+              <div class="stat-card-icon stat-draft-icon">
+                📝
+              </div>
+
+              <div class="stat-card-content">
+
+                <span class="stat-card-label">
+                  Drafts
+                </span>
+
+                <strong
+                  id="stat-draft-news"
+                  class="stat-card-value"
+                >
+                  0
+                </strong>
+
+                <span class="stat-card-meta">
+                  Pending content
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <!-- Contacts -->
+            <div
+              class="stat-card"
+              data-stat="contacts"
+            >
+
+              <div class="stat-card-icon stat-contact-icon">
+                ✉️
+              </div>
+
+              <div class="stat-card-content">
+
+                <span class="stat-card-label">
+                  Contacts
+                </span>
+
+                <strong
+                  id="stat-contacts"
+                  class="stat-card-value"
+                >
+                  0
+                </strong>
+
+                <span class="stat-card-meta">
+                  प्राप्त संदेश
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Dashboard Grid -->
+          <div class="dashboard-grid">
+
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card quick-actions-card">
+
+              <div class="dashboard-card-header">
+
+                <div>
+
+                  <span class="dashboard-card-eyebrow">
+                    QUICK ACCESS
+                  </span>
+
+                  <h3>
+                    Quick Actions
+                  </h3>
+
+                </div>
+
+                <span
+                  class="dashboard-card-header-icon"
+                  aria-hidden="true"
+                >
+                  ⚡
+                </span>
+
+              </div>
+
+
+              <div
+                id="quick-actions"
+                class="quick-actions"
+              >
+
+                <!-- Add News -->
+                <button
+                  type="button"
+                  class="quick-action"
+                  data-action="create-news"
+                  data-permission="news.create"
+                >
+
+                  <span class="quick-action-icon">
+                    ➕
+                  </span>
+
+                  <span class="quick-action-content">
+
+                    <strong>
+                      Add News
+                    </strong>
+
+                    <small>
+                      नई खबर प्रकाशित करें
+                    </small>
+
+                  </span>
+
+                  <span class="quick-action-arrow">
+                    →
+                  </span>
+
+                </button>
+
+
+                <!-- Breaking News -->
+                <button
+                  type="button"
+                  class="quick-action"
+                  data-action="manage-breaking"
+                  data-permission="breaking.manage"
+                >
+
+                  <span class="quick-action-icon">
+                    🚨
+                  </span>
+
+                  <span class="quick-action-content">
+
+                    <strong>
+                      Breaking News
+                    </strong>
+
+                    <small>
+                      ब्रेकिंग न्यूज़ मैनेज करें
+                    </small>
+
+                  </span>
+
+                  <span class="quick-action-arrow">
+                    →
+                  </span>
+
+                </button>
+
+
+                <!-- Live TV -->
+                <button
+                  type="button"
+                  class="quick-action"
+                  data-action="manage-live-tv"
+                  data-permission="live-tv.manage"
+                >
+
+                  <span class="quick-action-icon">
+                    📺
+                  </span>
+
+                  <span class="quick-action-content">
+
+                    <strong>
+                      Live TV
+                    </strong>
+
+                    <small>
+                      लाइव टीवी मैनेज करें
+                    </small>
+
+                  </span>
+
+                  <span class="quick-action-arrow">
+                    →
+                  </span>
+
+                </button>
+
+
+                <!-- ePaper -->
+                <button
+                  type="button"
+                  class="quick-action"
+                  data-action="manage-epaper"
+                  data-permission="epaper.manage"
+                >
+
+                  <span class="quick-action-icon">
+                    📄
+                  </span>
+
+                  <span class="quick-action-content">
+
+                    <strong>
+                      ePaper
+                    </strong>
+
+                    <small>
+                      आज का ePaper मैनेज करें
+                    </small>
+
+                  </span>
+
+                  <span class="quick-action-arrow">
+                    →
+                  </span>
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <!-- System Overview -->
+            <div class="dashboard-card system-overview-card">
+
+              <div class="dashboard-card-header">
+
+                <div>
+
+                  <span class="dashboard-card-eyebrow">
+                    SYSTEM
+                  </span>
+
+                  <h3>
+                    System Overview
+                  </h3>
+
+                </div>
+
+                <span
+                  class="dashboard-card-header-icon"
+                  aria-hidden="true"
+                >
+                  🖥️
+                </span>
+
+              </div>
+
+
+              <div class="system-status-list">
+
+                <!-- API -->
+                <div class="system-status-item">
+
+                  <div class="system-status-label">
+
+                    <span class="system-status-icon">
+                      🔗
+                    </span>
+
+                    <span>
+                      Backend API
+                    </span>
+
+                  </div>
+
+                  <span
+                    id="system-api-status"
+                    class="system-status-badge checking"
+                  >
+                    Checking...
+                  </span>
+
+                </div>
+
+
+                <!-- Database -->
+                <div class="system-status-item">
+
+                  <div class="system-status-label">
+
+                    <span class="system-status-icon">
+                      🗄️
+                    </span>
+
+                    <span>
+                      Database
+                    </span>
+
+                  </div>
+
+                  <span
+                    id="system-db-status"
+                    class="system-status-badge checking"
+                  >
+                    Checking...
+                  </span>
+
+                </div>
+
+
+                <!-- Authentication -->
+                <div class="system-status-item">
+
+                  <div class="system-status-label">
+
+                    <span class="system-status-icon">
+                      🔐
+                    </span>
+
+                    <span>
+                      Authentication
+                    </span>
+
+                  </div>
+
+                  <span
+                    id="system-auth-status"
+                    class="system-status-badge online"
+                  >
+                    Secure
+                  </span>
+
+                </div>
+
+
+                <!-- Website -->
+                <div class="system-status-item">
+
+                  <div class="system-status-label">
+
+                    <span class="system-status-icon">
+                      🌐
+                    </span>
+
+                    <span>
+                      Website
+                    </span>
+
+                  </div>
+
+                  <span
+                    id="system-site-status"
+                    class="system-status-badge online"
+                  >
+                    Online
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ==================================
+               RECENT NEWS
+               ================================== -->
+
+          <div class="dashboard-card recent-news-card">
+
+            <div class="dashboard-card-header">
+
+              <div>
+
+                <span class="dashboard-card-eyebrow">
+                  CONTENT
+                </span>
+
+                <h3>
+                  Recent News
+                </h3>
+
+              </div>
+
+              <button
+                type="button"
+                class="text-action-button"
+                data-action="view-all-news"
+              >
+                View All →
+              </button>
+
+            </div>
+
+
+            <div
+              id="dashboard-recent-news"
+              class="recent-news-list"
+            >
+
+              <!-- JS यहाँ recent news render करेगा -->
+
+              <div
+                class="empty-state"
+                id="recent-news-empty"
+              >
+
+                <div class="empty-state-icon">
+                  📰
+                </div>
+
+                <h4>
+                  अभी कोई News उपलब्ध नहीं है
+                </h4>
+
+                <p>
+                  नई खबर जोड़ने के बाद वह यहाँ दिखाई देगी।
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+        </section>
+
+
+        <!-- ==========================================
+             PART 4 आगे जारी होगा
+             ========================================== -->
+                <!-- ==========================================
+             NEWS MANAGEMENT SECTION
+             ========================================== -->
+
+        <section
+          id="section-news"
+          class="admin-section"
+          data-section-content="news"
+          hidden
+        >
+
+          <!-- Section Header -->
+          <div class="section-toolbar">
+
+            <div class="section-toolbar-left">
+
+              <span class="section-eyebrow">
+                CONTENT MANAGEMENT
+              </span>
+
+              <h2>
+                News Management
+              </h2>
+
+              <p>
+                वेबसाइट की सभी खबरों को यहाँ से जोड़ें,
+                संपादित करें और प्रकाशित करें।
+              </p>
+
+            </div>
+
+            <div class="section-toolbar-actions">
+
+              <button
+                type="button"
+                id="news-refresh-button"
+                class="secondary-button"
+              >
+                🔄 Refresh
+              </button>
+
+              <button
+                type="button"
+                id="create-news-button"
+                class="primary-button"
+                data-action="create-news"
+                data-permission="news.create"
+              >
+                ➕ Add News
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- News Filters -->
+          <div class="content-card news-filters-card">
+
+            <div class="filter-row">
+
+              <!-- Search -->
+              <div class="filter-field search-filter">
+
+                <label for="news-search">
+                  Search News
+                </label>
+
+                <div class="search-input-wrapper">
+
+                  <span
+                    class="search-input-icon"
+                    aria-hidden="true"
+                  >
+                    🔍
+                  </span>
+
+                  <input
+                    type="search"
+                    id="news-search"
+                    placeholder="Headline, category या keyword..."
+                    autocomplete="off"
+                  />
+
+                </div>
+
+              </div>
+
+
+              <!-- Category -->
+              <div class="filter-field">
+
+                <label for="news-category-filter">
+                  Category
+                </label>
+
+                <select
+                  id="news-category-filter"
+                >
+                  <option value="">
+                    सभी Categories
+                  </option>
+
+                  <option value="राजस्थान">
+                    राजस्थान
+                  </option>
+
+                  <option value="जयपुर">
+                    जयपुर
+                  </option>
+
+                  <option value="जोधपुर">
+                    जोधपुर
+                  </option>
+
+                  <option value="उदयपुर">
+                    उदयपुर
+                  </option>
+
+                  <option value="कोटा">
+                    कोटा
+                  </option>
+
+                  <option value="अजमेर">
+                    अजमेर
+                  </option>
+
+                  <option value="बीकानेर">
+                    बीकानेर
+                  </option>
+
+                  <option value="अलवर">
+                    अलवर
+                  </option>
+
+                  <option value="भरतपुर">
+                    भरतपुर
+                  </option>
+
+                  <option value="राजनीति">
+                    राजनीति
+                  </option>
+
+                  <option value="शिक्षा">
+                    शिक्षा
+                  </option>
+
+                  <option value="नौकरी">
+                    नौकरी
+                  </option>
+
+                  <option value="खेल">
+                    खेल
+                  </option>
+
+                  <option value="व्यापार">
+                    व्यापार
+                  </option>
+
+                  <option value="मनोरंजन">
+                    मनोरंजन
+                  </option>
+
+                  <option value="देश">
+                    देश
+                  </option>
+
+                  <option value="दुनिया">
+                    दुनिया
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <!-- Status -->
+              <div class="filter-field">
+
+                <label for="news-status-filter">
+                  Status
+                </label>
+
+                <select
+                  id="news-status-filter"
+                >
+
+                  <option value="">
+                    सभी Status
+                  </option>
+
+                  <option value="published">
+                    Published
+                  </option>
+
+                  <option value="draft">
+                    Draft
+                  </option>
+
+                  <option value="scheduled">
+                    Scheduled
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <!-- Sort -->
+              <div class="filter-field">
+
+                <label for="news-sort-filter">
+                  Sort By
+                </label>
+
+                <select
+                  id="news-sort-filter"
+                >
+
+                  <option value="newest">
+                    नवीनतम
+                  </option>
+
+                  <option value="oldest">
+                    सबसे पुरानी
+                  </option>
+
+                  <option value="updated">
+                    Recently Updated
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- News Table -->
+          <div class="content-card table-card">
+
+            <div class="table-card-header">
+
+              <div>
+
+                <h3>
+                  All News
+                </h3>
+
+                <span
+                  id="news-result-count"
+                  class="result-count"
+                >
+                  0 news
+                </span>
+
+              </div>
+
+              <div class="table-header-actions">
+
+                <button
+                  type="button"
+                  id="news-select-all-button"
+                  class="small-action-button"
+                >
+                  Select All
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <div class="responsive-table-wrapper">
+
+              <table
+                class="admin-table"
+                id="news-table"
+              >
+
+                <thead>
+
+                  <tr>
+
+                    <th class="checkbox-column">
+                      <input
+                        type="checkbox"
+                        id="news-select-all"
+                        aria-label="Select all news"
+                      />
+                    </th>
+
+                    <th>
+                      News
+                    </th>
+
+                    <th>
+                      Category
+                    </th>
+
+                    <th>
+                      Author
+                    </th>
+
+                    <th>
+                      Status
+                    </th>
+
+                    <th>
+                      Date
+                    </th>
+
+                    <th class="actions-column">
+                      Actions
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody id="news-table-body">
+
+                  <!-- JS news rows render करेगा -->
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+
+            <!-- News Empty State -->
+            <div
+              id="news-empty-state"
+              class="table-empty-state"
+              hidden
+            >
+
+              <div class="empty-state-icon">
+                📰
+              </div>
+
+              <h4>
+                कोई News नहीं मिली
+              </h4>
+
+              <p>
+                Search या filter बदलकर फिर प्रयास करें।
+              </p>
+
+            </div>
+
+
+            <!-- News Loading -->
+            <div
+              id="news-loading-state"
+              class="table-loading-state"
+              hidden
+            >
+
+              <div class="loading-spinner"></div>
+
+              <span>
+                News लोड हो रही हैं...
+              </span>
+
+            </div>
+
+
+            <!-- Pagination -->
+            <div
+              id="news-pagination"
+              class="table-pagination"
+            >
+
+              <span
+                id="news-pagination-info"
+                class="pagination-info"
+              >
+                0 results
+              </span>
+
+              <div class="pagination-buttons">
+
+                <button
+                  type="button"
+                  id="news-prev-page"
+                  class="pagination-button"
+                  disabled
+                >
+                  ← Previous
+                </button>
+
+                <span
+                  id="news-page-number"
+                  class="pagination-page-number"
+                >
+                  1
+                </span>
+
+                <button
+                  type="button"
+                  id="news-next-page"
+                  class="pagination-button"
+                  disabled
+                >
+                  Next →
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             BREAKING NEWS SECTION
+             ========================================== -->
+
+        <section
+          id="section-breaking"
+          class="admin-section"
+          data-section-content="breaking"
+          hidden
+        >
+
+          <div class="section-toolbar">
+
+            <div class="section-toolbar-left">
+
+              <span class="section-eyebrow">
+                LIVE CONTENT
+              </span>
+
+              <h2>
+                Breaking News
+              </h2>
+
+              <p>
+                वेबसाइट की Breaking News ticker को
+                यहाँ से नियंत्रित करें।
+              </p>
+
+            </div>
+
+            <div class="section-toolbar-actions">
+
+              <button
+                type="button"
+                id="breaking-refresh-button"
+                class="secondary-button"
+              >
+                🔄 Refresh
+              </button>
+
+              <button
+                type="button"
+                id="create-breaking-button"
+                class="primary-button"
+                data-action="create-breaking"
+                data-permission="breaking.manage"
+              >
+                🚨 Add Breaking
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- Breaking Status -->
+          <div class="content-card breaking-status-card">
+
+            <div class="breaking-status-content">
+
+              <div class="breaking-status-icon">
+                🚨
+              </div>
+
+              <div class="breaking-status-text">
+
+                <span class="section-eyebrow">
+                  BREAKING TICKER
+                </span>
+
+                <h3>
+                  Breaking News Status
+                </h3>
+
+                <p id="breaking-status-description">
+                  Breaking News ticker की स्थिति जाँच रहे हैं...
+                </p>
+
+              </div>
+
+              <label class="switch-control">
+
+                <input
+                  type="checkbox"
+                  id="breaking-enabled-toggle"
+                />
+
+                <span class="switch-slider"></span>
+
+                <span class="switch-label">
+                  Enabled
+                </span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <!-- Breaking News Form -->
+          <div class="content-card">
+
+            <div class="content-card-header">
+
+              <div>
+
+                <span class="section-eyebrow">
+                  CURRENT
+                </span>
+
+                <h3>
+                  Current Breaking News
+                </h3>
+
+              </div>
+
+              <span
+                id="breaking-item-count"
+                class="count-badge"
+              >
+                0
+              </span>
+
+            </div>
+
+
+            <div
+              id="breaking-news-list"
+              class="breaking-news-list"
+            >
+
+              <!-- JS breaking items render करेगा -->
+
+              <div
+                id="breaking-empty-state"
+                class="empty-state"
+              >
+
+                <div class="empty-state-icon">
+                  🚨
+                </div>
+
+                <h4>
+                  कोई Breaking News नहीं है
+                </h4>
+
+                <p>
+                  Add Breaking से नई Breaking News जोड़ें।
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             TRENDING SECTION
+             ========================================== -->
+
+        <section
+          id="section-trending"
+          class="admin-section"
+          data-section-content="trending"
+          hidden
+        >
+
+          <div class="section-toolbar">
+
+            <div class="section-toolbar-left">
+
+              <span class="section-eyebrow">
+                AUDIENCE
+              </span>
+
+              <h2>
+                Trending News
+              </h2>
+
+              <p>
+                Homepage पर दिखाई देने वाली Trending
+                News को मैनेज करें।
+              </p>
+
+            </div>
+
+            <div class="section-toolbar-actions">
+
+              <button
+                type="button"
+                id="trending-refresh-button"
+                class="secondary-button"
+              >
+                🔄 Refresh
+              </button>
+
+              <button
+                type="button"
+                id="save-trending-button"
+                class="primary-button"
+                data-permission="trending.manage"
+              >
+                💾 Save Changes
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- Trending Info -->
+          <div class="info-banner">
+
+            <span
+              class="info-banner-icon"
+              aria-hidden="true"
+            >
+              💡
+            </span>
+
+            <div class="info-banner-content">
+
+              <strong>
+                Trending Order
+              </strong>
+
+              <p>
+                ऊपर की खबर सबसे पहले दिखाई जाएगी।
+                Drag करके खबरों का क्रम बदल सकते हैं।
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- Trending List -->
+          <div class="content-card">
+
+            <div class="content-card-header">
+
+              <div>
+
+                <span class="section-eyebrow">
+                  TRENDING LIST
+                </span>
+
+                <h3>
+                  Selected Stories
+                </h3>
+
+              </div>
+
+              <span
+                id="trending-count"
+                class="count-badge"
+              >
+                0
+              </span>
+
+            </div>
+
+
+            <div
+              id="trending-news-list"
+              class="sortable-list"
+            >
+
+              <!-- JS trending items render करेगा -->
+
+              <div
+                id="trending-empty-state"
+                class="empty-state"
+              >
+
+                <div class="empty-state-icon">
+                  🔥
+                </div>
+
+                <h4>
+                  Trending list खाली है
+                </h4>
+
+                <p>
+                  Trending में News जोड़ने के लिए
+                  ऊपर से Manage करें।
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Trending Add Area -->
+          <div class="content-card">
+
+            <div class="content-card-header">
+
+              <div>
+
+                <span class="section-eyebrow">
+                  ADD STORY
+                </span>
+
+                <h3>
+                  Trending में News जोड़ें
+                </h3>
+
+              </div>
+
+            </div>
+
+
+            <div class="add-story-row">
+
+              <div class="search-input-wrapper">
+
+                <span
+                  class="search-input-icon"
+                  aria-hidden="true"
+                >
+                  🔍
+                </span>
+
+                <input
+                  type="search"
+                  id="trending-news-search"
+                  placeholder="News खोजें..."
+                  autocomplete="off"
+                />
+
+              </div>
+
+              <button
+                type="button"
+                id="add-trending-news-button"
+                class="primary-button"
+                data-permission="trending.manage"
+              >
+                ➕ Add
+              </button>
+
+            </div>
+
+
+            <div
+              id="trending-search-results"
+              class="search-results-list"
+            >
+              <!-- Search results JS render करेगा -->
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             PART 5 आगे जारी होगा
+             ========================================== -->
+                <!-- ==========================================
+             VIDEO MANAGEMENT SECTION
+             ========================================== -->
+
+        <section
+          id="section-video"
+          class="admin-section"
+          data-section-content="video"
+          hidden
+        >
+
+          <div class="section-toolbar">
+
+            <div class="section-toolbar-left">
+
+              <span class="section-eyebrow">
+                VIDEO CONTENT
+              </span>
+
+              <h2>
+                Video Management
+              </h2>
+
+              <p>
+                वेबसाइट पर दिखने वाले Video Content को
+                यहाँ से मैनेज करें।
+              </p>
+
+            </div>
+
+            <div class="section-toolbar-actions">
+
+              <button
+                type="button"
+                id="video-refresh-button"
+                class="secondary-button"
+              >
+                🔄 Refresh
+              </button>
+
+              <button
+                type="button"
+                id="create-video-button"
+                class="primary-button"
+                data-action="create-video"
+                data-permission="video.manage"
+              >
+                🎥 Add Video
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- Video Filters -->
+          <div class="content-card">
+
+            <div class="filter-row">
+
+              <div class="filter-field search-filter">
+
+                <label for="video-search">
+                  Search Video
+                </label>
+
+                <div class="search-input-wrapper">
+
+                  <span
+                    class="search-input-icon"
+                    aria-hidden="true"
+                  >
+                    🔍
+                  </span>
+
+                  <input
+                    type="search"
+                    id="video-search"
+                    placeholder="Video title या keyword..."
+                    autocomplete="off"
+                  />
+
+                </div>
+
+              </div>
+
+
+              <div class="filter-field">
+
+                <label for="video-status-filter">
+                  Status
+                </label>
+
+                <select id="video-status-filter">
+
+                  <option value="">
+                    सभी Status
+                  </option>
+
+                  <option value="published">
+                    Published
+                  </option>
+
+                  <option value="draft">
+                    Draft
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Video List -->
+          <div class="content-card table-card">
+
+            <div class="table-card-header">
+
+              <div>
+
+                <h3>
+                  Video Library
+                </h3>
+
+                <span
+                  id="video-result-count"
+                  class="result-count"
+                >
+                  0 videos
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div
+              id="video-list"
+              class="media-grid"
+            >
+
+              <!-- JS videos render करेगा -->
+
+              <div
+                id="video-empty-state"
+                class="empty-state"
+              >
+
+                <div class="empty-state-icon">
+                  🎥
+                </div>
+
+                <h4>
+                  अभी कोई Video नहीं है
+                </h4>
+
+                <p>
+                  Add Video से नया वीडियो जोड़ें।
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             LIVE TV SECTION
+             ========================================== -->
+
+        <section
+          id="section-live-tv"
+          class="admin-section"
+          data-section-content="live-tv"
+          hidden
+        >
+
+          <div class="section-toolbar">
+
+            <div class="section-toolbar-left">
+
+              <span class="section-eyebrow">
+                LIVE BROADCAST
+              </span>
+
+              <h2>
+                Live TV
+              </h2>
+
+              <p>
+                आवाज राजस्थान Live TV की स्थिति और
+                stream को यहाँ से नियंत्रित करें।
+              </p>
+
+            </div>
+
+            <div class="section-toolbar-actions">
+
+              <button
+                type="button"
+                id="live-tv-refresh-button"
+                class="secondary-button"
+              >
+                🔄 Refresh
+              </button>
+
+              <button
+                type="button"
+                id="save-live-tv-button"
+                class="primary-button"
+                data-permission="live-tv.manage"
+              >
+                💾 Save Changes
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- Live TV Status -->
+          <div class="content-card live-tv-status-card">
+
+            <div class="live-tv-status-content">
+
+              <div class="live-tv-icon">
+                📺
+              </div>
+
+              <div class="live-tv-status-info">
+
+                <span class="section-eyebrow">
+                  BROADCAST STATUS
+                </span>
+
+                <h3>
+                  Live TV Channel
+                </h3>
+
+                <p id="live-tv-status-description">
+                  Live TV configuration लोड हो रही है...
+                </p>
+
+              </div>
+
+              <label class="switch-control">
+
+                <input
+                  type="checkbox"
+                  id="live-tv-enabled-toggle"
+                />
+
+                <span class="switch-slider"></span>
+
+                <span class="switch-label">
+                  Live
+                </span>
+
+              </label>
+
+            </div>
+
+          </div>
+
+
+          <!-- Live TV Settings -->
+          <div class="content-card">
+
+            <div class="content-card-header">
+
+              <div>
+
+                <span class="section-eyebrow">
+                  STREAM SETTINGS
+                </span>
+
+                <h3>
+                  Live TV Configuration
+                </h3>
+
+              </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+              <!-- Title -->
+              <div class="form-group">
+
+                <label for="live-tv-title">
+                  Channel Title
+                </label>
+
+                <input
+                  type="text"
+                  id="live-tv-title"
+                  placeholder="आवाज राजस्थान Live TV"
+                  maxlength="120"
+                />
+
+              </div>
+
+
+              <!-- Stream URL -->
+              <div class="form-group">
+
+                <label for="live-tv-url">
+                  Stream URL
+                </label>
+
+                <input
+                  type="url"
+                  id="live-tv-url"
+                  placeholder="https://example.com/live-stream"
+                  autocomplete="off"
+                />
+
+              </div>
+
+
+              <!-- Poster -->
+              <div class="form-group">
+
+                <label for="live-tv-poster">
+                  Poster / Thumbnail URL
+                </label>
+
+                <input
+                  type="url"
+                  id="live-tv-poster"
+                  placeholder="https://example.com/poster.jpg"
+                  autocomplete="off"
+                />
+
+              </div>
+
+
+              <!-- Description -->
+              <div class="form-group form-group-full">
+
+                <label for="live-tv-description">
+                  Description
+                </label>
+
+                <textarea
+                  id="live-tv-description"
+                  rows="4"
+                  maxlength="500"
+                  placeholder="Live TV के बारे में जानकारी..."
+                ></textarea>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Live TV Preview -->
+          <div class="content-card">
+
+            <div class="content-card-header">
+
+              <div>
+
+                <span class="section-eyebrow">
+                  PREVIEW
+                </span>
+
+                <h3>
+                  Live TV Preview
+                </h3>
+
+              </div>
+
+              <span
+                id="live-tv-preview-status"
+                class="status-badge"
+              >
+                Preview
+              </span>
+
+            </div>
+
+
+            <div
+              id="live-tv-preview"
+              class="live-tv-preview"
+            >
+
+              <div class="live-tv-preview-placeholder">
+
+                <span>
+                  📺
+                </span>
+
+                <p>
+                  Stream Preview
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             LIVE BLOG SECTION
+             ========================================== -->
+
+        <section
+          id="section-live-blog"
+          class="admin-section"
+          data-section-content="live-blog"
+          hidden
+        >
+
+          <div class="section-toolbar">
+
+            <div class="section-toolbar-left">
+
+              <span class="section-eyebrow">
+                REAL-TIME NEWS
+              </span>
+
+              <h2>
+                Live Blog
+              </h2>
+
+              <p>
+                किसी बड़ी घटना की Live Updates को
+                क्रमवार प्रकाशित करें।
+              </p>
+
+            </div>
+
+            <div class="section-toolbar-actions">
+
+              <button
+                type="button"
+                id="live-blog-refresh-button"
+                class="secondary-button"
+              >
+                🔄 Refresh
+              </button>
+
+              <button
+                type="button"
+                id="create-live-blog-button"
+                class="primary-button"
+                data-action="create-live-blog"
+                data-permission="live-blog.manage"
+              >
+                🔴 Start Live Blog
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- Live Blog Current Status -->
+          <div class="content-card live-blog-status-card">
+
+            <div class="live-blog-status-content">
+
+              <div class="live-blog-status-icon">
+                🔴
+              </div>
+
+              <div class="live-blog-status-info">
+
+                <span class="section-eyebrow">
+                  LIVE COVERAGE
+                </span>
+
+                <h3
+                  id="live-blog-current-title"
+                >
+                  कोई Live Blog सक्रिय नहीं है
+                </h3>
+
+                <p
+                  id="live-blog-current-description"
+                >
+                  नई Live Coverage शुरू करने के लिए
+                  Start Live Blog पर क्लिक करें।
+                </p>
+
+              </div>
+
+              <span
+                id="live-blog-current-status"
+                class="status-badge offline"
+              >
+                Offline
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- Live Blog List -->
+          <div class="content-card table-card">
+
+            <div class="table-card-header">
+
+              <div>
+
+                <span class="section-eyebrow">
+                  LIVE BLOGS
+                </span>
+
+                <h3>
+                  Coverage History
+                </h3>
+
+              </div>
+
+              <span
+                id="live-blog-count"
+                class="count-badge"
+              >
+                0
+              </span>
+
+            </div>
+
+
+            <div
+              id="live-blog-list"
+              class="live-blog-list"
+            >
+
+              <!-- JS live blogs render करेगा -->
+
+              <div
+                id="live-blog-empty-state"
+                class="empty-state"
+              >
+
+                <div class="empty-state-icon">
+                  🔴
+                </div>
+
+                <h4>
+                  कोई Live Blog उपलब्ध नहीं है
+                </h4>
+
+                <p>
+                  बड़ी खबर के लिए Live Blog शुरू करें।
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Live Update Composer -->
+          <div
+            id="live-blog-composer"
+            class="content-card live-blog-composer"
+            hidden
+          >
+
+            <div class="content-card-header">
+
+              <div>
+
+                <span class="section-eyebrow">
+                  LIVE UPDATE
+                </span>
+
+                <h3>
+                  नई Update प्रकाशित करें
+                </h3>
+
+              </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+              <div class="form-group form-group-full">
+
+                <label for="live-blog-update-text">
+                  Update
+                </label>
+
+                <textarea
+                  id="live-blog-update-text"
+                  rows="5"
+                  maxlength="2000"
+                  placeholder="Live घटना की नई जानकारी लिखें..."
+                ></textarea>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="live-blog-update-type">
+                  Update Type
+                </label>
+
+                <select id="live-blog-update-type">
+
+                  <option value="update">
+                    सामान्य Update
+                  </option>
+
+                  <option value="important">
+                    महत्वपूर्ण
+                  </option>
+
+                  <option value="breaking">
+                    Breaking
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="form-group form-action-group">
+
+                <button
+                  type="button"
+                  id="publish-live-blog-update"
+                  class="primary-button"
+                  data-permission="live-blog.manage"
+                >
+                  🔴 Publish Update
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ==========================================
+             PART 6 आगे जारी होगा
+             ========================================== -->
+        <!-- =========================================================
+     PART 6A
+     EPAPER + CONTACTS + USERS
+     ========================================================= -->
+
+<!-- =========================
+     EPAPER MANAGEMENT
+     ========================= -->
+<section
+  id="section-epaper"
+  class="admin-section"
+  data-section-content="epaper"
+  hidden
+>
+  <div class="section-toolbar">
+    <div class="section-toolbar-left">
+      <div>
+        <div class="section-eyebrow">CONTENT MANAGEMENT</div>
+        <h2 class="section-title">ePaper Management</h2>
+        <p class="section-description">
+          दैनिक ePaper अपलोड और प्रकाशित करें।
+        </p>
+      </div>
+    </div>
+
+    <div class="section-toolbar-actions">
+      <button
+        type="button"
+        class="primary-button"
+        id="epaper-upload-button"
+      >
+        <span class="button-icon">＋</span>
+        <span>ePaper Upload</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Current ePaper -->
+  <div class="content-card epaper-preview-card">
+    <div class="epaper-preview-icon">
+      <span>📰</span>
+    </div>
+
+    <div class="epaper-preview-info">
+      <div class="section-eyebrow">CURRENT EPAPER</div>
+      <h3 id="current-epaper-title">आज का ePaper</h3>
+
+      <p id="current-epaper-meta">
+        अभी कोई ePaper प्रकाशित नहीं है।
+      </p>
+
+      <div class="epaper-preview-status">
+        <span
+          id="current-epaper-status"
+          class="status-badge offline"
+        >
+          उपलब्ध नहीं
+        </span>
+      </div>
+    </div>
+
+    <div class="epaper-preview-actions">
+      <button
+        type="button"
+        class="secondary-button"
+        id="epaper-preview-button"
+      >
+        <span class="button-icon">👁</span>
+        Preview
+      </button>
+
+      <button
+        type="button"
+        class="secondary-button"
+        id="epaper-download-button"
+      >
+        <span class="button-icon">↓</span>
+        Download
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload Form -->
+  <div class="content-card upload-form">
+    <div class="content-card-header">
+      <div>
+        <div class="section-eyebrow">NEW EPAPER</div>
+        <h3>नया ePaper अपलोड करें</h3>
+      </div>
+
+      <div class="dashboard-card-header-icon">
+        🗞️
+      </div>
+    </div>
+
+    <form id="epaper-upload-form">
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="epaper-title">
+            ePaper Title
+          </label>
+
+          <input
+            type="text"
+            id="epaper-title"
+            name="title"
+            placeholder="जैसे: आवाज राजस्थान - 8 सितंबर 2026"
+            maxlength="200"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="epaper-date">
+            Publication Date
+          </label>
+
+          <input
+            type="date"
+            id="epaper-date"
+            name="date"
+          />
+        </div>
+
+        <div class="form-group form-group-full">
+          <label for="epaper-description">
+            Description
+          </label>
+
+          <textarea
+            id="epaper-description"
+            name="description"
+            rows="3"
+            maxlength="500"
+            placeholder="ePaper के बारे में संक्षिप्त जानकारी..."
+          ></textarea>
+        </div>
+
+        <div class="form-group form-group-full">
+
+          <label>
+            ePaper PDF
+          </label>
+
+          <div
+            class="file-drop-zone"
+            id="epaper-file-drop-zone"
+          >
+            <input
+              type="file"
+              id="epaper-file"
+              name="file"
+              accept=".pdf,application/pdf"
+              hidden
+            />
+
+            <div class="file-drop-content">
+              <div class="file-drop-icon">
+                📄
+              </div>
+
+              <strong>
+                PDF यहाँ चुनें
+              </strong>
+
+              <span>
+                या क्लिक करके PDF फ़ाइल चुनें
+              </span>
+
+              <small>
+                केवल PDF फ़ाइल • अधिकतम फ़ाइल आकार server settings के अनुसार
+              </small>
+
+              <div
+                id="epaper-selected-file"
+                class="selected-file-name"
+                hidden
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="epaper-publish-status">
+            Publication Status
+          </label>
+
+          <select
+            id="epaper-publish-status"
+            name="status"
+          >
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="epaper-featured">
+            Featured
+          </label>
+
+          <select
+            id="epaper-featured"
+            name="featured"
+          >
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+
+        <button
+          type="reset"
+          class="secondary-button"
+          id="epaper-reset-button"
+        >
+          Reset
+        </button>
+
+        <button
+          type="submit"
+          class="primary-button"
+          id="epaper-submit-button"
+        >
+          <span class="button-icon">↑</span>
+          <span class="button-text">Upload ePaper</span>
+          <span
+            class="button-loader"
+            hidden
+          ></span>
+        </button>
+
+      </div>
+    </form>
+  </div>
+
+  <!-- ePaper History -->
+  <div class="content-card">
+    <div class="content-card-header">
+      <div>
+        <div class="section-eyebrow">ARCHIVE</div>
+        <h3>ePaper History</h3>
+      </div>
+
+      <div class="table-header-actions">
+        <button
+          type="button"
+          class="small-action-button"
+          id="epaper-refresh-button"
+          title="Refresh"
+        >
+          ↻
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="epaper-history-list"
+      class="epaper-history-list"
+    >
+      <div class="table-empty-state">
+        <div class="table-empty-icon">📰</div>
+        <h4>कोई ePaper उपलब्ध नहीं</h4>
+        <p>
+          अपलोड किए गए ePaper यहाँ दिखाई देंगे।
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =========================
+     CONTACT MANAGEMENT
+     ========================= -->
+<section
+  id="section-contacts"
+  class="admin-section"
+  data-section-content="contacts"
+  hidden
+>
+  <div class="section-toolbar">
+    <div class="section-toolbar-left">
+      <div>
+        <div class="section-eyebrow">COMMUNICATION</div>
+        <h2 class="section-title">Contact Messages</h2>
+        <p class="section-description">
+          वेबसाइट से प्राप्त संपर्क संदेश देखें और manage करें।
+        </p>
+      </div>
+    </div>
+
+    <div class="section-toolbar-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        id="contacts-refresh-button"
+      >
+        <span class="button-icon">↻</span>
+        Refresh
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Contact Stats -->
+  <div class="mini-stats-grid">
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-icon">
+        ✉️
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Total Messages
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="contacts-total-count"
+        >
+          0
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-icon">
+        🆕
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          New
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="contacts-new-count"
+        >
+          0
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-icon">
+        👁️
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Read
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="contacts-read-count"
+        >
+          0
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-stat-card">
+      <div class="mini-stat-icon">
+        ✅
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Resolved
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="contacts-resolved-count"
+        >
+          0
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Contact Filters -->
+  <div class="content-card">
+
+    <div class="filter-row">
+
+      <div class="filter-field search-filter">
+
+        <label for="contacts-search">
+          Search
+        </label>
+
+        <div class="search-input-wrapper">
+
+          <span class="search-input-icon">
+            🔎
+          </span>
+
+          <input
+            type="search"
+            id="contacts-search"
+            class="search-input"
+            placeholder="नाम, email या subject खोजें..."
+          />
+
+        </div>
+      </div>
+
+      <div class="filter-field">
+
+        <label for="contacts-status-filter">
+          Status
+        </label>
+
+        <select id="contacts-status-filter">
+          <option value="">All Status</option>
+          <option value="new">New</option>
+          <option value="read">Read</option>
+          <option value="resolved">Resolved</option>
+        </select>
+
+      </div>
+
+      <div class="filter-field">
+
+        <label for="contacts-sort">
+          Sort
+        </label>
+
+        <select id="contacts-sort">
+          <option value="newest">
+            Newest First
+          </option>
+
+          <option value="oldest">
+            Oldest First
+          </option>
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Contacts Table -->
+  <div class="content-card table-card">
+
+    <div class="content-card-header">
+
+      <div>
+        <div class="section-eyebrow">
+          INBOX
+        </div>
+
+        <h3>
+          Contact Messages
+        </h3>
+      </div>
+
+      <div class="result-count">
+        <span id="contacts-result-count">
+          0
+        </span>
+        messages
+      </div>
+
+    </div>
+
+    <div class="responsive-table-wrapper">
+
+      <table class="admin-table">
+
+        <thead>
+          <tr>
+
+            <th>
+              Sender
+            </th>
+
+            <th>
+              Subject
+            </th>
+
+            <th>
+              Message
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Date
+            </th>
+
+            <th class="actions-column">
+              Actions
+            </th>
+
+          </tr>
+        </thead>
+
+        <tbody id="contacts-table-body">
+
+          <tr>
+            <td
+              colspan="6"
+              class="table-empty-state"
+            >
+              <div class="table-empty-icon">
+                ✉️
+              </div>
+
+              <h4>
+                कोई contact message नहीं
+              </h4>
+
+              <p>
+                वेबसाइट से आने वाले messages यहाँ दिखाई देंगे।
+              </p>
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <div class="table-pagination">
+
+      <div class="pagination-info">
+        Showing
+        <span id="contacts-pagination-from">0</span>
+        -
+        <span id="contacts-pagination-to">0</span>
+        of
+        <span id="contacts-pagination-total">0</span>
+      </div>
+
+      <div class="pagination-buttons">
+
+        <button
+          type="button"
+          class="pagination-button"
+          id="contacts-prev-page"
+          disabled
+        >
+          ←
+        </button>
+
+        <span
+          class="pagination-page-number"
+          id="contacts-current-page"
+        >
+          1
+        </span>
+
+        <button
+          type="button"
+          class="pagination-button"
+          id="contacts-next-page"
+          disabled
+        >
+          →
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+
+<!-- =========================
+     PUBLIC USERS MANAGEMENT
+     ========================= -->
+<section
+  id="section-users"
+  class="admin-section"
+  data-section-content="users"
+  hidden
+>
+  <div class="section-toolbar">
+
+    <div class="section-toolbar-left">
+
+      <div>
+        <div class="section-eyebrow">
+          USER MANAGEMENT
+        </div>
+
+        <h2 class="section-title">
+          Public Users
+        </h2>
+
+        <p class="section-description">
+          वेबसाइट के registered users की जानकारी और access manage करें।
+        </p>
+      </div>
+
+    </div>
+
+    <div class="section-toolbar-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        id="users-refresh-button"
+      >
+        <span class="button-icon">↻</span>
+        Refresh
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- User Stats -->
+  <div class="mini-stats-grid">
+
+    <div class="mini-stat-card">
+
+      <div class="mini-stat-icon">
+        👥
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Total Users
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="users-total-count"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="mini-stat-card">
+
+      <div class="mini-stat-icon">
+        🟢
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Active Users
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="users-active-count"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="mini-stat-card">
+
+      <div class="mini-stat-icon">
+        📝
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Reporters
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="users-reporter-count"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="mini-stat-card">
+
+      <div class="mini-stat-icon">
+        📅
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          New This Month
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="users-new-month-count"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- User Filters -->
+  <div class="content-card">
+
+    <div class="filter-row">
+
+      <div class="filter-field search-filter">
+
+        <label for="users-search">
+          Search Users
+        </label>
+
+        <div class="search-input-wrapper">
+
+          <span class="search-input-icon">
+            🔎
+          </span>
+
+          <input
+            type="search"
+            id="users-search"
+            class="search-input"
+            placeholder="नाम, email या mobile खोजें..."
+          />
+
+        </div>
+
+      </div>
+
+
+      <div class="filter-field">
+
+        <label for="users-role-filter">
+          Role
+        </label>
+
+        <select id="users-role-filter">
+
+          <option value="">
+            All Roles
+          </option>
+
+          <option value="user">
+            User
+          </option>
+
+          <option value="reporter">
+            Reporter
+          </option>
+
+          <option value="admin">
+            Admin
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="filter-field">
+
+        <label for="users-status-filter">
+          Status
+        </label>
+
+        <select id="users-status-filter">
+
+          <option value="">
+            All Status
+          </option>
+
+          <option value="active">
+            Active
+          </option>
+
+          <option value="inactive">
+            Inactive
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Users Table -->
+  <div class="content-card table-card">
+
+    <div class="content-card-header">
+
+      <div>
+
+        <div class="section-eyebrow">
+          REGISTERED USERS
+        </div>
+
+        <h3>
+          User Directory
+        </h3>
+
+      </div>
+
+      <div class="result-count">
+
+        <span id="users-result-count">
+          0
+        </span>
+
+        users
+
+      </div>
+
+    </div>
+
+
+    <div class="responsive-table-wrapper">
+
+      <table class="admin-table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              User
+            </th>
+
+            <th>
+              Email
+            </th>
+
+            <th>
+              Role
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Joined
+            </th>
+
+            <th class="actions-column">
+              Actions
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="users-table-body">
+
+          <tr>
+
+            <td
+              colspan="6"
+              class="table-empty-state"
+            >
+
+              <div class="table-empty-icon">
+                👥
+              </div>
+
+              <h4>
+                कोई user data नहीं
+              </h4>
+
+              <p>
+                Registered users यहाँ दिखाई देंगे।
+              </p>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- Pagination -->
+    <div class="table-pagination">
+
+      <div class="pagination-info">
+
+        Showing
+        <span id="users-pagination-from">
+          0
+        </span>
+
+        -
+
+        <span id="users-pagination-to">
+          0
+        </span>
+
+        of
+
+        <span id="users-pagination-total">
+          0
+        </span>
+
+      </div>
+
+
+      <div class="pagination-buttons">
+
+        <button
+          type="button"
+          class="pagination-button"
+          id="users-prev-page"
+          disabled
+        >
+          ←
+        </button>
+
+        <span
+          class="pagination-page-number"
+          id="users-current-page"
+        >
+          1
+        </span>
+
+        <button
+          type="button"
+          class="pagination-button"
+          id="users-next-page"
+          disabled
+        >
+          →
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- User Information -->
+  <div class="content-card info-banner">
+
+    <div class="info-banner-icon">
+      ℹ️
+    </div>
+
+    <div class="info-banner-content">
+
+      <strong>
+        Public Users और Admin Users अलग हैं
+      </strong>
+
+      <p>
+        इस section में केवल public website users manage किए जाते हैं।
+        Admin और Owner accounts को अलग से Admin Management section में manage किया जाएगा।
+      </p>
+
+    </div>
+
+  </div>
+
+            </section>
+            <!-- =========================================================
+     PART 6B
+     ADMIN MANAGEMENT + SITE SETTINGS + MY PROFILE
+     ========================================================= -->
+
+
+<!-- =========================
+     ADMIN MANAGEMENT
+     OWNER ONLY
+     ========================= -->
+<section
+  id="section-admins"
+  class="admin-section"
+  data-section-content="admins"
+  hidden
+>
+  <div class="section-toolbar">
+
+    <div class="section-toolbar-left">
+      <div>
+        <div class="section-eyebrow">
+          ACCESS CONTROL
+        </div>
+
+        <h2 class="section-title">
+          Admin Management
+        </h2>
+
+        <p class="section-description">
+          Admin accounts, roles और permissions को manage करें।
+        </p>
+      </div>
+    </div>
+
+    <div class="section-toolbar-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        id="admins-refresh-button"
+      >
+        <span class="button-icon">↻</span>
+        Refresh
+      </button>
+
+      <button
+        type="button"
+        class="primary-button"
+        id="create-admin-button"
+      >
+        <span class="button-icon">＋</span>
+        <span>Create Admin</span>
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- Owner Information -->
+  <div class="content-card owner-info-banner">
+
+    <div class="info-banner-icon">
+      👑
+    </div>
+
+    <div class="info-banner-content">
+
+      <strong>
+        Owner Control
+      </strong>
+
+      <p>
+        केवल Owner ही नए Admin बना सकता है और Admin permissions,
+        activation, password तथा account access को manage कर सकता है।
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- Admin Stats -->
+  <div class="mini-stats-grid">
+
+    <div class="mini-stat-card">
+
+      <div class="mini-stat-icon">
+        👑
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Owner
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="admins-owner-count"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="mini-stat-card">
+
+      <div class="mini-stat-icon">
+        🛡️
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Admins
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="admins-admin-count"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="mini-stat-card">
+
+      <div class="mini-stat-icon">
+        🟢
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Active
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="admins-active-count"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="mini-stat-card">
+
+      <div class="mini-stat-icon">
+        🔴
+      </div>
+
+      <div>
+        <div class="stat-card-label">
+          Inactive
+        </div>
+
+        <div
+          class="stat-card-value"
+          id="admins-inactive-count"
+        >
+          0
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Admin Filters -->
+  <div class="content-card">
+
+    <div class="filter-row">
+
+      <div class="filter-field search-filter">
+
+        <label for="admins-search">
+          Search Admin
+        </label>
+
+        <div class="search-input-wrapper">
+
+          <span class="search-input-icon">
+            🔎
+          </span>
+
+          <input
+            type="search"
+            id="admins-search"
+            class="search-input"
+            placeholder="Admin ID, नाम या email खोजें..."
+          />
+
+        </div>
+
+      </div>
+
+
+      <div class="filter-field">
+
+        <label for="admins-role-filter">
+          Role
+        </label>
+
+        <select id="admins-role-filter">
+
+          <option value="">
+            All Roles
+          </option>
+
+          <option value="owner">
+            Owner
+          </option>
+
+          <option value="admin">
+            Admin
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="filter-field">
+
+        <label for="admins-status-filter">
+          Status
+        </label>
+
+        <select id="admins-status-filter">
+
+          <option value="">
+            All Status
+          </option>
+
+          <option value="active">
+            Active
+          </option>
+
+          <option value="inactive">
+            Inactive
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Admin Table -->
+  <div class="content-card table-card">
+
+    <div class="content-card-header">
+
+      <div>
+
+        <div class="section-eyebrow">
+          ADMIN DIRECTORY
+        </div>
+
+        <h3>
+          Admin Accounts
+        </h3>
+
+      </div>
+
+      <div class="result-count">
+
+        <span id="admins-result-count">
+          0
+        </span>
+
+        admins
+
+      </div>
+
+    </div>
+
+
+    <div class="responsive-table-wrapper">
+
+      <table class="admin-table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Admin
+            </th>
+
+            <th>
+              Admin ID
+            </th>
+
+            <th>
+              Role
+            </th>
+
+            <th>
+              Permissions
+            </th>
+
+            <th>
+              Status
+            </th>
+
+            <th>
+              Last Login
+            </th>
+
+            <th class="actions-column">
+              Actions
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody id="admins-table-body">
+
+          <tr>
+
+            <td
+              colspan="7"
+              class="table-empty-state"
+            >
+
+              <div class="table-empty-icon">
+                🛡️
+              </div>
+
+              <h4>
+                कोई admin account नहीं
+              </h4>
+
+              <p>
+                Admin accounts यहाँ दिखाई देंगे।
+              </p>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- Pagination -->
+    <div class="table-pagination">
+
+      <div class="pagination-info">
+
+        Showing
+
+        <span id="admins-pagination-from">
+          0
+        </span>
+
+        -
+
+        <span id="admins-pagination-to">
+          0
+        </span>
+
+        of
+
+        <span id="admins-pagination-total">
+          0
+        </span>
+
+      </div>
+
+
+      <div class="pagination-buttons">
+
+        <button
+          type="button"
+          class="pagination-button"
+          id="admins-prev-page"
+          disabled
+        >
+          ←
+        </button>
+
+        <span
+          class="pagination-page-number"
+          id="admins-current-page"
+        >
+          1
+        </span>
+
+        <button
+          type="button"
+          class="pagination-button"
+          id="admins-next-page"
+          disabled
+        >
+          →
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     SITE SETTINGS
+     ========================= -->
+<section
+  id="section-settings"
+  class="admin-section"
+  data-section-content="settings"
+  hidden
+>
+  <div class="section-toolbar">
+
+    <div class="section-toolbar-left">
+
+      <div>
+
+        <div class="section-eyebrow">
+          CONFIGURATION
+        </div>
+
+        <h2 class="section-title">
+          Site Settings
+        </h2>
+
+        <p class="section-description">
+          वेबसाइट की basic configuration और public features manage करें।
+        </p>
+
+      </div>
+
+    </div>
+
+    <div class="section-toolbar-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        id="settings-reset-button"
+      >
+        Reset
+      </button>
+
+      <button
+        type="button"
+        class="primary-button"
+        id="settings-save-button"
+      >
+        <span class="button-icon">✓</span>
+        <span class="button-text">
+          Save Changes
+        </span>
+
+        <span
+          class="button-loader"
+          hidden
+        ></span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- General Settings -->
+  <div class="content-card">
+
+    <div class="content-card-header">
+
+      <div>
+
+        <div class="section-eyebrow">
+          GENERAL
+        </div>
+
+        <h3>
+          General Website Settings
+        </h3>
+
+      </div>
+
+      <div class="dashboard-card-header-icon">
+        ⚙️
+      </div>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <div class="form-group">
+
+        <label for="setting-site-name">
+          Site Name
+        </label>
+
+        <input
+          type="text"
+          id="setting-site-name"
+          value="आवाज राजस्थान"
+          maxlength="100"
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="setting-site-tagline">
+          Tagline
+        </label>
+
+        <input
+          type="text"
+          id="setting-site-tagline"
+          placeholder="राजस्थान की हर खबर सबसे पहले"
+          maxlength="200"
+        />
+
+      </div>
+
+
+      <div class="form-group form-group-full">
+
+        <label for="setting-site-description">
+          Site Description
+        </label>
+
+        <textarea
+          id="setting-site-description"
+          rows="3"
+          maxlength="500"
+          placeholder="आवाज राजस्थान की website description..."
+        ></textarea>
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="setting-contact-email">
+          Contact Email
+        </label>
+
+        <input
+          type="email"
+          id="setting-contact-email"
+          placeholder="contact@example.com"
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="setting-contact-phone">
+          Contact Phone
+        </label>
+
+        <input
+          type="tel"
+          id="setting-contact-phone"
+          placeholder="+91 XXXXX XXXXX"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Feature Settings -->
+  <div class="content-card">
+
+    <div class="content-card-header">
+
+      <div>
+
+        <div class="section-eyebrow">
+          FEATURES
+        </div>
+
+        <h3>
+          Website Features
+        </h3>
+
+      </div>
+
+      <div class="dashboard-card-header-icon">
+        ✨
+      </div>
+
+    </div>
+
+
+    <div class="settings-list">
+
+
+      <div class="setting-row">
+
+        <div class="setting-info">
+
+          <strong>
+            Breaking News
+          </strong>
+
+          <span>
+            वेबसाइट पर Breaking News feature enable करें।
+          </span>
+
+        </div>
+
+        <label class="switch-control">
+
+          <input
+            type="checkbox"
+            id="setting-breaking-enabled"
+            checked
+          />
+
+          <span class="switch-slider"></span>
+
+          <span class="switch-label">
+            Enabled
+          </span>
+
+        </label>
+
+      </div>
+
+
+      <div class="setting-row">
+
+        <div class="setting-info">
+
+          <strong>
+            Trending News
+          </strong>
+
+          <span>
+            Trending section को public website पर दिखाएँ।
+          </span>
+
+        </div>
+
+        <label class="switch-control">
+
+          <input
+            type="checkbox"
+            id="setting-trending-enabled"
+            checked
+          />
+
+          <span class="switch-slider"></span>
+
+          <span class="switch-label">
+            Enabled
+          </span>
+
+        </label>
+
+      </div>
+
+
+      <div class="setting-row">
+
+        <div class="setting-info">
+
+          <strong>
+            Video Section
+          </strong>
+
+          <span>
+            News video section को enable या disable करें।
+          </span>
+
+        </div>
+
+        <label class="switch-control">
+
+          <input
+            type="checkbox"
+            id="setting-video-enabled"
+            checked
+          />
+
+          <span class="switch-slider"></span>
+
+          <span class="switch-label">
+            Enabled
+          </span>
+
+        </label>
+
+      </div>
+
+
+      <div class="setting-row">
+
+        <div class="setting-info">
+
+          <strong>
+            Live TV
+          </strong>
+
+          <span>
+            Live TV feature को public website पर दिखाएँ।
+          </span>
+
+        </div>
+
+        <label class="switch-control">
+
+          <input
+            type="checkbox"
+            id="setting-live-tv-enabled"
+          />
+
+          <span class="switch-slider"></span>
+
+          <span class="switch-label">
+            Disabled
+          </span>
+
+        </label>
+
+      </div>
+
+
+      <div class="setting-row">
+
+        <div class="setting-info">
+
+          <strong>
+            Live Blog
+          </strong>
+
+          <span>
+            Live Blog feature को enable या disable करें।
+          </span>
+
+        </div>
+
+        <label class="switch-control">
+
+          <input
+            type="checkbox"
+            id="setting-live-blog-enabled"
+          />
+
+          <span class="switch-slider"></span>
+
+          <span class="switch-label">
+            Disabled
+          </span>
+
+        </label>
+
+      </div>
+
+
+      <div class="setting-row">
+
+        <div class="setting-info">
+
+          <strong>
+            ePaper
+          </strong>
+
+          <span>
+            Daily ePaper को public website पर उपलब्ध कराएँ।
+          </span>
+
+        </div>
+
+        <label class="switch-control">
+
+          <input
+            type="checkbox"
+            id="setting-epaper-enabled"
+          />
+
+          <span class="switch-slider"></span>
+
+          <span class="switch-label">
+            Disabled
+          </span>
+
+        </label>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Social Settings -->
+  <div class="content-card">
+
+    <div class="content-card-header">
+
+      <div>
+
+        <div class="section-eyebrow">
+          SOCIAL
+        </div>
+
+        <h3>
+          Social Media
+        </h3>
+
+      </div>
+
+      <div class="dashboard-card-header-icon">
+        🌐
+      </div>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <div class="form-group">
+
+        <label for="setting-facebook">
+          Facebook
+        </label>
+
+        <input
+          type="url"
+          id="setting-facebook"
+          placeholder="Facebook page URL"
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="setting-instagram">
+          Instagram
+        </label>
+
+        <input
+          type="url"
+          id="setting-instagram"
+          placeholder="Instagram profile URL"
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="setting-youtube">
+          YouTube
+        </label>
+
+        <input
+          type="url"
+          id="setting-youtube"
+          placeholder="YouTube channel URL"
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="setting-twitter">
+          X / Twitter
+        </label>
+
+        <input
+          type="url"
+          id="setting-twitter"
+          placeholder="X profile URL"
+        />
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     MY PROFILE
+     ========================= -->
+<section
+  id="section-profile"
+  class="admin-section"
+  data-section-content="profile"
+  hidden
+>
+  <div class="section-toolbar">
+
+    <div class="section-toolbar-left">
+
+      <div>
+
+        <div class="section-eyebrow">
+          ACCOUNT
+        </div>
+
+        <h2 class="section-title">
+          My Profile
+        </h2>
+
+        <p class="section-description">
+          अपने Admin account की जानकारी और security settings manage करें।
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="profile-layout">
+
+
+    <!-- Profile Card -->
+    <div class="content-card profile-card">
+
+      <div class="profile-card-top">
+
+        <div
+          class="profile-avatar"
+          id="profile-avatar"
+        >
+          AR
+        </div>
+
+        <div class="profile-main-info">
+
+          <div class="section-eyebrow">
+            ADMIN ACCOUNT
+          </div>
+
+          <h3 id="profile-name">
+            Awaaz Rajasthan
+          </h3>
+
+          <p id="profile-email">
+            -
+          </p>
+
+          <span
+            class="role-badge"
+            id="profile-role"
+          >
+            ADMIN
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="profile-details">
+
+        <div class="profile-detail-item">
+
+          <span>
+            Admin ID
+          </span>
+
+          <strong id="profile-admin-id">
+            -
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail-item">
+
+          <span>
+            Account Status
+          </span>
+
+          <strong
+            id="profile-account-status"
+            class="text-success"
+          >
+            Active
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail-item">
+
+          <span>
+            Last Login
+          </span>
+
+          <strong id="profile-last-login">
+            -
+          </strong>
+
+        </div>
+
+
+        <div class="profile-detail-item">
+
+          <span>
+            Account Created
+          </span>
+
+          <strong id="profile-created-at">
+            -
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Password Card -->
+    <div class="content-card password-card">
+
+      <div class="content-card-header">
+
+        <div>
+
+          <div class="section-eyebrow">
+            SECURITY
+          </div>
+
+          <h3>
+            Change Password
+          </h3>
+
+        </div>
+
+        <div class="security-icon">
+          🔐
+        </div>
+
+      </div>
+
+
+      <form
+        id="profile-password-form"
+        class="profile-password-form"
+      >
+
+        <div class="form-group">
+
+          <label for="profile-current-password">
+            Current Password
+          </label>
+
+          <div class="password-input-wrapper">
+
+            <input
+              type="password"
+              id="profile-current-password"
+              autocomplete="current-password"
+              required
+            />
+
+            <button
+              type="button"
+              class="password-toggle"
+              data-password-target="profile-current-password"
+              aria-label="Show password"
+            >
+              👁
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profile-new-password">
+            New Password
+          </label>
+
+          <div class="password-input-wrapper">
+
+            <input
+              type="password"
+              id="profile-new-password"
+              autocomplete="new-password"
+              minlength="8"
+              required
+            />
+
+            <button
+              type="button"
+              class="password-toggle"
+              data-password-target="profile-new-password"
+              aria-label="Show password"
+            >
+              👁
+            </button>
+
+          </div>
+
+          <small>
+            Password कम से कम 8 characters का होना चाहिए।
+          </small>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="profile-confirm-password">
+            Confirm New Password
+          </label>
+
+          <div class="password-input-wrapper">
+
+            <input
+              type="password"
+              id="profile-confirm-password"
+              autocomplete="new-password"
+              minlength="8"
+              required
+            />
+
+            <button
+              type="button"
+              class="password-toggle"
+              data-password-target="profile-confirm-password"
+              aria-label="Show password"
+            >
+              👁
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <div class="form-action-group">
+
+          <button
+            type="submit"
+            class="primary-button"
+            id="change-password-button"
+          >
+
+            <span class="button-icon">
+              🔐
+            </span>
+
+            <span class="button-text">
+              Change Password
+            </span>
+
+            <span
+              class="button-loader"
+              hidden
+            ></span>
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- Session Security -->
+  <div class="content-card">
+
+    <div class="content-card-header">
+
+      <div>
+
+        <div class="section-eyebrow">
+          SESSION SECURITY
+        </div>
+
+        <h3>
+          Active Sessions
+        </h3>
+
+      </div>
+
+      <div class="dashboard-card-header-icon">
+        🛡️
+      </div>
+
+    </div>
+
+
+    <div class="info-banner">
+
+      <div class="info-banner-icon">
+        🔒
+      </div>
+
+      <div class="info-banner-content">
+
+        <strong>
+          Secure your account
+        </strong>
+
+        <p>
+          अगर आपको लगता है कि आपका account किसी दूसरे device पर login है,
+          तो आप सभी active sessions को logout कर सकते हैं।
+        </p>
+
+      </div>
+
+      <div class="section-toolbar-actions">
+
+        <button
+          type="button"
+          class="danger-button"
+          id="logout-all-sessions-button"
+        >
+          Logout All Sessions
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+<!-- =========================================================
+     PART 7A
+     GLOBAL MODAL SYSTEM
+     ========================================================= -->
+
+
+<!-- =========================
+     GLOBAL ADMIN MODAL
+     ========================= -->
+<div
+  id="admin-modal"
+  class="admin-modal"
+  hidden
+  aria-hidden="true"
+>
+
+  <!-- Modal Backdrop -->
+  <div
+    class="admin-modal-backdrop"
+    data-modal-close="true"
+  ></div>
+
+
+  <!-- Modal Dialog -->
+  <div
+    class="admin-modal-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="admin-modal-title"
+  >
+
+    <!-- Modal Header -->
+    <div class="admin-modal-header">
+
+      <div class="admin-modal-title-area">
+
+        <div
+          class="admin-modal-icon"
+          id="admin-modal-icon"
+        >
+          ℹ️
+        </div>
+
+        <div>
+
+          <div
+            class="admin-modal-eyebrow"
+            id="admin-modal-eyebrow"
+          >
+            ADMIN PANEL
+          </div>
+
+          <h3
+            class="admin-modal-title"
+            id="admin-modal-title"
+          >
+            Details
+          </h3>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="modal-close-button"
+        id="admin-modal-close"
+        aria-label="Close modal"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- Modal Body -->
+    <div
+      class="admin-modal-body"
+      id="admin-modal-body"
+    >
+      <!-- Dynamic modal content will be inserted here -->
+    </div>
+
+
+    <!-- Modal Footer -->
+    <div
+      class="admin-modal-footer"
+      id="admin-modal-footer"
+    >
+
+      <button
+        type="button"
+        class="secondary-button"
+        id="admin-modal-cancel"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="primary-button"
+        id="admin-modal-confirm"
+      >
+        Confirm
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- =========================================================
+     PART 7B
+     TOAST + LOADING OVERLAY + CONFIRMATION DIALOG
+     ========================================================= -->
+
+
+<!-- =========================
+     ADMIN TOAST NOTIFICATIONS
+     ========================= -->
+<div
+  id="admin-toast-container"
+  class="admin-toast-container"
+  aria-live="polite"
+  aria-atomic="true"
+></div>
+
+
+
+<!-- =========================
+     GLOBAL LOADING OVERLAY
+     ========================= -->
+<div
+  id="admin-loading-overlay"
+  class="admin-loading-overlay"
+  hidden
+  aria-hidden="true"
+>
+
+  <div class="admin-loading-box">
+
+    <div class="loading-spinner large"></div>
+
+    <div class="admin-loading-content">
+
+      <strong id="admin-loading-title">
+        Please wait...
+      </strong>
+
+      <span id="admin-loading-message">
+        Processing your request
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================
+     CONFIRMATION DIALOG
+     ========================= -->
+<div
+  id="admin-confirm-dialog"
+  class="admin-confirm-dialog"
+  hidden
+  aria-hidden="true"
+>
+
+  <!-- Confirmation Backdrop -->
+  <div
+    class="admin-confirm-backdrop"
+    data-confirm-close="true"
+  ></div>
+
+
+  <!-- Confirmation Box -->
+  <div
+    class="admin-confirm-box"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="admin-confirm-title"
+    aria-describedby="admin-confirm-message"
+  >
+
+    <!-- Icon -->
+    <div
+      class="confirm-icon"
+      id="admin-confirm-icon"
+    >
+      ⚠️
+    </div>
+
+
+    <!-- Content -->
+    <div class="admin-confirm-content">
+
+      <div class="section-eyebrow">
+        CONFIRM ACTION
+      </div>
+
+      <h3 id="admin-confirm-title">
+        Are you sure?
+      </h3>
+
+      <p id="admin-confirm-message">
+        क्या आप यह action करना चाहते हैं?
+      </p>
+
+    </div>
+
+
+    <!-- Actions -->
+    <div class="confirm-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        id="admin-confirm-cancel"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="danger-button"
+        id="admin-confirm-submit"
+      >
+        Confirm
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- =========================================================
+     PART 7C
+     FOOTER + UTILITY JAVASCRIPT + ADMIN.JS + CLOSING TAGS
+     ========================================================= -->
+
+
+<!-- =========================
+     ADMIN FOOTER
+     ========================= -->
+<footer class="admin-footer">
+
+  <div class="admin-footer-left">
+
+    <span>
+      © <span id="admin-footer-year">2026</span>
+      आवाज राजस्थान
+    </span>
+
+    <span class="footer-dot">•</span>
+
+    <span>
+      Admin Panel
+    </span>
+
+  </div>
+
+
+  <div class="admin-footer-right">
+
+    <span class="footer-secure-icon">
+      🔒
+    </span>
+
+    <span>
+      Secure Admin Access
+    </span>
+
+  </div>
+
+</footer>
+
+
+</main>
+</div>
+</div>
+
+
+<!-- =========================
+     INLINE ADMIN UTILITIES
+     ========================= -->
+<script>
+  "use strict";
+
+  /*
+   * Basic global helpers.
+   * Main admin functionality is handled by admin.js.
+   */
+
+  window.AdminUI = window.AdminUI || {};
+
+
+  /* -----------------------------------------
+     Escape HTML
+     ----------------------------------------- */
+  window.AdminUI.escapeHTML = function (value) {
+    if (value === null || value === undefined) {
+      return "";
+    }
+
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
+
+
+  /* -----------------------------------------
+     Safe text setter
+     ----------------------------------------- */
+  window.AdminUI.setText = function (selector, value) {
+    const element = document.querySelector(selector);
+
+    if (!element) return;
+
+    element.textContent =
+      value === null || value === undefined
+        ? ""
+        : String(value);
+  };
+
+
+  /* -----------------------------------------
+     Current year
+     ----------------------------------------- */
+  document.addEventListener("DOMContentLoaded", function () {
+    const yearElement =
+      document.getElementById("admin-footer-year");
+
+    if (yearElement) {
+      yearElement.textContent =
+        new Date().getFullYear();
+    }
+  });
+
+
+  /* -----------------------------------------
+     Modal close helper
+     ----------------------------------------- */
+  window.AdminUI.closeModal = function () {
+    const modal =
+      document.getElementById("admin-modal");
+
+    if (!modal) return;
+
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+
+    document.body.classList.remove("modal-open");
+  };
+
+
+  /* -----------------------------------------
+     Confirmation dialog close helper
+     ----------------------------------------- */
+  window.AdminUI.closeConfirm = function () {
+    const dialog =
+      document.getElementById("admin-confirm-dialog");
+
+    if (!dialog) return;
+
+    dialog.hidden = true;
+    dialog.setAttribute("aria-hidden", "true");
+
+    document.body.classList.remove("modal-open");
+  };
+
+
+  /* -----------------------------------------
+     Loading overlay helpers
+     ----------------------------------------- */
+  window.AdminUI.showLoading = function (
+    title,
+    message
+  ) {
+    const overlay =
+      document.getElementById("admin-loading-overlay");
+
+    if (!overlay) return;
+
+    const titleElement =
+      document.getElementById("admin-loading-title");
+
+    const messageElement =
+      document.getElementById("admin-loading-message");
+
+    if (titleElement) {
+      titleElement.textContent =
+        title || "Please wait...";
+    }
+
+    if (messageElement) {
+      messageElement.textContent =
+        message || "Processing your request";
+    }
+
+    overlay.hidden = false;
+    overlay.setAttribute("aria-hidden", "false");
+
+    document.body.classList.add("loading-open");
+  };
+
+
+  window.AdminUI.hideLoading = function () {
+    const overlay =
+      document.getElementById("admin-loading-overlay");
+
+    if (!overlay) return;
+
+    overlay.hidden = true;
+    overlay.setAttribute("aria-hidden", "true");
+
+    document.body.classList.remove("loading-open");
+  };
+
+
+  /* -----------------------------------------
+     Password visibility
+     ----------------------------------------- */
+  document.addEventListener(
+    "click",
+    function (event) {
+
+      const button =
+        event.target.closest(
+          ".password-toggle"
+        );
+
+      if (!button) return;
+
+      const targetId =
+        button.getAttribute(
+          "data-password-target"
+        );
+
+      if (!targetId) return;
+
+      const input =
+        document.getElementById(targetId);
+
+      if (!input) return;
+
+      const isPassword =
+        input.type === "password";
+
+      input.type =
+        isPassword
+          ? "text"
+          : "password";
+
+      button.textContent =
+        isPassword
+          ? "🙈"
+          : "👁";
+
+      button.setAttribute(
+        "aria-label",
+        isPassword
+          ? "Hide password"
+          : "Show password"
+      );
+    }
+  );
+
+
+  /* -----------------------------------------
+     Close modal buttons
+     ----------------------------------------- */
+  document.addEventListener(
+    "click",
+    function (event) {
+
+      if (
+        event.target.closest(
+          "#admin-modal-close"
+        )
+      ) {
+        window.AdminUI.closeModal();
+      }
+
+      if (
+        event.target.closest(
+          "#admin-modal-cancel"
+        )
+      ) {
+        window.AdminUI.closeModal();
+      }
+
+      if (
+        event.target.closest(
+          "[data-modal-close='true']"
+        )
+      ) {
+        window.AdminUI.closeModal();
+      }
+
+      if (
+        event.target.closest(
+          "#admin-confirm-cancel"
+        )
+      ) {
+        window.AdminUI.closeConfirm();
+      }
+
+      if (
+        event.target.closest(
+          "[data-confirm-close='true']"
+        )
+      ) {
+        window.AdminUI.closeConfirm();
+      }
+    }
+  );
+
+
+  /* -----------------------------------------
+     Escape key
+     ----------------------------------------- */
+  document.addEventListener(
+    "keydown",
+    function (event) {
+
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      window.AdminUI.closeModal();
+      window.AdminUI.closeConfirm();
+    }
+  );
+
+
+  /* -----------------------------------------
+     Prevent accidental form submission
+     for buttons that are explicitly marked
+     as non-submit.
+     ----------------------------------------- */
+  document.addEventListener(
+    "click",
+    function (event) {
+
+      const button =
+        event.target.closest(
+          "button[data-action]"
+        );
+
+      if (!button) return;
+
+      const action =
+        button.getAttribute(
+          "data-action"
+        );
+
+      if (
+        action === "prevent-submit"
+      ) {
+        event.preventDefault();
+      }
+    }
+  );
+</script>
+
+
+<!-- =========================
+     ADMIN PANEL JAVASCRIPT
+     ========================= -->
+<script src="./admin.js"></script>
+
+
+<!-- =========================
+     HTML CLOSING TAGS
+     ========================= -->
+</body>
+  </html>
