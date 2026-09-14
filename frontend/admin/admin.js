@@ -5682,3 +5682,3315 @@ function canManageNews(
 /* =========================================================
    PART 3/20 END
    ========================================================= */
+/* =========================================================
+   NEWS EDITOR
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Open News Editor
+   --------------------------------------------------------- */
+
+function openNewsEditor(news = null) {
+
+  if (
+    news &&
+    !hasAdminPermission("news.edit")
+  ) {
+
+    showAdminToast(
+      "News edit करने की permission नहीं है।",
+      "warning"
+    );
+
+    return;
+  }
+
+
+  if (
+    !news &&
+    !hasAdminPermission("news.create")
+  ) {
+
+    showAdminToast(
+      "नई News create करने की permission नहीं है।",
+      "warning"
+    );
+
+    return;
+  }
+
+
+  adminState.editingNews =
+    news || null;
+
+
+  const modal =
+    document.getElementById(
+      "news-editor-modal"
+    );
+
+
+  if (!modal) {
+
+    console.warn(
+      "news-editor-modal नहीं मिला।"
+    );
+
+    return;
+  }
+
+
+  const title =
+    document.getElementById(
+      "news-editor-title"
+    );
+
+
+  if (title) {
+
+    title.textContent =
+      news
+        ? "Edit News"
+        : "Create News";
+
+  }
+
+
+  resetNewsEditor();
+
+
+  if (news) {
+
+    fillNewsEditor(
+      news
+    );
+
+  }
+
+
+  modal.hidden =
+    false;
+
+
+  modal.classList.add(
+    "active"
+  );
+
+
+  document.body.classList.add(
+    "admin-modal-open"
+  );
+
+
+  initializeNewsEditorFields();
+
+}
+
+
+/* ---------------------------------------------------------
+   Close News Editor
+   --------------------------------------------------------- */
+
+function closeNewsEditor() {
+
+  const modal =
+    document.getElementById(
+      "news-editor-modal"
+    );
+
+
+  if (!modal) {
+    return;
+  }
+
+
+  modal.classList.remove(
+    "active"
+  );
+
+
+  modal.hidden =
+    true;
+
+
+  document.body.classList.remove(
+    "admin-modal-open"
+  );
+
+
+  adminState.editingNews =
+    null;
+
+}
+
+
+/* ---------------------------------------------------------
+   Reset News Editor
+   --------------------------------------------------------- */
+
+function resetNewsEditor() {
+
+  const form =
+    document.getElementById(
+      "news-editor-form"
+    );
+
+
+  if (form) {
+
+    form.reset();
+
+  }
+
+
+  const imagePreview =
+    document.getElementById(
+      "news-image-preview"
+    );
+
+
+  if (imagePreview) {
+
+    imagePreview.innerHTML =
+      "";
+
+  }
+
+
+  const imageInput =
+    document.getElementById(
+      "news-image"
+    );
+
+
+  if (imageInput) {
+
+    imageInput.value =
+      "";
+
+  }
+
+
+  const slugInput =
+    document.getElementById(
+      "news-slug"
+    );
+
+
+  if (slugInput) {
+
+    slugInput.value =
+      "";
+
+  }
+
+
+  const newsId =
+    document.getElementById(
+      "news-id"
+    );
+
+
+  if (newsId) {
+
+    newsId.value =
+      "";
+
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   Fill News Editor
+   --------------------------------------------------------- */
+
+function fillNewsEditor(
+  news
+) {
+
+  if (!news) {
+    return;
+  }
+
+
+  setInputValue(
+    "news-id",
+    news._id ||
+    news.id ||
+    ""
+  );
+
+
+  setInputValue(
+    "news-title",
+    news.title ||
+    ""
+  );
+
+
+  setInputValue(
+    "news-slug",
+    news.slug ||
+    ""
+  );
+
+
+  setInputValue(
+    "news-category",
+    news.category ||
+    "राजस्थान"
+  );
+
+
+  setInputValue(
+    "news-subcategory",
+    news.subcategory ||
+    ""
+  );
+
+
+  setInputValue(
+    "news-location",
+    news.location ||
+    news.district ||
+    ""
+  );
+
+
+  setInputValue(
+    "news-author",
+    news.author ||
+    ""
+  );
+
+
+  setInputValue(
+    "news-summary",
+    news.summary ||
+    ""
+  );
+
+
+  setInputValue(
+    "news-content",
+    news.content ||
+    news.description ||
+    ""
+  );
+
+
+  setInputValue(
+    "news-tags",
+    Array.isArray(news.tags)
+      ? news.tags.join(", ")
+      : (
+          news.tags ||
+          ""
+        )
+  );
+
+
+  setInputValue(
+    "news-status",
+    news.status ||
+    (
+      news.isPublished
+        ? "published"
+        : "draft"
+    )
+  );
+
+
+  setInputValue(
+    "news-scheduled-at",
+    news.scheduledAt
+      ? formatDateTimeLocal(
+          news.scheduledAt
+        )
+      : ""
+  );
+
+
+  if (news.image) {
+
+    showNewsImagePreview(
+      news.image
+    );
+
+  }
+
+
+  updateNewsSlugPreview();
+
+}
+
+
+/* ---------------------------------------------------------
+   Initialize News Editor Fields
+   --------------------------------------------------------- */
+
+function initializeNewsEditorFields() {
+
+  const form =
+    document.getElementById(
+      "news-editor-form"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  if (
+    form.dataset.initialized ===
+    "true"
+  ) {
+
+    return;
+
+  }
+
+
+  form.dataset.initialized =
+    "true";
+
+
+  const titleInput =
+    document.getElementById(
+      "news-title"
+    );
+
+
+  const slugInput =
+    document.getElementById(
+      "news-slug"
+    );
+
+
+  const imageInput =
+    document.getElementById(
+      "news-image"
+    );
+
+
+  const closeButton =
+    document.getElementById(
+      "news-editor-close"
+    );
+
+
+  const cancelButton =
+    document.getElementById(
+      "news-editor-cancel"
+    );
+
+
+  /* -----------------------------------------
+     Title to slug
+     ----------------------------------------- */
+
+  if (titleInput) {
+
+    titleInput.addEventListener(
+      "input",
+      () => {
+
+        if (
+          !slugInput ||
+          slugInput.dataset.manual ===
+          "true"
+        ) {
+
+          return;
+
+        }
+
+
+        updateNewsSlugPreview();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Manual slug
+     ----------------------------------------- */
+
+  if (slugInput) {
+
+    slugInput.addEventListener(
+      "input",
+      () => {
+
+        slugInput.dataset.manual =
+          slugInput.value.trim()
+            ? "true"
+            : "false";
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Image
+     ----------------------------------------- */
+
+  if (imageInput) {
+
+    imageInput.addEventListener(
+      "change",
+      handleNewsImageChange
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Close
+     ----------------------------------------- */
+
+  if (closeButton) {
+
+    closeButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        closeNewsEditor();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Cancel
+     ----------------------------------------- */
+
+  if (cancelButton) {
+
+    cancelButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        closeNewsEditor();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Submit
+     ----------------------------------------- */
+
+  form.addEventListener(
+    "submit",
+    handleNewsSubmit
+  );
+
+}
+
+
+/* ---------------------------------------------------------
+   Update News Slug
+   --------------------------------------------------------- */
+
+function updateNewsSlugPreview() {
+
+  const titleInput =
+    document.getElementById(
+      "news-title"
+    );
+
+
+  const slugInput =
+    document.getElementById(
+      "news-slug"
+    );
+
+
+  if (
+    !titleInput ||
+    !slugInput
+  ) {
+
+    return;
+
+  }
+
+
+  if (
+    slugInput.dataset.manual ===
+    "true"
+  ) {
+
+    return;
+
+  }
+
+
+  slugInput.value =
+    createNewsSlug(
+      titleInput.value
+    );
+
+}
+
+
+/* ---------------------------------------------------------
+   Create News Slug
+   --------------------------------------------------------- */
+
+function createNewsSlug(
+  text
+) {
+
+  if (!text) {
+    return "";
+  }
+
+
+  return String(text)
+    .toLowerCase()
+    .trim()
+    .replace(
+      /[^\p{L}\p{N}\s-]/gu,
+      ""
+    )
+    .replace(
+      /\s+/g,
+      "-"
+    )
+    .replace(
+      /-+/g,
+      "-"
+    )
+    .replace(
+      /^-|-$/g,
+      ""
+    );
+
+}
+
+
+/* ---------------------------------------------------------
+   Handle News Image Change
+   --------------------------------------------------------- */
+
+function handleNewsImageChange(
+  event
+) {
+
+  const file =
+    event.target.files?.[0];
+
+
+  if (!file) {
+    return;
+  }
+
+
+  const maxSize =
+    5 * 1024 * 1024;
+
+
+  if (
+    file.size >
+    maxSize
+  ) {
+
+    showAdminToast(
+      "Image का size 5MB से कम होना चाहिए।",
+      "warning"
+    );
+
+
+    event.target.value =
+      "";
+
+
+    return;
+
+  }
+
+
+  if (
+    !file.type.startsWith(
+      "image/"
+    )
+  ) {
+
+    showAdminToast(
+      "कृपया valid image file चुनें।",
+      "warning"
+    );
+
+
+    event.target.value =
+      "";
+
+
+    return;
+
+  }
+
+
+  const reader =
+    new FileReader();
+
+
+  reader.onload =
+    () => {
+
+      showNewsImagePreview(
+        reader.result
+      );
+
+    };
+
+
+  reader.onerror =
+    () => {
+
+      showAdminToast(
+        "Image preview नहीं बन पाया।",
+        "error"
+      );
+
+    };
+
+
+  reader.readAsDataURL(
+    file
+  );
+
+}
+
+
+/* ---------------------------------------------------------
+   Show News Image Preview
+   --------------------------------------------------------- */
+
+function showNewsImagePreview(
+  source
+) {
+
+  const preview =
+    document.getElementById(
+      "news-image-preview"
+    );
+
+
+  if (!preview) {
+    return;
+  }
+
+
+  preview.innerHTML =
+    "";
+
+
+  if (!source) {
+    return;
+  }
+
+
+  const image =
+    document.createElement(
+      "img"
+    );
+
+
+  image.src =
+    source;
+
+
+  image.alt =
+    "News image preview";
+
+
+  image.loading =
+    "lazy";
+
+
+  preview.appendChild(
+    image
+  );
+
+}
+
+
+/* =========================================================
+   PART 4/25 END
+   ========================================================= */
+// ========================================
+// ADMIN.JS
+// PART 5 / 25
+// NAVIGATION + SIDEBAR + HEADER
+// ========================================
+
+
+// ========================================
+// ADMIN NAVIGATION
+// ========================================
+
+function initializeAdminNavigation() {
+  const navButtons = document.querySelectorAll(
+    "#admin-sidebar [data-section]"
+  );
+
+  navButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const sectionName = button.dataset.section;
+
+      if (!sectionName) {
+        return;
+      }
+
+      if (
+        button.dataset.permission &&
+        !hasAdminPermission(button.dataset.permission)
+      ) {
+        showAdminToast(
+          "error",
+          "अनुमति नहीं",
+          "आपके Admin Account को इस सेक्शन की अनुमति नहीं है।"
+        );
+        return;
+      }
+
+      switchAdminSection(sectionName);
+    });
+  });
+}
+
+
+// ========================================
+// SWITCH ADMIN SECTION
+// ========================================
+
+function switchAdminSection(sectionName) {
+  if (!sectionName) {
+    return;
+  }
+
+  const targetSection = document.querySelector(
+    `#section-${sectionName}`
+  );
+
+  if (!targetSection) {
+    console.warn(
+      `Admin section not found: ${sectionName}`
+    );
+    return;
+  }
+
+  if (!adminState.isAuthenticated) {
+    return;
+  }
+
+  adminState.currentSection = sectionName;
+
+  document
+    .querySelectorAll("#admin-content > section")
+    .forEach((section) => {
+      section.classList.remove("active");
+      section.classList.add("hidden");
+    });
+
+  targetSection.classList.remove("hidden");
+  targetSection.classList.add("active");
+
+  updateAdminNavigationActiveState(sectionName);
+  updateAdminBreadcrumb(sectionName);
+  updateAdminPageHeader(sectionName);
+
+  closeAdminSidebar();
+
+  loadSectionData(sectionName);
+}
+
+
+// ========================================
+// ACTIVE NAVIGATION STATE
+// ========================================
+
+function updateAdminNavigationActiveState(sectionName) {
+  const navButtons = document.querySelectorAll(
+    "#admin-sidebar [data-section]"
+  );
+
+  navButtons.forEach((button) => {
+    const buttonSection = button.dataset.section;
+
+    button.classList.toggle(
+      "active",
+      buttonSection === sectionName
+    );
+
+    button.setAttribute(
+      "aria-current",
+      buttonSection === sectionName
+        ? "page"
+        : "false"
+    );
+  });
+}
+
+
+// ========================================
+// BREADCRUMB
+// ========================================
+
+function updateAdminBreadcrumb(sectionName) {
+  const breadcrumb = document.getElementById(
+    "admin-breadcrumb"
+  );
+
+  if (!breadcrumb) {
+    return;
+  }
+
+  const sectionNames = {
+    dashboard: "डैशबोर्ड",
+    news: "न्यूज़ मैनेजमेंट",
+    breaking: "ब्रेकिंग न्यूज़",
+    trending: "ट्रेंडिंग न्यूज़",
+    video: "वीडियो",
+    "live-tv": "लाइव टीवी",
+    "live-blog": "लाइव ब्लॉग",
+    epaper: "ई-पेपर",
+    contacts: "कॉन्टैक्ट्स",
+    users: "यूज़र्स",
+    admins: "एडमिन मैनेजमेंट",
+    settings: "सेटिंग्स",
+    profile: "प्रोफाइल"
+  };
+
+  breadcrumb.textContent =
+    sectionNames[sectionName] ||
+    sectionName;
+}
+
+
+// ========================================
+// PAGE HEADER
+// ========================================
+
+function updateAdminPageHeader(sectionName) {
+  const pageTitle = document.getElementById(
+    "admin-page-title"
+  );
+
+  const pageDescription = document.getElementById(
+    "admin-page-description"
+  );
+
+  const pageData = {
+    dashboard: {
+      title: "डैशबोर्ड",
+      description:
+        "आवाज राजस्थान न्यूज़ पोर्टल का ओवरव्यू"
+    },
+
+    news: {
+      title: "न्यूज़ मैनेजमेंट",
+      description:
+        "राजस्थान की सभी न्यूज़ को मैनेज करें"
+    },
+
+    breaking: {
+      title: "ब्रेकिंग न्यूज़",
+      description:
+        "ब्रेकिंग न्यूज़ को मैनेज और प्रकाशित करें"
+    },
+
+    trending: {
+      title: "ट्रेंडिंग न्यूज़",
+      description:
+        "ट्रेंडिंग न्यूज़ और लोकप्रिय कंटेंट मैनेज करें"
+    },
+
+    video: {
+      title: "वीडियो",
+      description:
+        "न्यूज़ वीडियो और वीडियो कंटेंट मैनेज करें"
+    },
+
+    "live-tv": {
+      title: "लाइव टीवी",
+      description:
+        "आवाज राजस्थान LIVE टीवी सेटिंग्स मैनेज करें"
+    },
+
+    "live-blog": {
+      title: "लाइव ब्लॉग",
+      description:
+        "रियल-टाइम लाइव ब्लॉग अपडेट मैनेज करें"
+    },
+
+    epaper: {
+      title: "ई-पेपर",
+      description:
+        "डिजिटल ई-पेपर अपलोड और प्रकाशित करें"
+    },
+
+    contacts: {
+      title: "कॉन्टैक्ट्स",
+      description:
+        "यूज़र्स द्वारा भेजे गए संपर्क संदेश मैनेज करें"
+    },
+
+    users: {
+      title: "यूज़र्स",
+      description:
+        "वेबसाइट यूज़र्स और उनके अकाउंट मैनेज करें"
+    },
+
+    admins: {
+      title: "एडमिन मैनेजमेंट",
+      description:
+        "Admin Accounts और permissions मैनेज करें"
+    },
+
+    settings: {
+      title: "साइट सेटिंग्स",
+      description:
+        "वेबसाइट की मुख्य सेटिंग्स मैनेज करें"
+    },
+
+    profile: {
+      title: "मेरा प्रोफाइल",
+      description:
+        "Admin Account और security settings"
+    }
+  };
+
+  const data =
+    pageData[sectionName] ||
+    pageData.dashboard;
+
+  if (pageTitle) {
+    pageTitle.textContent = data.title;
+  }
+
+  if (pageDescription) {
+    pageDescription.textContent =
+      data.description;
+  }
+}
+
+
+// ========================================
+// LOAD SECTION DATA
+// ========================================
+
+async function loadSectionData(sectionName) {
+  try {
+    switch (sectionName) {
+      case "dashboard":
+        await loadDashboard();
+        break;
+
+      case "news":
+        await loadNews();
+        break;
+
+      case "breaking":
+        await loadBreakingNews();
+        break;
+
+      case "trending":
+        await loadTrendingNews();
+        break;
+
+      case "video":
+        await loadVideos();
+        break;
+
+      case "live-tv":
+        await loadLiveTV();
+        break;
+
+      case "live-blog":
+        await loadLiveBlog();
+        break;
+
+      case "epaper":
+        await loadEPaper();
+        break;
+
+      case "contacts":
+        await loadContacts();
+        break;
+
+      case "users":
+        await loadUsers();
+        break;
+
+      case "admins":
+        await loadAdmins();
+        break;
+
+      case "settings":
+        await loadSettings();
+        break;
+
+      case "profile":
+        await loadProfile();
+        break;
+
+      default:
+        console.warn(
+          `No loader available for section: ${sectionName}`
+        );
+    }
+  } catch (error) {
+    console.error(
+      `Section loading error (${sectionName}):`,
+      error
+    );
+
+    showAdminToast(
+      "error",
+      "लोडिंग समस्या",
+      "इस सेक्शन का डेटा लोड नहीं हो पाया।"
+    );
+  }
+}
+
+
+// ========================================
+// SIDEBAR MOBILE MENU
+// ========================================
+
+function initializeAdminSidebar() {
+  const menuButton = document.getElementById(
+    "admin-mobile-menu-button"
+  );
+
+  const sidebar = document.getElementById(
+    "admin-sidebar"
+  );
+
+  const overlay = document.getElementById(
+    "admin-sidebar-overlay"
+  );
+
+  if (menuButton) {
+    menuButton.addEventListener(
+      "click",
+      toggleAdminSidebar
+    );
+  }
+
+  if (overlay) {
+    overlay.addEventListener(
+      "click",
+      closeAdminSidebar
+    );
+  }
+
+  if (sidebar) {
+    sidebar
+      .querySelectorAll("[data-section]")
+      .forEach((button) => {
+        button.addEventListener("click", () => {
+          if (window.innerWidth <= 1024) {
+            closeAdminSidebar();
+          }
+        });
+      });
+  }
+}
+
+
+// ========================================
+// TOGGLE SIDEBAR
+// ========================================
+
+function toggleAdminSidebar() {
+  const sidebar = document.getElementById(
+    "admin-sidebar"
+  );
+
+  const overlay = document.getElementById(
+    "admin-sidebar-overlay"
+  );
+
+  if (!sidebar) {
+    return;
+  }
+
+  sidebar.classList.toggle("open");
+
+  if (overlay) {
+    overlay.classList.toggle(
+      "active",
+      sidebar.classList.contains("open")
+    );
+  }
+
+  document.body.classList.toggle(
+    "admin-sidebar-open",
+    sidebar.classList.contains("open")
+  );
+}
+
+
+// ========================================
+// CLOSE SIDEBAR
+// ========================================
+
+function closeAdminSidebar() {
+  const sidebar = document.getElementById(
+    "admin-sidebar"
+  );
+
+  const overlay = document.getElementById(
+    "admin-sidebar-overlay"
+  );
+
+  if (sidebar) {
+    sidebar.classList.remove("open");
+  }
+
+  if (overlay) {
+    overlay.classList.remove("active");
+  }
+
+  document.body.classList.remove(
+    "admin-sidebar-open"
+  );
+}
+
+
+// ========================================
+// HEADER PROFILE BUTTON
+// ========================================
+
+function initializeAdminHeader() {
+  const profileButton = document.getElementById(
+    "admin-header-profile-button"
+  );
+
+  if (profileButton) {
+    profileButton.addEventListener(
+      "click",
+      () => {
+        switchAdminSection("profile");
+      }
+    );
+  }
+
+  const notificationButton =
+    document.getElementById(
+      "admin-notification-button"
+    );
+
+  if (notificationButton) {
+    notificationButton.addEventListener(
+      "click",
+      handleAdminNotifications
+    );
+  }
+}
+
+
+// ========================================
+// ADMIN NOTIFICATIONS
+// ========================================
+
+function handleAdminNotifications() {
+  const badge = document.getElementById(
+    "admin-notification-badge"
+  );
+
+  if (badge) {
+    badge.classList.add("hidden");
+  }
+
+  showAdminToast(
+    "info",
+    "Notifications",
+    "फिलहाल कोई नई महत्वपूर्ण notification नहीं है।"
+  );
+}
+
+
+// ========================================
+// QUICK ACTIONS
+// ========================================
+
+function initializeQuickActions() {
+  const actionButtons = document.querySelectorAll(
+    "#quick-actions [data-action]"
+  );
+
+  actionButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.action;
+
+      handleQuickAction(action);
+    });
+  });
+}
+
+
+// ========================================
+// QUICK ACTION HANDLER
+// ========================================
+
+function handleQuickAction(action) {
+  if (!action) {
+    return;
+  }
+
+  switch (action) {
+    case "create-news":
+      if (!hasAdminPermission("news.create")) {
+        showAdminToast(
+          "error",
+          "अनुमति नहीं",
+          "आपको न्यूज़ बनाने की अनुमति नहीं है।"
+        );
+        return;
+      }
+
+      openNewsEditor();
+      break;
+
+    case "manage-breaking":
+      switchAdminSection("breaking");
+      break;
+
+    case "manage-live-tv":
+      switchAdminSection("live-tv");
+      break;
+
+    case "manage-epaper":
+      switchAdminSection("epaper");
+      break;
+
+    default:
+      console.warn(
+        `Unknown quick action: ${action}`
+      );
+  }
+}
+
+
+// ========================================
+// FOOTER YEAR
+// ========================================
+
+function updateAdminFooterYear() {
+  const footerYear = document.getElementById(
+    "admin-footer-year"
+  );
+
+  if (footerYear) {
+    footerYear.textContent =
+      new Date().getFullYear();
+  }
+}
+
+
+// ========================================
+// RESPONSIVE SIDEBAR
+// ========================================
+
+function initializeAdminResponsive() {
+  window.addEventListener(
+    "resize",
+    () => {
+      if (window.innerWidth > 1024) {
+        closeAdminSidebar();
+      }
+    }
+  );
+}
+
+
+// ========================================
+// INITIAL NAVIGATION
+// ========================================
+
+function openDefaultAdminSection() {
+  const defaultSection =
+    adminState.currentSection ||
+    "dashboard";
+
+  const sectionExists = document.querySelector(
+    `#section-${defaultSection}`
+  );
+
+  if (sectionExists) {
+    switchAdminSection(
+      defaultSection
+    );
+  } else {
+    switchAdminSection("dashboard");
+  }
+  }
+// ========================================
+// ADMIN.JS
+// PART 6 / 25
+// TOAST + LOADING + MODAL + CONFIRMATION
+// ========================================
+
+
+// ========================================
+// TOAST CONTAINER
+// ========================================
+
+function getToastContainer() {
+  let container = document.getElementById(
+    "admin-toast-container"
+  );
+
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "admin-toast-container";
+    container.className = "admin-toast-container";
+
+    document.body.appendChild(container);
+  }
+
+  return container;
+}
+
+
+// ========================================
+// SHOW ADMIN TOAST
+// ========================================
+
+function showAdminToast(
+  type = "info",
+  title = "सूचना",
+  message = ""
+) {
+  const container = getToastContainer();
+
+  const toast = document.createElement("div");
+
+  toast.className =
+    `admin-toast admin-toast-${type}`;
+
+  const icons = {
+    success: "✓",
+    error: "!",
+    warning: "⚠",
+    info: "i"
+  };
+
+  const icon =
+    icons[type] || icons.info;
+
+  toast.innerHTML = `
+    <div class="admin-toast-icon">
+      ${icon}
+    </div>
+
+    <div class="admin-toast-content">
+      <strong class="admin-toast-title">
+        ${escapeHTML(title)}
+      </strong>
+
+      <div class="admin-toast-message">
+        ${escapeHTML(message)}
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="admin-toast-close"
+      aria-label="Close notification"
+    >
+      ×
+    </button>
+  `;
+
+  container.appendChild(toast);
+
+  requestAnimationFrame(() => {
+    toast.classList.add("show");
+  });
+
+  const closeButton =
+    toast.querySelector(
+      ".admin-toast-close"
+    );
+
+  if (closeButton) {
+    closeButton.addEventListener(
+      "click",
+      () => removeAdminToast(toast)
+    );
+  }
+
+  const timeout =
+    type === "error"
+      ? 6000
+      : 4000;
+
+  setTimeout(() => {
+    removeAdminToast(toast);
+  }, timeout);
+
+  return toast;
+}
+
+
+// ========================================
+// REMOVE TOAST
+// ========================================
+
+function removeAdminToast(toast) {
+  if (!toast) {
+    return;
+  }
+
+  toast.classList.remove("show");
+
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.parentNode.removeChild(
+        toast
+      );
+    }
+  }, 250);
+}
+
+
+// ========================================
+// ESCAPE HTML
+// ========================================
+
+function escapeHTML(value) {
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return "";
+  }
+
+  const div =
+    document.createElement("div");
+
+  div.textContent = String(value);
+
+  return div.innerHTML;
+}
+
+
+// ========================================
+// LOADING OVERLAY
+// ========================================
+
+function showAdminLoading(
+  title = "कृपया प्रतीक्षा करें",
+  message = "डेटा प्रोसेस हो रहा है..."
+) {
+  const overlay =
+    document.getElementById(
+      "admin-loading-overlay"
+    );
+
+  if (!overlay) {
+    return;
+  }
+
+  const titleElement =
+    document.getElementById(
+      "admin-loading-title"
+    );
+
+  const messageElement =
+    document.getElementById(
+      "admin-loading-message"
+    );
+
+  if (titleElement) {
+    titleElement.textContent =
+      title;
+  }
+
+  if (messageElement) {
+    messageElement.textContent =
+      message;
+  }
+
+  overlay.classList.remove(
+    "hidden"
+  );
+
+  overlay.classList.add(
+    "active"
+  );
+
+  overlay.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+}
+
+
+// ========================================
+// HIDE LOADING OVERLAY
+// ========================================
+
+function hideAdminLoading() {
+  const overlay =
+    document.getElementById(
+      "admin-loading-overlay"
+    );
+
+  if (!overlay) {
+    return;
+  }
+
+  overlay.classList.remove(
+    "active"
+  );
+
+  overlay.classList.add(
+    "hidden"
+  );
+
+  overlay.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+}
+
+
+// ========================================
+// ADMIN MODAL
+// ========================================
+
+function openAdminModal(options = {}) {
+  const modal =
+    document.getElementById(
+      "admin-modal"
+    );
+
+  if (!modal) {
+    return;
+  }
+
+  const icon =
+    document.getElementById(
+      "admin-modal-icon"
+    );
+
+  const eyebrow =
+    document.getElementById(
+      "admin-modal-eyebrow"
+    );
+
+  const title =
+    document.getElementById(
+      "admin-modal-title"
+    );
+
+  const body =
+    document.getElementById(
+      "admin-modal-body"
+    );
+
+  const footer =
+    document.getElementById(
+      "admin-modal-footer"
+    );
+
+  if (icon) {
+    icon.textContent =
+      options.icon || "ℹ";
+  }
+
+  if (eyebrow) {
+    eyebrow.textContent =
+      options.eyebrow || "ADMIN";
+  }
+
+  if (title) {
+    title.textContent =
+      options.title || "सूचना";
+  }
+
+  if (body) {
+    if (
+      options.html === true
+    ) {
+      body.innerHTML =
+        options.body || "";
+    } else {
+      body.textContent =
+        options.body || "";
+    }
+  }
+
+  if (footer) {
+    footer.innerHTML =
+      options.footer || "";
+  }
+
+  modal.classList.remove(
+    "hidden"
+  );
+
+  modal.classList.add(
+    "active"
+  );
+
+  modal.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  document.body.classList.add(
+    "admin-modal-open"
+  );
+
+  return modal;
+}
+
+
+// ========================================
+// CLOSE ADMIN MODAL
+// ========================================
+
+function closeAdminModal() {
+  const modal =
+    document.getElementById(
+      "admin-modal"
+    );
+
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.remove(
+    "active"
+  );
+
+  modal.classList.add(
+    "hidden"
+  );
+
+  modal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  document.body.classList.remove(
+    "admin-modal-open"
+  );
+}
+
+
+// ========================================
+// CONFIRMATION DIALOG
+// ========================================
+
+function showAdminConfirm(options = {}) {
+  const dialog =
+    document.getElementById(
+      "admin-confirm-dialog"
+    );
+
+  if (!dialog) {
+    return Promise.resolve(false);
+  }
+
+  const icon =
+    document.getElementById(
+      "admin-confirm-icon"
+    );
+
+  const title =
+    document.getElementById(
+      "admin-confirm-title"
+    );
+
+  const message =
+    document.getElementById(
+      "admin-confirm-message"
+    );
+
+  const cancelButton =
+    document.getElementById(
+      "admin-confirm-cancel"
+    );
+
+  const submitButton =
+    document.getElementById(
+      "admin-confirm-submit"
+    );
+
+  if (icon) {
+    icon.textContent =
+      options.icon || "!";
+  }
+
+  if (title) {
+    title.textContent =
+      options.title ||
+      "क्या आप सुनिश्चित हैं?";
+  }
+
+  if (message) {
+    message.textContent =
+      options.message ||
+      "इस कार्रवाई को जारी रखना है?";
+  }
+
+  if (cancelButton) {
+    cancelButton.textContent =
+      options.cancelText ||
+      "रद्द करें";
+  }
+
+  if (submitButton) {
+    submitButton.textContent =
+      options.confirmText ||
+      "जारी रखें";
+  }
+
+  dialog.classList.remove(
+    "hidden"
+  );
+
+  dialog.classList.add(
+    "active"
+  );
+
+  dialog.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  document.body.classList.add(
+    "admin-dialog-open"
+  );
+
+  return new Promise((resolve) => {
+    let finished = false;
+
+    const finish = (result) => {
+      if (finished) {
+        return;
+      }
+
+      finished = true;
+
+      cleanup();
+
+      closeAdminConfirm();
+
+      resolve(result);
+    };
+
+    const cleanup = () => {
+      if (cancelButton) {
+        cancelButton.removeEventListener(
+          "click",
+          onCancel
+        );
+      }
+
+      if (submitButton) {
+        submitButton.removeEventListener(
+          "click",
+          onConfirm
+        );
+      }
+
+      dialog.removeEventListener(
+        "click",
+        onOutsideClick
+      );
+    };
+
+    const onCancel = () => {
+      finish(false);
+    };
+
+    const onConfirm = () => {
+      finish(true);
+    };
+
+    const onOutsideClick =
+      (event) => {
+        if (
+          event.target === dialog &&
+          options.closeOnOutside !== false
+        ) {
+          finish(false);
+        }
+      };
+
+    if (cancelButton) {
+      cancelButton.addEventListener(
+        "click",
+        onCancel
+      );
+    }
+
+    if (submitButton) {
+      submitButton.addEventListener(
+        "click",
+        onConfirm
+      );
+    }
+
+    dialog.addEventListener(
+      "click",
+      onOutsideClick
+    );
+  });
+}
+
+
+// ========================================
+// CLOSE CONFIRMATION DIALOG
+// ========================================
+
+function closeAdminConfirm() {
+  const dialog =
+    document.getElementById(
+      "admin-confirm-dialog"
+    );
+
+  if (!dialog) {
+    return;
+  }
+
+  dialog.classList.remove(
+    "active"
+  );
+
+  dialog.classList.add(
+    "hidden"
+  );
+
+  dialog.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+  document.body.classList.remove(
+    "admin-dialog-open"
+  );
+}
+
+
+// ========================================
+// MODAL CLOSE BUTTONS
+// ========================================
+
+function initializeAdminDialogs() {
+  const modalClose =
+    document.getElementById(
+      "admin-modal-close"
+    );
+
+  const modalCancel =
+    document.getElementById(
+      "admin-modal-cancel"
+    );
+
+  if (modalClose) {
+    modalClose.addEventListener(
+      "click",
+      closeAdminModal
+    );
+  }
+
+  if (modalCancel) {
+    modalCancel.addEventListener(
+      "click",
+      closeAdminModal
+    );
+  }
+}
+
+
+// ========================================
+// ESC KEY HANDLER
+// ========================================
+
+function initializeAdminEscapeHandler() {
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      closeAdminModal();
+      closeAdminConfirm();
+      closeAdminSidebar();
+
+      const newsEditor =
+        document.getElementById(
+          "news-editor-modal"
+        );
+
+      if (
+        newsEditor &&
+        newsEditor.classList.contains(
+          "active"
+        )
+      ) {
+        closeNewsEditor();
+      }
+    }
+  );
+}
+
+
+// ========================================
+// DISABLE BUTTON
+// ========================================
+
+function setButtonLoading(
+  button,
+  loading,
+  loadingText = "प्रोसेस हो रहा है..."
+) {
+  if (!button) {
+    return;
+  }
+
+  if (loading) {
+    if (
+      !button.dataset.originalText
+    ) {
+      button.dataset.originalText =
+        button.textContent;
+    }
+
+    button.disabled = true;
+
+    button.classList.add(
+      "loading"
+    );
+
+    button.textContent =
+      loadingText;
+  } else {
+    button.disabled = false;
+
+    button.classList.remove(
+      "loading"
+    );
+
+    if (
+      button.dataset.originalText
+    ) {
+      button.textContent =
+        button.dataset.originalText;
+
+      delete button.dataset
+        .originalText;
+    }
+  }
+     }
+// ========================================
+// ADMIN.JS
+// PART 7 / 25
+// PERMISSIONS + ADMIN UI
+// ========================================
+
+
+// ========================================
+// ADMIN PERMISSION CHECK
+// ========================================
+
+function hasAdminPermission(permission) {
+  if (!permission) {
+    return true;
+  }
+
+  const admin = adminState.admin;
+
+  if (!admin) {
+    return false;
+  }
+
+  // Owner को सभी permissions
+  // automatically मिलती हैं।
+  if (
+    admin.role === "owner" ||
+    admin.isOwner === true
+  ) {
+    return true;
+  }
+
+  const permissions =
+    Array.isArray(admin.permissions)
+      ? admin.permissions
+      : [];
+
+  return permissions.includes(
+    permission
+  );
+}
+
+
+// ========================================
+// OWNER CHECK
+// ========================================
+
+function isAdminOwner() {
+  const admin = adminState.admin;
+
+  if (!admin) {
+    return false;
+  }
+
+  return (
+    admin.role === "owner" ||
+    admin.isOwner === true
+  );
+}
+
+
+// ========================================
+// ROLE CHECK
+// ========================================
+
+function hasAdminRole(...roles) {
+  const admin = adminState.admin;
+
+  if (!admin) {
+    return false;
+  }
+
+  return roles.includes(
+    admin.role
+  );
+}
+
+
+// ========================================
+// APPLY PERMISSIONS TO SIDEBAR
+// ========================================
+
+function applyAdminPermissions() {
+  const navButtons =
+    document.querySelectorAll(
+      "#admin-sidebar [data-permission]"
+    );
+
+  navButtons.forEach((button) => {
+    const permission =
+      button.dataset.permission;
+
+    if (!permission) {
+      return;
+    }
+
+    const allowed =
+      hasAdminPermission(permission);
+
+    if (!allowed) {
+      button.classList.add(
+        "permission-hidden"
+      );
+
+      button.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      button.setAttribute(
+        "tabindex",
+        "-1"
+      );
+    } else {
+      button.classList.remove(
+        "permission-hidden"
+      );
+
+      button.removeAttribute(
+        "aria-hidden"
+      );
+
+      button.removeAttribute(
+        "tabindex"
+      );
+    }
+  });
+}
+
+
+// ========================================
+// APPLY OWNER-ONLY CONTROLS
+// ========================================
+
+function applyOwnerControls() {
+  const ownerElements =
+    document.querySelectorAll(
+      "[data-owner-only]"
+    );
+
+  const owner =
+    isAdminOwner();
+
+  ownerElements.forEach((element) => {
+    if (owner) {
+      element.classList.remove(
+        "permission-hidden"
+      );
+
+      element.removeAttribute(
+        "aria-hidden"
+      );
+    } else {
+      element.classList.add(
+        "permission-hidden"
+      );
+
+      element.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+    }
+  });
+}
+
+
+// ========================================
+// UPDATE ADMIN IDENTITY
+// ========================================
+
+function updateAdminIdentity() {
+  const admin =
+    adminState.admin;
+
+  if (!admin) {
+    return;
+  }
+
+  const name =
+    admin.name ||
+    admin.fullName ||
+    admin.username ||
+    admin.adminId ||
+    "Admin";
+
+  const role =
+    admin.role ||
+    "admin";
+
+  const adminId =
+    admin.adminId ||
+    admin.username ||
+    "";
+
+  updateElementText(
+    "sidebar-admin-name",
+    name
+  );
+
+  updateElementText(
+    "sidebar-admin-role",
+    formatAdminRole(role)
+  );
+
+  updateElementText(
+    "header-admin-name",
+    name
+  );
+
+  updateElementText(
+    "header-admin-role",
+    formatAdminRole(role)
+  );
+
+  updateElementText(
+    "dashboard-admin-name",
+    name
+  );
+
+  updateElementText(
+    "profile-name",
+    name
+  );
+
+  updateElementText(
+    "profile-admin-id",
+    adminId
+  );
+
+  updateElementText(
+    "profile-role",
+    formatAdminRole(role)
+  );
+
+  updateAdminAvatar(
+    name
+  );
+}
+
+
+// ========================================
+// UPDATE ELEMENT TEXT
+// ========================================
+
+function updateElementText(
+  elementId,
+  value
+) {
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+  if (!element) {
+    return;
+  }
+
+  element.textContent =
+    value === null ||
+    value === undefined
+      ? ""
+      : String(value);
+}
+
+
+// ========================================
+// FORMAT ADMIN ROLE
+// ========================================
+
+function formatAdminRole(role) {
+  const roles = {
+    owner: "Owner",
+    admin: "Administrator",
+    editor: "Editor",
+    reporter: "Reporter"
+  };
+
+  return (
+    roles[role] ||
+    role ||
+    "Admin"
+  );
+}
+
+
+// ========================================
+// UPDATE ADMIN AVATAR
+// ========================================
+
+function updateAdminAvatar(name) {
+  const safeName =
+    String(name || "A");
+
+  const firstLetter =
+    safeName
+      .trim()
+      .charAt(0)
+      .toUpperCase() ||
+    "A";
+
+  updateElementText(
+    "sidebar-admin-avatar-text",
+    firstLetter
+  );
+
+  const headerAvatar =
+    document.getElementById(
+      "header-admin-avatar"
+    );
+
+  if (
+    headerAvatar &&
+    !headerAvatar.querySelector(
+      "img"
+    )
+  ) {
+    headerAvatar.textContent =
+      firstLetter;
+  }
+
+  const profileAvatar =
+    document.getElementById(
+      "profile-avatar"
+    );
+
+  if (
+    profileAvatar &&
+    !profileAvatar.querySelector(
+      "img"
+    )
+  ) {
+    profileAvatar.textContent =
+      firstLetter;
+  }
+}
+
+
+// ========================================
+// POPULATE PROFILE DATA
+// ========================================
+
+function populateAdminProfile() {
+  const admin =
+    adminState.admin;
+
+  if (!admin) {
+    return;
+  }
+
+  updateElementText(
+    "profile-name",
+    admin.name ||
+      admin.fullName ||
+      admin.username ||
+      admin.adminId ||
+      "Admin"
+  );
+
+  updateElementText(
+    "profile-email",
+    admin.email ||
+      "-"
+  );
+
+  updateElementText(
+    "profile-role",
+    formatAdminRole(
+      admin.role
+    )
+  );
+
+  updateElementText(
+    "profile-admin-id",
+    admin.adminId ||
+      admin.username ||
+      "-"
+  );
+
+  updateElementText(
+    "profile-account-status",
+    admin.isActive === false
+      ? "Inactive"
+      : "Active"
+  );
+
+  updateElementText(
+    "profile-last-login",
+    formatDateTime(
+      admin.lastLogin
+    )
+  );
+
+  updateElementText(
+    "profile-created-at",
+    formatDateTime(
+      admin.createdAt
+    )
+  );
+}
+
+
+// ========================================
+// FORMAT DATE TIME
+// ========================================
+
+function formatDateTime(
+  value
+) {
+  if (!value) {
+    return "-";
+  }
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "-";
+  }
+
+  return date.toLocaleString(
+    "hi-IN",
+    {
+      dateStyle: "medium",
+      timeStyle: "short"
+    }
+  );
+}
+
+
+// ========================================
+// PERMISSION-BASED BUTTON STATE
+// ========================================
+
+function applyPermissionButtons() {
+  const elements =
+    document.querySelectorAll(
+      "[data-permission]"
+    );
+
+  elements.forEach((element) => {
+    const permission =
+      element.dataset.permission;
+
+    if (!permission) {
+      return;
+    }
+
+    const allowed =
+      hasAdminPermission(
+        permission
+      );
+
+    if (
+      element.tagName ===
+      "BUTTON"
+    ) {
+      element.disabled =
+        !allowed;
+    }
+
+    if (!allowed) {
+      element.classList.add(
+        "permission-disabled"
+      );
+    } else {
+      element.classList.remove(
+        "permission-disabled"
+      );
+    }
+  });
+}
+
+
+// ========================================
+// INITIALIZE PERMISSION SYSTEM
+// ========================================
+
+function initializeAdminPermissions() {
+  applyAdminPermissions();
+  applyOwnerControls();
+  applyPermissionButtons();
+  updateAdminIdentity();
+  populateAdminProfile();
+}
+
+
+// ========================================
+// ADMIN ACCESS GUARD
+// ========================================
+
+function requireAdminPermission(
+  permission,
+  callback
+) {
+  if (
+    hasAdminPermission(
+      permission
+    )
+  ) {
+    if (
+      typeof callback ===
+      "function"
+    ) {
+      return callback();
+    }
+
+    return true;
+  }
+
+  showAdminToast(
+    "error",
+    "Access Denied",
+    "आपके Admin Account को इस कार्रवाई की अनुमति नहीं है।"
+  );
+
+  return false;
+}
+
+
+// ========================================
+// OWNER ACCESS GUARD
+// ========================================
+
+function requireOwner(
+  callback
+) {
+  if (!isAdminOwner()) {
+    showAdminToast(
+      "error",
+      "Owner Access Required",
+      "यह सुविधा केवल Owner Account के लिए उपलब्ध है।"
+    );
+
+    return false;
+  }
+
+  if (
+    typeof callback ===
+    "function"
+  ) {
+    return callback();
+  }
+
+  return true;
+}
+
+
+// ========================================
+// PERMISSION SUMMARY
+// ========================================
+
+function getAdminPermissionSummary() {
+  const admin =
+    adminState.admin;
+
+  if (!admin) {
+    return [];
+  }
+
+  if (isAdminOwner()) {
+    return ["*"];
+  }
+
+  return Array.isArray(
+    admin.permissions
+  )
+    ? [...admin.permissions]
+    : [];
+     }
+// ========================================
+// ADMIN.JS
+// PART 8 / 25
+// DASHBOARD LOADING + SYSTEM STATUS
+// ========================================
+
+
+// ========================================
+// DASHBOARD STATE
+// ========================================
+
+if (!adminState.dashboard) {
+  adminState.dashboard = {
+    loading: false,
+    loaded: false,
+    stats: {},
+    recentNews: []
+  };
+}
+
+
+// ========================================
+// LOAD DASHBOARD
+// ========================================
+
+async function loadDashboard() {
+  if (!adminState.isAuthenticated) {
+    return;
+  }
+
+  if (!adminState.dashboard) {
+    adminState.dashboard = {
+      loading: false,
+      loaded: false,
+      stats: {},
+      recentNews: []
+    };
+  }
+
+  adminState.dashboard.loading = true;
+
+  try {
+    await Promise.allSettled([
+      loadDashboardStats(),
+      loadDashboardRecentNews(),
+      checkDashboardSystemStatus()
+    ]);
+
+    adminState.dashboard.loaded = true;
+  } catch (error) {
+    console.error(
+      "Dashboard loading error:",
+      error
+    );
+  } finally {
+    adminState.dashboard.loading = false;
+  }
+}
+
+
+// ========================================
+// LOAD DASHBOARD STATS
+// ========================================
+
+async function loadDashboardStats() {
+  try {
+    const newsResponse =
+      await adminAPIRequest(
+        "/api/news?limit=100"
+      );
+
+    const newsData =
+      normalizeAPIResponse(
+        newsResponse
+      );
+
+    const news =
+      extractArrayData(
+        newsData,
+        [
+          "news",
+          "items",
+          "results"
+        ]
+      );
+
+    const totalNews =
+      newsData.total ??
+      newsData.totalNews ??
+      news.length;
+
+    const publishedNews =
+      news.filter(
+        (item) =>
+          item.isPublished === true
+      ).length;
+
+    const draftNews =
+      news.filter(
+        (item) =>
+          item.isPublished !== true
+      ).length;
+
+    adminState.dashboard.stats = {
+      totalNews,
+      publishedNews,
+      draftNews
+    };
+
+    updateDashboardStat(
+      "stat-total-news",
+      totalNews
+    );
+
+    updateDashboardStat(
+      "stat-published-news",
+      publishedNews
+    );
+
+    updateDashboardStat(
+      "stat-draft-news",
+      draftNews
+    );
+
+    return newsData;
+  } catch (error) {
+    console.error(
+      "Dashboard news stats error:",
+      error
+    );
+
+    updateDashboardStat(
+      "stat-total-news",
+      "-"
+    );
+
+    updateDashboardStat(
+      "stat-published-news",
+      "-"
+    );
+
+    updateDashboardStat(
+      "stat-draft-news",
+      "-"
+    );
+
+    return null;
+  }
+}
+
+
+// ========================================
+// LOAD RECENT NEWS
+// ========================================
+
+async function loadDashboardRecentNews() {
+  const container =
+    document.getElementById(
+      "dashboard-recent-news"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  try {
+    const response =
+      await adminAPIRequest(
+        "/api/news?limit=5&sort=-createdAt"
+      );
+
+    const data =
+      normalizeAPIResponse(
+        response
+      );
+
+    const news =
+      extractArrayData(
+        data,
+        [
+          "news",
+          "items",
+          "results"
+        ]
+      );
+
+    adminState.dashboard.recentNews =
+      news.slice(0, 5);
+
+    renderDashboardRecentNews(
+      adminState.dashboard.recentNews
+    );
+
+    return news;
+  } catch (error) {
+    console.error(
+      "Recent news loading error:",
+      error
+    );
+
+    renderDashboardRecentNews(
+      []
+    );
+
+    return [];
+  }
+}
+
+
+// ========================================
+// RENDER RECENT NEWS
+// ========================================
+
+function renderDashboardRecentNews(
+  news
+) {
+  const container =
+    document.getElementById(
+      "dashboard-recent-news"
+    );
+
+  const emptyState =
+    document.getElementById(
+      "recent-news-empty"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = "";
+
+  if (
+    !Array.isArray(news) ||
+    news.length === 0
+  ) {
+    if (emptyState) {
+      emptyState.classList.remove(
+        "hidden"
+      );
+    }
+
+    return;
+  }
+
+  if (emptyState) {
+    emptyState.classList.add(
+      "hidden"
+    );
+  }
+
+  news.forEach((item) => {
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "dashboard-recent-news-item";
+
+    const title =
+      item.title ||
+      "बिना शीर्षक न्यूज़";
+
+    const category =
+      item.category ||
+      "राजस्थान";
+
+    const date =
+      formatDateTime(
+        item.createdAt ||
+        item.updatedAt
+      );
+
+    row.innerHTML = `
+      <div class="dashboard-news-info">
+        <div class="dashboard-news-title">
+          ${escapeHTML(title)}
+        </div>
+
+        <div class="dashboard-news-meta">
+          <span>
+            ${escapeHTML(category)}
+          </span>
+
+          <span>
+            ${escapeHTML(date)}
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="admin-btn admin-btn-small"
+        data-view-news-id="${escapeHTML(
+          getObjectId(item)
+        )}"
+      >
+        देखें
+      </button>
+    `;
+
+    const viewButton =
+      row.querySelector(
+        "[data-view-news-id]"
+      );
+
+    if (viewButton) {
+      viewButton.addEventListener(
+        "click",
+        () => {
+          openNewsPreview(
+            item
+          );
+        }
+      );
+    }
+
+    container.appendChild(
+      row
+    );
+  });
+}
+
+
+// ========================================
+// UPDATE DASHBOARD STAT
+// ========================================
+
+function updateDashboardStat(
+  elementId,
+  value
+) {
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+  if (!element) {
+    return;
+  }
+
+  element.textContent =
+    value === null ||
+    value === undefined
+      ? "-"
+      : String(value);
+}
+
+
+// ========================================
+// CHECK SYSTEM STATUS
+// ========================================
+
+async function checkDashboardSystemStatus() {
+  const apiStatus =
+    document.getElementById(
+      "system-api-status"
+    );
+
+  const dbStatus =
+    document.getElementById(
+      "system-db-status"
+    );
+
+  const authStatus =
+    document.getElementById(
+      "system-auth-status"
+    );
+
+  const siteStatus =
+    document.getElementById(
+      "system-site-status"
+    );
+
+  setSystemStatus(
+    apiStatus,
+    "checking",
+    "Checking..."
+  );
+
+  setSystemStatus(
+    dbStatus,
+    "checking",
+    "Checking..."
+  );
+
+  setSystemStatus(
+    authStatus,
+    "checking",
+    "Checking..."
+  );
+
+  setSystemStatus(
+    siteStatus,
+    "checking",
+    "Checking..."
+  );
+
+  let apiOK = false;
+
+  try {
+    const response =
+      await adminAPIRequest(
+        "/api/admin/me"
+      );
+
+    apiOK =
+      response &&
+      response.success !== false;
+
+    setSystemStatus(
+      apiStatus,
+      apiOK
+        ? "online"
+        : "offline",
+      apiOK
+        ? "Online"
+        : "Offline"
+    );
+
+    setSystemStatus(
+      authStatus,
+      adminState.isAuthenticated
+        ? "online"
+        : "offline",
+      adminState.isAuthenticated
+        ? "Authenticated"
+        : "Not authenticated"
+    );
+  } catch (error) {
+    console.error(
+      "API status error:",
+      error
+    );
+
+    setSystemStatus(
+      apiStatus,
+      "offline",
+      "Offline"
+    );
+
+    setSystemStatus(
+      authStatus,
+      "offline",
+      "Not authenticated"
+    );
+  }
+
+  try {
+    const siteResponse =
+      await fetch(
+        `${getAPIBaseURL()}/api/site/live-tv`,
+        {
+          method: "GET",
+          headers: {
+            Accept:
+              "application/json"
+          }
+        }
+      );
+
+    setSystemStatus(
+      siteStatus,
+      siteResponse.ok
+        ? "online"
+        : "offline",
+      siteResponse.ok
+        ? "Online"
+        : "Offline"
+    );
+  } catch (error) {
+    console.error(
+      "Site status error:",
+      error
+    );
+
+    setSystemStatus(
+      siteStatus,
+      "offline",
+      "Offline"
+    );
+  }
+
+  /*
+   * Database status का अलग public/admin
+   * endpoint अभी backend में उपलब्ध नहीं है।
+   *
+   * इसलिए DB को API health के आधार पर
+   * indirect status दिया जा रहा है।
+   */
+  setSystemStatus(
+    dbStatus,
+    apiOK
+      ? "online"
+      : "offline",
+    apiOK
+      ? "Connected"
+      : "Unavailable"
+  );
+
+  return {
+    api: apiOK
+  };
+}
+
+
+// ========================================
+// SYSTEM STATUS UI
+// ========================================
+
+function setSystemStatus(
+  element,
+  status,
+  text
+) {
+  if (!element) {
+    return;
+  }
+
+  element.textContent =
+    text || status;
+
+  element.classList.remove(
+    "online",
+    "offline",
+    "checking",
+    "warning"
+  );
+
+  element.classList.add(
+    status
+  );
+
+  element.dataset.status =
+    status;
+}
+
+
+// ========================================
+// REFRESH DASHBOARD
+// ========================================
+
+async function refreshDashboard() {
+  showAdminLoading(
+    "डैशबोर्ड अपडेट हो रहा है",
+    "नवीनतम जानकारी प्राप्त की जा रही है..."
+  );
+
+  try {
+    await loadDashboard();
+
+    showAdminToast(
+      "success",
+      "अपडेट पूरा",
+      "डैशबोर्ड सफलतापूर्वक अपडेट हो गया।"
+    );
+  } catch (error) {
+    console.error(
+      "Dashboard refresh error:",
+      error
+    );
+
+    showAdminToast(
+      "error",
+      "अपडेट विफल",
+      "डैशबोर्ड अपडेट नहीं हो पाया।"
+    );
+  } finally {
+    hideAdminLoading();
+  }
+}
+
+
+// ========================================
+// DASHBOARD REFRESH BUTTON
+// ========================================
+
+function initializeDashboardControls() {
+  const refreshButtons =
+    document.querySelectorAll(
+      "#section-dashboard [data-action='refresh'], " +
+      "#section-dashboard #dashboard-refresh-button"
+    );
+
+  refreshButtons.forEach(
+    (button) => {
+      button.addEventListener(
+        "click",
+        refreshDashboard
+      );
+    }
+  );
+}
+
+
+// ========================================
+// GET OBJECT ID
+// ========================================
+
+function getObjectId(item) {
+  if (!item) {
+    return "";
+  }
+
+  if (typeof item._id === "string") {
+    return item._id;
+  }
+
+  if (
+    item._id &&
+    typeof item._id === "object" &&
+    item._id.$oid
+  ) {
+    return item._id.$oid;
+  }
+
+  if (
+    typeof item.id === "string"
+  ) {
+    return item.id;
+  }
+
+  return "";
+}
+
+
+// ========================================
+// EXTRACT ARRAY DATA
+// ========================================
+
+function extractArrayData(
+  data,
+  keys = []
+) {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (!data || typeof data !== "object") {
+    return [];
+  }
+
+  for (const key of keys) {
+    if (Array.isArray(data[key])) {
+      return data[key];
+    }
+  }
+
+  if (
+    data.data &&
+    Array.isArray(data.data)
+  ) {
+    return data.data;
+  }
+
+  if (
+    data.result &&
+    Array.isArray(data.result)
+  ) {
+    return data.result;
+  }
+
+  return [];
+}
+
+
+// ========================================
+// NORMALIZE API RESPONSE
+// ========================================
+
+function normalizeAPIResponse(
+  response
+) {
+  if (!response) {
+    return {};
+  }
+
+  if (
+    response.data &&
+    typeof response.data ===
+      "object"
+  ) {
+    return response.data;
+  }
+
+  return response;
+}
+
+
+// ========================================
+// DASHBOARD VIEW ALL NEWS
+// ========================================
+
+function initializeDashboardNewsLink() {
+  const buttons =
+    document.querySelectorAll(
+      "#dashboard-recent-news [data-view-all-news], " +
+      "#section-dashboard [data-action='view-all-news']"
+    );
+
+  buttons.forEach((button) => {
+    button.addEventListener(
+      "click",
+      () => {
+        switchAdminSection(
+          "news"
+        );
+      }
+    );
+  });
+}
