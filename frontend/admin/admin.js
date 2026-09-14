@@ -3935,3 +3935,1750 @@ function loadProfile() {
 /* =========================================================
    PART 2/20 END
    ========================================================= */
+/* =========================================================
+   NEWS MANAGEMENT
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Initialize News Controls
+   --------------------------------------------------------- */
+
+function initializeNewsControls() {
+
+  const refreshButton =
+    document.getElementById(
+      "news-refresh-button"
+    );
+
+
+  const createButton =
+    document.getElementById(
+      "create-news-button"
+    );
+
+
+  const searchInput =
+    document.getElementById(
+      "news-search"
+    );
+
+
+  const categoryFilter =
+    document.getElementById(
+      "news-category-filter"
+    );
+
+
+  const statusFilter =
+    document.getElementById(
+      "news-status-filter"
+    );
+
+
+  const sortFilter =
+    document.getElementById(
+      "news-sort-filter"
+    );
+
+
+  const selectAllCheckbox =
+    document.getElementById(
+      "news-select-all"
+    );
+
+
+  const selectAllButton =
+    document.getElementById(
+      "news-select-all-button"
+    );
+
+
+  const previousButton =
+    document.getElementById(
+      "news-prev-page"
+    );
+
+
+  const nextButton =
+    document.getElementById(
+      "news-next-page"
+    );
+
+
+  /* -----------------------------------------
+     Refresh
+     ----------------------------------------- */
+
+  if (refreshButton) {
+
+    refreshButton.addEventListener(
+      "click",
+      async () => {
+
+        await loadNews();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Create News
+     ----------------------------------------- */
+
+  if (createButton) {
+
+    createButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        if (
+          !hasAdminPermission(
+            "news.create"
+          )
+        ) {
+
+          showAdminToast(
+            "News create करने की permission नहीं है।",
+            "warning"
+          );
+
+          return;
+
+        }
+
+
+        openNewsEditor();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Search
+     ----------------------------------------- */
+
+  if (searchInput) {
+
+    let searchTimer =
+      null;
+
+
+    searchInput.addEventListener(
+      "input",
+      () => {
+
+        clearTimeout(
+          searchTimer
+        );
+
+
+        adminState.newsSearch =
+          searchInput.value.trim();
+
+
+        searchTimer =
+          setTimeout(
+            () => {
+
+              adminState.newsPage =
+                1;
+
+              loadNews();
+
+            },
+            400
+          );
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Category Filter
+     ----------------------------------------- */
+
+  if (categoryFilter) {
+
+    categoryFilter.addEventListener(
+      "change",
+      () => {
+
+        adminState.newsCategory =
+          categoryFilter.value;
+
+
+        adminState.newsPage =
+          1;
+
+
+        loadNews();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Status Filter
+     ----------------------------------------- */
+
+  if (statusFilter) {
+
+    statusFilter.addEventListener(
+      "change",
+      () => {
+
+        adminState.newsStatus =
+          statusFilter.value;
+
+
+        adminState.newsPage =
+          1;
+
+
+        loadNews();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Sort Filter
+     ----------------------------------------- */
+
+  if (sortFilter) {
+
+    sortFilter.addEventListener(
+      "change",
+      () => {
+
+        adminState.newsSort =
+          sortFilter.value;
+
+
+        adminState.newsPage =
+          1;
+
+
+        loadNews();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Select All Checkbox
+     ----------------------------------------- */
+
+  if (selectAllCheckbox) {
+
+    selectAllCheckbox.addEventListener(
+      "change",
+      () => {
+
+        toggleSelectAllNews(
+          selectAllCheckbox.checked
+        );
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Select All Button
+     ----------------------------------------- */
+
+  if (selectAllButton) {
+
+    selectAllButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        const allSelected =
+          adminState.news.length > 0 &&
+          adminState.news.every(
+            news =>
+              adminState.selectedNews.has(
+                getNewsId(news)
+              )
+          );
+
+
+        toggleSelectAllNews(
+          !allSelected
+        );
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Previous Page
+     ----------------------------------------- */
+
+  if (previousButton) {
+
+    previousButton.addEventListener(
+      "click",
+      () => {
+
+        if (
+          adminState.newsPage <= 1
+        ) {
+
+          return;
+
+        }
+
+
+        adminState.newsPage--;
+
+        loadNews();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Next Page
+     ----------------------------------------- */
+
+  if (nextButton) {
+
+    nextButton.addEventListener(
+      "click",
+      () => {
+
+        if (
+          adminState.newsPage >=
+          adminState.newsTotalPages
+        ) {
+
+          return;
+
+        }
+
+
+        adminState.newsPage++;
+
+        loadNews();
+
+      }
+    );
+
+  }
+
+
+  /* -----------------------------------------
+     Table Row Actions
+     ----------------------------------------- */
+
+  const tableBody =
+    document.getElementById(
+      "news-table-body"
+    );
+
+
+  if (tableBody) {
+
+    tableBody.addEventListener(
+      "click",
+      handleNewsTableClick
+    );
+
+
+    tableBody.addEventListener(
+      "change",
+      handleNewsTableChange
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD NEWS
+   GET /api/news
+   ========================================================= */
+
+async function loadNews() {
+
+  const tableBody =
+    document.getElementById(
+      "news-table-body"
+    );
+
+
+  if (!tableBody) {
+    return;
+  }
+
+
+  showNewsLoading(
+    true
+  );
+
+
+  hideNewsEmptyState();
+
+
+  try {
+
+    const params =
+      new URLSearchParams();
+
+
+    /* -----------------------------------------
+       Pagination
+       ----------------------------------------- */
+
+    params.set(
+      "page",
+      String(
+        adminState.newsPage
+      )
+    );
+
+
+    params.set(
+      "limit",
+      String(
+        adminState.newsLimit
+      )
+    );
+
+
+    /* -----------------------------------------
+       Search
+       ----------------------------------------- */
+
+    if (
+      adminState.newsSearch
+    ) {
+
+      params.set(
+        "search",
+        adminState.newsSearch
+      );
+
+    }
+
+
+    /* -----------------------------------------
+       Category
+       ----------------------------------------- */
+
+    if (
+      adminState.newsCategory
+    ) {
+
+      params.set(
+        "category",
+        adminState.newsCategory
+      );
+
+    }
+
+
+    /* -----------------------------------------
+       Status
+       ----------------------------------------- */
+
+    if (
+      adminState.newsStatus
+    ) {
+
+      params.set(
+        "status",
+        adminState.newsStatus
+      );
+
+    }
+
+
+    /* -----------------------------------------
+       Sort
+       ----------------------------------------- */
+
+    if (
+      adminState.newsSort
+    ) {
+
+      params.set(
+        "sort",
+        adminState.newsSort
+      );
+
+    }
+
+
+    const data =
+      await adminApiRequest(
+        `/news?${params.toString()}`
+      );
+
+
+    const normalized =
+      normalizeNewsResponse(
+        data
+      );
+
+
+    adminState.news =
+      normalized.items;
+
+
+    adminState.newsTotal =
+      normalized.total;
+
+
+    adminState.newsTotalPages =
+      normalized.totalPages;
+
+
+    if (
+      adminState.newsPage >
+      adminState.newsTotalPages
+    ) {
+
+      adminState.newsPage =
+        adminState.newsTotalPages;
+
+
+      if (
+        adminState.newsPage < 1
+      ) {
+
+        adminState.newsPage =
+          1;
+
+      }
+
+    }
+
+
+    renderNewsTable();
+
+    updateNewsPagination();
+
+    updateNewsResultCount();
+
+
+  } catch (error) {
+
+    console.error(
+      "Load news error:",
+      error
+    );
+
+
+    tableBody.innerHTML =
+      "";
+
+
+    showAdminToast(
+      error.message ||
+      "News load नहीं हो पाई।",
+      "error"
+    );
+
+
+    showNewsEmptyState(
+      "News data load नहीं हो पाया।"
+    );
+
+  } finally {
+
+    showNewsLoading(
+      false
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   NORMALIZE NEWS RESPONSE
+   ========================================================= */
+
+function normalizeNewsResponse(
+  data
+) {
+
+  let items = [];
+
+
+  if (
+    Array.isArray(data)
+  ) {
+
+    items =
+      data;
+
+  } else if (
+    Array.isArray(
+      data?.news
+    )
+  ) {
+
+    items =
+      data.news;
+
+  } else if (
+    Array.isArray(
+      data?.data
+    )
+  ) {
+
+    items =
+      data.data;
+
+  } else if (
+    Array.isArray(
+      data?.data?.news
+    )
+  ) {
+
+    items =
+      data.data.news;
+
+  } else if (
+    Array.isArray(
+      data?.results
+    )
+  ) {
+
+    items =
+      data.results;
+
+  }
+
+
+  const total =
+    Number(
+      data?.total ??
+      data?.count ??
+      data?.pagination?.total ??
+      items.length
+    );
+
+
+  const page =
+    Number(
+      data?.page ??
+      data?.pagination?.page ??
+      adminState.newsPage
+    );
+
+
+  const limit =
+    Number(
+      data?.limit ??
+      data?.pagination?.limit ??
+      adminState.newsLimit
+    );
+
+
+  const totalPages =
+    Number(
+      data?.totalPages ??
+      data?.pagination?.totalPages ??
+      Math.max(
+        1,
+        Math.ceil(
+          total /
+          Math.max(
+            1,
+            limit
+          )
+        )
+      )
+    );
+
+
+  adminState.newsPage =
+    page;
+
+
+  return {
+
+    items:
+      Array.isArray(items)
+        ? items
+        : [],
+
+    total:
+      Number.isFinite(total)
+        ? total
+        : items.length,
+
+    totalPages:
+      Number.isFinite(totalPages) &&
+      totalPages > 0
+        ? totalPages
+        : 1
+
+  };
+
+}
+
+
+/* =========================================================
+   RENDER NEWS TABLE
+   ========================================================= */
+
+function renderNewsTable() {
+
+  const tableBody =
+    document.getElementById(
+      "news-table-body"
+    );
+
+
+  if (!tableBody) {
+    return;
+  }
+
+
+  tableBody.innerHTML =
+    "";
+
+
+  if (
+    !adminState.news.length
+  ) {
+
+    showNewsEmptyState(
+      "कोई News नहीं मिली।"
+    );
+
+    updateNewsSelectAllState();
+
+    return;
+
+  }
+
+
+  hideNewsEmptyState();
+
+
+  adminState.news.forEach(
+    news => {
+
+      const row =
+        createNewsTableRow(
+          news
+        );
+
+
+      tableBody.appendChild(
+        row
+      );
+
+    }
+  );
+
+
+  updateNewsSelectAllState();
+
+}
+
+
+/* =========================================================
+   CREATE NEWS TABLE ROW
+   ========================================================= */
+
+function createNewsTableRow(
+  news
+) {
+
+  const row =
+    document.createElement(
+      "tr"
+    );
+
+
+  const id =
+    getNewsId(
+      news
+    );
+
+
+  const selected =
+    adminState.selectedNews.has(
+      id
+    );
+
+
+  const title =
+    escapeHTML(
+      news.title ||
+      "Untitled News"
+    );
+
+
+  const category =
+    escapeHTML(
+      news.category ||
+      "राजस्थान"
+    );
+
+
+  const author =
+    escapeHTML(
+      news.author ||
+      "आवाज राजस्थान ब्यूरो"
+    );
+
+
+  const status =
+    getNewsStatus(
+      news
+    );
+
+
+  const statusLabel =
+    getNewsStatusLabel(
+      status
+    );
+
+
+  const statusClass =
+    getNewsStatusClass(
+      status
+    );
+
+
+  const date =
+    formatAdminDate(
+      news.publishedAt ||
+      news.createdAt ||
+      news.updatedAt
+    );
+
+
+  const image =
+    news.image ||
+    "";
+
+
+  const safeImage =
+    escapeAttribute(
+      image
+    );
+
+
+  row.dataset.newsId =
+    id;
+
+
+  row.innerHTML = `
+
+    <td class="checkbox-column">
+
+      <input
+        type="checkbox"
+        class="news-row-checkbox"
+        data-news-id="${escapeAttribute(id)}"
+        ${selected ? "checked" : ""}
+        aria-label="Select news"
+      />
+
+    </td>
+
+
+    <td>
+
+      <div class="news-table-item">
+
+        ${
+          image
+            ? `
+              <div class="news-table-thumbnail">
+
+                <img
+                  src="${safeImage}"
+                  alt=""
+                  loading="lazy"
+                  onerror="this.style.display='none'"
+                />
+
+              </div>
+            `
+            : `
+              <div class="news-table-thumbnail news-thumbnail-placeholder">
+                📰
+              </div>
+            `
+        }
+
+
+        <div class="news-table-content">
+
+          <strong
+            class="news-table-title"
+            title="${escapeAttribute(
+              news.title || ""
+            )}"
+          >
+            ${title}
+          </strong>
+
+
+          ${
+            news.summary
+              ? `
+                <span class="news-table-summary">
+                  ${escapeHTML(
+                    truncateText(
+                      news.summary,
+                      90
+                    )
+                  )}
+                </span>
+              `
+              : ""
+          }
+
+        </div>
+
+      </div>
+
+    </td>
+
+
+    <td>
+
+      <span class="category-badge">
+
+        ${category}
+
+      </span>
+
+    </td>
+
+
+    <td>
+
+      <span class="author-name">
+
+        ${author}
+
+      </span>
+
+    </td>
+
+
+    <td>
+
+      <span
+        class="status-badge ${statusClass}"
+      >
+
+        ${statusLabel}
+
+      </span>
+
+    </td>
+
+
+    <td>
+
+      <time
+        datetime="${escapeAttribute(
+          news.publishedAt ||
+          news.createdAt ||
+          ""
+        )}"
+      >
+
+        ${escapeHTML(date)}
+
+      </time>
+
+    </td>
+
+
+    <td class="actions-column">
+
+      <div class="table-row-actions">
+
+        <button
+          type="button"
+          class="table-action-button view-news-action"
+          data-news-id="${escapeAttribute(id)}"
+          title="View News"
+          aria-label="View News"
+        >
+          👁
+        </button>
+
+
+        ${
+          hasAdminPermission(
+            "news.edit"
+          )
+            ? `
+              <button
+                type="button"
+                class="table-action-button edit-news-action"
+                data-news-id="${escapeAttribute(id)}"
+                title="Edit News"
+                aria-label="Edit News"
+              >
+                ✏️
+              </button>
+            `
+            : ""
+        }
+
+
+        ${
+          hasAdminPermission(
+            "news.delete"
+          )
+            ? `
+              <button
+                type="button"
+                class="table-action-button delete-news-action danger"
+                data-news-id="${escapeAttribute(id)}"
+                title="Delete News"
+                aria-label="Delete News"
+              >
+                🗑
+              </button>
+            `
+            : ""
+        }
+
+      </div>
+
+    </td>
+
+  `;
+
+
+  return row;
+
+}
+
+
+/* =========================================================
+   NEWS TABLE CLICK HANDLER
+   ========================================================= */
+
+function handleNewsTableClick(
+  event
+) {
+
+  const actionButton =
+    event.target.closest(
+      "[data-news-id]"
+    );
+
+
+  if (!actionButton) {
+    return;
+  }
+
+
+  const newsId =
+    actionButton.getAttribute(
+      "data-news-id"
+    );
+
+
+  if (!newsId) {
+    return;
+  }
+
+
+  /* -----------------------------------------
+     View
+     ----------------------------------------- */
+
+  if (
+    actionButton.classList.contains(
+      "view-news-action"
+    )
+  ) {
+
+    viewNews(
+      newsId
+    );
+
+    return;
+
+  }
+
+
+  /* -----------------------------------------
+     Edit
+     ----------------------------------------- */
+
+  if (
+    actionButton.classList.contains(
+      "edit-news-action"
+    )
+  ) {
+
+    if (
+      !hasAdminPermission(
+        "news.edit"
+      )
+    ) {
+
+      showAdminToast(
+        "News edit करने की permission नहीं है।",
+        "warning"
+      );
+
+      return;
+
+    }
+
+
+    editNews(
+      newsId
+    );
+
+    return;
+
+  }
+
+
+  /* -----------------------------------------
+     Delete
+     ----------------------------------------- */
+
+  if (
+    actionButton.classList.contains(
+      "delete-news-action"
+    )
+  ) {
+
+    if (
+      !hasAdminPermission(
+        "news.delete"
+      )
+    ) {
+
+      showAdminToast(
+        "News delete करने की permission नहीं है।",
+        "warning"
+      );
+
+      return;
+
+    }
+
+
+    deleteNews(
+      newsId
+    );
+
+    return;
+
+  }
+
+}
+
+
+/* =========================================================
+   NEWS CHECKBOX CHANGE
+   ========================================================= */
+
+function handleNewsTableChange(
+  event
+) {
+
+  const checkbox =
+    event.target.closest(
+      ".news-row-checkbox"
+    );
+
+
+  if (!checkbox) {
+    return;
+  }
+
+
+  const newsId =
+    checkbox.getAttribute(
+      "data-news-id"
+    );
+
+
+  if (!newsId) {
+    return;
+  }
+
+
+  if (
+    checkbox.checked
+  ) {
+
+    adminState.selectedNews.add(
+      newsId
+    );
+
+  } else {
+
+    adminState.selectedNews.delete(
+      newsId
+    );
+
+  }
+
+
+  updateNewsSelectAllState();
+
+}
+
+
+/* =========================================================
+   SELECT ALL NEWS
+   ========================================================= */
+
+function toggleSelectAllNews(
+  shouldSelect
+) {
+
+  const checkboxes =
+    document.querySelectorAll(
+      ".news-row-checkbox"
+    );
+
+
+  checkboxes.forEach(
+    checkbox => {
+
+      checkbox.checked =
+        shouldSelect;
+
+
+      const newsId =
+        checkbox.getAttribute(
+          "data-news-id"
+        );
+
+
+      if (!newsId) {
+        return;
+      }
+
+
+      if (shouldSelect) {
+
+        adminState.selectedNews.add(
+          newsId
+        );
+
+      } else {
+
+        adminState.selectedNews.delete(
+          newsId
+        );
+
+      }
+
+    }
+  );
+
+
+  updateNewsSelectAllState();
+
+}
+
+
+/* =========================================================
+   UPDATE SELECT ALL STATE
+   ========================================================= */
+
+function updateNewsSelectAllState() {
+
+  const selectAll =
+    document.getElementById(
+      "news-select-all"
+    );
+
+
+  const selectAllButton =
+    document.getElementById(
+      "news-select-all-button"
+    );
+
+
+  const checkboxes =
+    document.querySelectorAll(
+      ".news-row-checkbox"
+    );
+
+
+  if (
+    !selectAll
+  ) {
+
+    return;
+
+  }
+
+
+  const total =
+    checkboxes.length;
+
+
+  const checked =
+    Array.from(
+      checkboxes
+    ).filter(
+      checkbox =>
+        checkbox.checked
+    ).length;
+
+
+  selectAll.checked =
+    total > 0 &&
+    checked === total;
+
+
+  selectAll.indeterminate =
+    checked > 0 &&
+    checked < total;
+
+
+  if (
+    selectAllButton
+  ) {
+
+    selectAllButton.textContent =
+      total > 0 &&
+      checked === total
+        ? "Deselect All"
+        : "Select All";
+
+  }
+
+}
+
+
+/* =========================================================
+   UPDATE NEWS PAGINATION
+   ========================================================= */
+function updateNewsPagination() {
+
+  const info =
+    document.getElementById(
+      "news-pagination-info"
+    );
+
+
+  const pageNumber =
+    document.getElementById(
+      "news-page-number"
+    );
+
+
+  const previous =
+    document.getElementById(
+      "news-prev-page"
+    );
+
+
+  const next =
+    document.getElementById(
+      "news-next-page"
+    );
+
+
+  const total =
+    adminState.newsTotal;
+
+
+  const page =
+    adminState.newsPage;
+
+
+  const limit =
+    adminState.newsLimit;
+
+
+  const totalPages =
+    Math.max(
+      1,
+      adminState.newsTotalPages
+    );
+
+
+  const from =
+    total === 0
+      ? 0
+      : (
+          (page - 1) *
+          limit
+        ) + 1;
+
+
+  const to =
+    total === 0
+      ? 0
+      : Math.min(
+          page * limit,
+          total
+        );
+
+
+  if (info) {
+
+    info.textContent =
+      total === 0
+        ? "0 results"
+        : `${from}-${to} of ${total} results`;
+
+  }
+
+
+  if (pageNumber) {
+
+    pageNumber.textContent =
+      `${page} / ${totalPages}`;
+
+  }
+
+
+  if (previous) {
+
+    previous.disabled =
+      page <= 1;
+
+  }
+
+
+  if (next) {
+
+    next.disabled =
+      page >= totalPages ||
+      total === 0;
+
+  }
+
+}
+
+
+/* =========================================================
+   UPDATE NEWS RESULT COUNT
+   ========================================================= */
+
+function updateNewsResultCount() {
+
+  const element =
+    document.getElementById(
+      "news-result-count"
+    );
+
+
+  if (!element) {
+    return;
+  }
+
+
+  element.textContent =
+    `${adminState.newsTotal} news`;
+
+}
+
+
+/* =========================================================
+   NEWS LOADING STATE
+   ========================================================= */
+
+function showNewsLoading(
+  isLoading
+) {
+
+  const loading =
+    document.getElementById(
+      "news-loading-state"
+    );
+
+
+  if (loading) {
+
+    loading.hidden =
+      !isLoading;
+
+  }
+
+
+  const table =
+    document.getElementById(
+      "news-table"
+    );
+
+
+  if (table) {
+
+    table.setAttribute(
+      "aria-busy",
+      isLoading
+        ? "true"
+        : "false"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   NEWS EMPTY STATE
+   ========================================================= */
+
+function showNewsEmptyState(
+  message
+) {
+
+  const empty =
+    document.getElementById(
+      "news-empty-state"
+    );
+
+
+  if (!empty) {
+    return;
+  }
+
+
+  const paragraph =
+    empty.querySelector(
+      "p"
+    );
+
+
+  if (paragraph) {
+
+    paragraph.textContent =
+      message ||
+      "कोई News नहीं मिली।";
+
+  }
+
+
+  empty.hidden =
+    false;
+
+}
+
+
+/* ---------------------------------------------------------
+   Hide News Empty State
+   --------------------------------------------------------- */
+
+function hideNewsEmptyState() {
+
+  const empty =
+    document.getElementById(
+      "news-empty-state"
+    );
+
+
+  if (empty) {
+
+    empty.hidden =
+      true;
+
+  }
+
+}
+
+
+/* =========================================================
+   GET NEWS ID
+   ========================================================= */
+
+function getNewsId(
+  news
+) {
+
+  if (!news) {
+    return "";
+  }
+
+
+  return String(
+    news._id ||
+    news.id ||
+    news.newsId ||
+    ""
+  );
+
+}
+
+
+/* =========================================================
+   GET NEWS STATUS
+   ========================================================= */
+
+function getNewsStatus(
+  news
+) {
+
+  if (!news) {
+    return "draft";
+  }
+
+
+  if (
+    news.scheduledAt &&
+    new Date(
+      news.scheduledAt
+    ).getTime() >
+    Date.now()
+  ) {
+
+    return "scheduled";
+
+  }
+
+
+  if (
+    news.isPublished === true
+  ) {
+
+    return "published";
+
+  }
+
+
+  if (
+    news.status === "published"
+  ) {
+
+    return "published";
+
+  }
+
+
+  if (
+    news.status === "scheduled"
+  ) {
+
+    return "scheduled";
+
+  }
+
+
+  return "draft";
+
+}
+
+
+/* =========================================================
+   NEWS STATUS LABEL
+   ========================================================= */
+
+function getNewsStatusLabel(
+  status
+) {
+
+  switch (status) {
+
+    case "published":
+
+      return "Published";
+
+
+    case "scheduled":
+
+      return "Scheduled";
+
+
+    case "draft":
+
+      return "Draft";
+
+
+    default:
+
+      return "Draft";
+
+  }
+
+}
+
+
+/* =========================================================
+   NEWS STATUS CSS CLASS
+   ========================================================= */
+
+function getNewsStatusClass(
+  status
+) {
+
+  switch (status) {
+
+    case "published":
+
+      return "status-published";
+
+
+    case "scheduled":
+
+      return "status-scheduled";
+
+
+    case "draft":
+
+      return "status-draft";
+
+
+    default:
+
+      return "status-draft";
+
+  }
+
+}
+
+
+/* =========================================================
+   NEWS PERMISSION CHECK
+   ========================================================= */
+
+function canManageNews(
+  permission
+) {
+
+  return hasAdminPermission(
+    permission
+  );
+
+}
+
+
+/* =========================================================
+   PART 3/20 END
+   ========================================================= */
