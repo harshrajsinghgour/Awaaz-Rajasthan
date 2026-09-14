@@ -1506,3 +1506,2432 @@ function applyRoleBasedUI(
 /* =========================================================
    PART 1/20 END
    ========================================================= */
+/* =========================================================
+   NAVIGATION SYSTEM
+   ========================================================= */
+
+function initializeNavigation() {
+
+  const navigationItems =
+    document.querySelectorAll(
+      "[data-section]"
+    );
+
+
+  navigationItems.forEach(
+    item => {
+
+      item.addEventListener(
+        "click",
+        event => {
+
+          event.preventDefault();
+
+          const section =
+            item.getAttribute(
+              "data-section"
+            );
+
+
+          if (!section) {
+            return;
+          }
+
+
+          const permission =
+            item.getAttribute(
+              "data-permission"
+            );
+
+
+          if (
+            permission &&
+            !hasAdminPermission(
+              permission
+            )
+          ) {
+
+            showAdminToast(
+              "आपके Admin account को इस section की permission नहीं है।",
+              "warning"
+            );
+
+            return;
+
+          }
+
+
+          switchAdminSection(
+            section
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   SWITCH ADMIN SECTION
+   ========================================================= */
+
+function switchAdminSection(
+  sectionName
+) {
+
+  if (!sectionName) {
+    return;
+  }
+
+
+  const section =
+    document.querySelector(
+      `[data-section-content="${sectionName}"]`
+    );
+
+
+  if (!section) {
+
+    console.warn(
+      `Admin section not found: ${sectionName}`
+    );
+
+    return;
+
+  }
+
+
+  /* -----------------------------------------
+     Hide all sections
+     ----------------------------------------- */
+
+  document
+    .querySelectorAll(
+      "[data-section-content]"
+    )
+    .forEach(
+      sectionElement => {
+
+        sectionElement.classList.remove(
+          "active"
+        );
+
+        sectionElement.hidden =
+          true;
+
+      }
+    );
+
+
+  /* -----------------------------------------
+     Show selected section
+     ----------------------------------------- */
+
+  section.classList.add(
+    "active"
+  );
+
+  section.hidden =
+    false;
+
+
+  /* -----------------------------------------
+     Update navigation
+     ----------------------------------------- */
+
+  document
+    .querySelectorAll(
+      "[data-section]"
+    )
+    .forEach(
+      navigationItem => {
+
+        const target =
+          navigationItem.getAttribute(
+            "data-section"
+          );
+
+
+        navigationItem.classList.toggle(
+          "active",
+          target === sectionName
+        );
+
+        navigationItem.setAttribute(
+          "aria-current",
+          target === sectionName
+            ? "page"
+            : "false"
+        );
+
+      }
+    );
+
+
+  /* -----------------------------------------
+     Update state
+     ----------------------------------------- */
+
+  adminState.currentSection =
+    sectionName;
+
+
+  /* -----------------------------------------
+     Page information
+     ----------------------------------------- */
+
+  updateAdminPageHeading(
+    sectionName
+  );
+
+
+  /* -----------------------------------------
+     Close mobile sidebar
+     ----------------------------------------- */
+
+  closeAdminSidebar();
+
+
+  /* -----------------------------------------
+     Load section data
+     ----------------------------------------- */
+
+  loadSectionData(
+    sectionName
+  );
+
+
+  /* -----------------------------------------
+     Scroll to top
+     ----------------------------------------- */
+
+  const main =
+    document.getElementById(
+      "admin-main"
+    );
+
+
+  if (main) {
+
+    main.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+  }
+
+}
+
+
+/* =========================================================
+   PAGE TITLES
+   ========================================================= */
+
+const ADMIN_SECTION_META = {
+
+  dashboard: {
+
+    title:
+      "Dashboard",
+
+    description:
+      "राजस्थान न्यूज़ पोर्टल का पूरा overview यहाँ देखें।",
+
+    breadcrumb:
+      "Dashboard"
+
+  },
+
+
+  news: {
+
+    title:
+      "News Management",
+
+    description:
+      "न्यूज़ बनाएं, edit करें, publish करें और manage करें।",
+
+    breadcrumb:
+      "News"
+
+  },
+
+
+  breaking: {
+
+    title:
+      "Breaking News",
+
+    description:
+      "Breaking news को manage और publish करें।",
+
+    breadcrumb:
+      "Breaking News"
+
+  },
+
+
+  trending: {
+
+    title:
+      "Trending",
+
+    description:
+      "Trending news और popular content manage करें।",
+
+    breadcrumb:
+      "Trending"
+
+  },
+
+
+  video: {
+
+    title:
+      "Video",
+
+    description:
+      "News videos और video content manage करें।",
+
+    breadcrumb:
+      "Video"
+
+  },
+
+
+  "live-tv": {
+
+    title:
+      "Live TV",
+
+    description:
+      "आवाज राजस्थान LIVE की settings और status manage करें।",
+
+    breadcrumb:
+      "Live TV"
+
+  },
+
+
+  "live-blog": {
+
+    title:
+      "Live Blog",
+
+    description:
+      "Live Blog updates और coverage manage करें।",
+
+    breadcrumb:
+      "Live Blog"
+
+  },
+
+
+  epaper: {
+
+    title:
+      "ePaper",
+
+    description:
+      "राजस्थान ePaper files और publication manage करें।",
+
+    breadcrumb:
+      "ePaper"
+
+  },
+
+
+  contacts: {
+
+    title:
+      "Contacts",
+
+    description:
+      "पाठकों द्वारा भेजे गए contact messages देखें और manage करें।",
+
+    breadcrumb:
+      "Contacts"
+
+  },
+
+
+  users: {
+
+    title:
+      "Users",
+
+    description:
+      "Website users और उनके accounts manage करें।",
+
+    breadcrumb:
+      "Users"
+
+  },
+
+
+  admins: {
+
+    title:
+      "Admin Management",
+
+    description:
+      "Admin accounts, roles और permissions manage करें।",
+
+    breadcrumb:
+      "Admins"
+
+  },
+
+
+  settings: {
+
+    title:
+      "Site Settings",
+
+    description:
+      "Website की मुख्य settings और configuration manage करें।",
+
+    breadcrumb:
+      "Settings"
+
+  },
+
+
+  profile: {
+
+    title:
+      "My Profile",
+
+    description:
+      "अपने Admin profile और security settings manage करें।",
+
+    breadcrumb:
+      "Profile"
+
+  }
+
+};
+
+
+/* =========================================================
+   UPDATE PAGE HEADING
+   ========================================================= */
+
+function updateAdminPageHeading(
+  sectionName
+) {
+
+  const meta =
+    ADMIN_SECTION_META[
+      sectionName
+    ];
+
+
+  if (!meta) {
+    return;
+  }
+
+
+  setText(
+    "#admin-page-title",
+    meta.title
+  );
+
+
+  setText(
+    "#admin-page-description",
+    meta.description
+  );
+
+
+  setText(
+    "#admin-breadcrumb",
+    meta.breadcrumb
+  );
+
+}
+
+
+/* =========================================================
+   LOAD SECTION DATA
+   ========================================================= */
+
+async function loadSectionData(
+  sectionName
+) {
+
+  try {
+
+    switch (
+      sectionName
+    ) {
+
+      case "dashboard":
+
+        await loadDashboard();
+
+        break;
+
+
+      case "news":
+
+        await loadNews();
+
+        break;
+
+
+      case "breaking":
+
+        await loadBreakingNews();
+
+        break;
+
+
+      case "trending":
+
+        await loadTrending();
+
+        break;
+
+
+      case "video":
+
+        await loadVideos();
+
+        break;
+
+
+      case "live-tv":
+
+        await loadLiveTV();
+
+        break;
+
+
+      case "live-blog":
+
+        await loadLiveBlog();
+
+        break;
+
+
+      case "epaper":
+
+        await loadEPaper();
+
+        break;
+
+
+      case "contacts":
+
+        await loadContacts();
+
+        break;
+
+
+      case "users":
+
+        await loadUsers();
+
+        break;
+
+
+      case "admins":
+
+        await loadAdmins();
+
+        break;
+
+
+      case "settings":
+
+        await loadSiteSettings();
+
+        break;
+
+
+      case "profile":
+
+        loadProfile();
+
+        break;
+
+
+      default:
+
+        break;
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      `Failed loading section ${sectionName}:`,
+      error
+    );
+
+
+    showAdminToast(
+      error.message ||
+      "Section data load नहीं हो पाया।",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   SIDEBAR INITIALIZATION
+   ========================================================= */
+
+function initializeSidebar() {
+
+  const mobileMenuButton =
+    document.getElementById(
+      "admin-mobile-menu-button"
+    );
+
+
+  const overlay =
+    document.getElementById(
+      "admin-sidebar-overlay"
+    );
+
+
+  const sidebar =
+    document.getElementById(
+      "admin-sidebar"
+    );
+
+
+  if (
+    mobileMenuButton
+  ) {
+
+    mobileMenuButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        toggleAdminSidebar();
+
+      }
+    );
+
+  }
+
+
+  if (overlay) {
+
+    overlay.addEventListener(
+      "click",
+      () => {
+
+        closeAdminSidebar();
+
+      }
+    );
+
+  }
+
+
+  if (sidebar) {
+
+    sidebar.addEventListener(
+      "click",
+      event => {
+
+        const link =
+          event.target.closest(
+            "[data-section]"
+          );
+
+
+        if (
+          link &&
+          window.innerWidth <= 900
+        ) {
+
+          closeAdminSidebar();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      if (
+        event.key === "Escape"
+      ) {
+
+        closeAdminSidebar();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   TOGGLE SIDEBAR
+   ========================================================= */
+
+function toggleAdminSidebar() {
+
+  const sidebar =
+    document.getElementById(
+      "admin-sidebar"
+    );
+
+
+  const overlay =
+    document.getElementById(
+      "admin-sidebar-overlay"
+    );
+
+
+  if (!sidebar) {
+    return;
+  }
+
+
+  const isOpen =
+    sidebar.classList.contains(
+      "open"
+    );
+
+
+  if (isOpen) {
+
+    closeAdminSidebar();
+
+  } else {
+
+    openAdminSidebar();
+
+  }
+
+}
+
+
+/* =========================================================
+   OPEN SIDEBAR
+   ========================================================= */
+
+function openAdminSidebar() {
+
+  const sidebar =
+    document.getElementById(
+      "admin-sidebar"
+    );
+
+
+  const overlay =
+    document.getElementById(
+      "admin-sidebar-overlay"
+    );
+
+
+  if (sidebar) {
+
+    sidebar.classList.add(
+      "open"
+    );
+
+  }
+
+
+  if (overlay) {
+
+    overlay.classList.add(
+      "active"
+    );
+
+  }
+
+
+  document.body.classList.add(
+    "admin-sidebar-open"
+  );
+
+}
+
+
+/* =========================================================
+   CLOSE SIDEBAR
+   ========================================================= */
+
+function closeAdminSidebar() {
+
+  const sidebar =
+    document.getElementById(
+      "admin-sidebar"
+    );
+
+
+  const overlay =
+    document.getElementById(
+      "admin-sidebar-overlay"
+    );
+
+
+  if (sidebar) {
+
+    sidebar.classList.remove(
+      "open"
+    );
+
+  }
+
+
+  if (overlay) {
+
+    overlay.classList.remove(
+      "active"
+    );
+
+  }
+
+
+  document.body.classList.remove(
+    "admin-sidebar-open"
+  );
+
+}
+
+
+/* =========================================================
+   HEADER INITIALIZATION
+   ========================================================= */
+
+function initializeHeader() {
+
+  const profileButton =
+    document.getElementById(
+      "admin-header-profile-button"
+    );
+
+
+  const notificationButton =
+    document.getElementById(
+      "admin-notification-button"
+    );
+
+
+  if (profileButton) {
+
+    profileButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        switchAdminSection(
+          "profile"
+        );
+
+      }
+    );
+
+  }
+
+
+  if (
+    notificationButton
+  ) {
+
+    notificationButton.addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        showAdminNotifications();
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   NOTIFICATION SYSTEM
+   ========================================================= */
+
+function showAdminNotifications() {
+
+  const badge =
+    document.getElementById(
+      "admin-notification-badge"
+    );
+
+
+  if (badge) {
+
+    badge.hidden =
+      true;
+
+  }
+
+
+  showAdminModal({
+
+    eyebrow:
+      "Notifications",
+
+    title:
+      "Admin Notifications",
+
+    icon:
+      "🔔",
+
+    body: `
+
+      <div class="admin-notification-list">
+
+        <div class="admin-notification-item">
+
+          <strong>
+            Admin Panel
+          </strong>
+
+          <p>
+            आपका Admin session सुरक्षित रूप से active है।
+          </p>
+
+        </div>
+
+        <div class="admin-notification-item">
+
+          <strong>
+            News Management
+          </strong>
+
+          <p>
+            Dashboard से नई खबरें manage की जा सकती हैं।
+          </p>
+
+        </div>
+
+      </div>
+
+    `,
+
+    showCancel:
+      false,
+
+    confirmText:
+      "ठीक है"
+
+  });
+
+}
+
+
+/* =========================================================
+   MODAL INITIALIZATION
+   ========================================================= */
+
+function initializeModal() {
+
+  const modal =
+    document.getElementById(
+      "admin-modal"
+    );
+
+
+  const closeButton =
+    document.getElementById(
+      "admin-modal-close"
+    );
+
+
+  const cancelButton =
+    document.getElementById(
+      "admin-modal-cancel"
+    );
+
+
+  if (closeButton) {
+
+    closeButton.addEventListener(
+      "click",
+      () => {
+
+        closeAdminModal();
+
+      }
+    );
+
+  }
+
+
+  if (cancelButton) {
+
+    cancelButton.addEventListener(
+      "click",
+      () => {
+
+        closeAdminModal();
+
+      }
+    );
+
+  }
+
+
+  if (modal) {
+
+    modal.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === modal
+        ) {
+
+          closeAdminModal();
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   SHOW ADMIN MODAL
+   ========================================================= */
+
+function showAdminModal(
+  options = {}
+) {
+
+  const modal =
+    document.getElementById(
+      "admin-modal"
+    );
+
+
+  if (!modal) {
+    return;
+  }
+
+
+  const icon =
+    document.getElementById(
+      "admin-modal-icon"
+    );
+
+
+  const eyebrow =
+    document.getElementById(
+      "admin-modal-eyebrow"
+    );
+
+
+  const title =
+    document.getElementById(
+      "admin-modal-title"
+    );
+
+
+  const body =
+    document.getElementById(
+      "admin-modal-body"
+    );
+
+
+  const footer =
+    document.getElementById(
+      "admin-modal-footer"
+    );
+
+
+  const cancelButton =
+    document.getElementById(
+      "admin-modal-cancel"
+    );
+
+
+  const confirmButton =
+    document.getElementById(
+      "admin-modal-confirm"
+    );
+
+
+  if (icon) {
+
+    icon.textContent =
+      options.icon || "ℹ️";
+
+  }
+
+
+  if (eyebrow) {
+
+    eyebrow.textContent =
+      options.eyebrow || "Admin";
+
+  }
+
+
+  if (title) {
+
+    title.textContent =
+      options.title || "Information";
+
+  }
+
+
+  if (body) {
+
+    if (
+      options.html !== undefined
+    ) {
+
+      body.innerHTML =
+        options.html;
+
+    } else {
+
+      body.textContent =
+        options.body || "";
+
+    }
+
+  }
+
+
+  if (cancelButton) {
+
+    cancelButton.hidden =
+      options.showCancel === false;
+
+    cancelButton.textContent =
+      options.cancelText ||
+      "Cancel";
+
+  }
+
+
+  if (confirmButton) {
+
+    confirmButton.hidden =
+      options.showConfirm === false;
+
+    confirmButton.textContent =
+      options.confirmText ||
+      "Confirm";
+
+  }
+
+
+  if (footer) {
+
+    footer.hidden =
+      options.hideFooter === true;
+
+  }
+
+
+  modal.hidden =
+    false;
+
+
+  modal.classList.add(
+    "active"
+  );
+
+
+  document.body.classList.add(
+    "admin-modal-open"
+  );
+
+
+  /* -----------------------------------------
+     Confirm callback
+     ----------------------------------------- */
+
+  if (confirmButton) {
+
+    confirmButton.onclick =
+      async () => {
+
+        if (
+          typeof options.onConfirm !==
+          "function"
+        ) {
+
+          closeAdminModal();
+
+          return;
+
+        }
+
+
+        try {
+
+          setButtonLoading(
+            confirmButton,
+            true,
+            "Processing..."
+          );
+
+
+          await options.onConfirm();
+
+        } catch (error) {
+
+          console.error(
+            "Modal confirmation error:",
+            error
+          );
+
+
+          showAdminToast(
+            error.message ||
+            "Action complete नहीं हुआ।",
+            "error"
+          );
+
+        } finally {
+
+          setButtonLoading(
+            confirmButton,
+            false,
+            options.confirmText ||
+            "Confirm"
+          );
+
+        }
+
+      };
+
+  }
+
+
+  /* -----------------------------------------
+     Focus
+     ----------------------------------------- */
+
+  if (confirmButton &&
+      !confirmButton.hidden) {
+
+    setTimeout(
+      () => {
+
+        confirmButton.focus();
+
+      },
+      50
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CLOSE ADMIN MODAL
+   ========================================================= */
+
+function closeAdminModal() {
+
+  const modal =
+    document.getElementById(
+      "admin-modal"
+    );
+
+
+  if (!modal) {
+    return;
+  }
+
+
+  modal.classList.remove(
+    "active"
+  );
+
+
+  modal.hidden =
+    true;
+
+
+  document.body.classList.remove(
+    "admin-modal-open"
+  );
+
+}
+
+
+/* =========================================================
+   CONFIRMATION DIALOG INITIALIZATION
+   ========================================================= */
+
+function initializeConfirmation() {
+
+  const dialog =
+    document.getElementById(
+      "admin-confirm-dialog"
+    );
+
+
+  const cancelButton =
+    document.getElementById(
+      "admin-confirm-cancel"
+    );
+
+
+  if (cancelButton) {
+
+    cancelButton.addEventListener(
+      "click",
+      () => {
+
+        closeAdminConfirmation();
+
+      }
+    );
+
+  }
+
+
+  if (dialog) {
+
+    dialog.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === dialog
+        ) {
+
+          closeAdminConfirmation();
+
+        }
+
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   CONFIRMATION STATE
+   ========================================================= */
+
+let adminConfirmationCallback =
+  null;
+
+
+/* =========================================================
+   SHOW CONFIRMATION
+   ========================================================= */
+function showAdminConfirmation(
+  options = {}
+) {
+
+  const dialog =
+    document.getElementById(
+      "admin-confirm-dialog"
+    );
+
+
+  if (!dialog) {
+
+    return new Promise(
+      resolve => {
+
+        const confirmed =
+          window.confirm(
+            options.message ||
+            "क्या आप यह action करना चाहते हैं?"
+          );
+
+        resolve(
+          confirmed
+        );
+
+      }
+    );
+
+  }
+
+
+  const icon =
+    document.getElementById(
+      "admin-confirm-icon"
+    );
+
+
+  const title =
+    document.getElementById(
+      "admin-confirm-title"
+    );
+
+
+  const message =
+    document.getElementById(
+      "admin-confirm-message"
+    );
+
+
+  const submitButton =
+    document.getElementById(
+      "admin-confirm-submit"
+    );
+
+
+  const cancelButton =
+    document.getElementById(
+      "admin-confirm-cancel"
+    );
+
+
+  if (icon) {
+
+    icon.textContent =
+      options.icon ||
+      "⚠️";
+
+  }
+
+
+  if (title) {
+
+    title.textContent =
+      options.title ||
+      "Confirm Action";
+
+  }
+
+
+  if (message) {
+
+    message.textContent =
+      options.message ||
+      "क्या आप यह action करना चाहते हैं?";
+
+  }
+
+
+  if (submitButton) {
+
+    submitButton.textContent =
+      options.confirmText ||
+      "Confirm";
+
+  }
+
+
+  if (cancelButton) {
+
+    cancelButton.textContent =
+      options.cancelText ||
+      "Cancel";
+
+  }
+
+
+  dialog.hidden =
+    false;
+
+
+  dialog.classList.add(
+    "active"
+  );
+
+
+  document.body.classList.add(
+    "admin-confirm-open"
+  );
+
+
+  return new Promise(
+    resolve => {
+
+      adminConfirmationCallback =
+        resolve;
+
+
+      if (submitButton) {
+
+        submitButton.onclick =
+          async () => {
+
+            try {
+
+              setButtonLoading(
+                submitButton,
+                true,
+                "Processing..."
+              );
+
+
+              if (
+                typeof options.onConfirm ===
+                "function"
+              ) {
+
+                await options.onConfirm();
+
+              }
+
+
+              resolveAdminConfirmation(
+                true
+              );
+
+            } catch (error) {
+
+              console.error(
+                "Confirmation action error:",
+                error
+              );
+
+
+              showAdminToast(
+                error.message ||
+                "Action complete नहीं हुआ।",
+                "error"
+              );
+
+
+              resolveAdminConfirmation(
+                false
+              );
+
+            } finally {
+
+              setButtonLoading(
+                submitButton,
+                false,
+                options.confirmText ||
+                "Confirm"
+              );
+
+            }
+
+          };
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   RESOLVE CONFIRMATION
+   ========================================================= */
+
+function resolveAdminConfirmation(
+  result
+) {
+
+  if (
+    typeof adminConfirmationCallback ===
+    "function"
+  ) {
+
+    adminConfirmationCallback(
+      result
+    );
+
+  }
+
+
+  adminConfirmationCallback =
+    null;
+
+
+  closeAdminConfirmation();
+
+}
+
+/* =========================================================
+   CLOSE CONFIRMATION
+   ========================================================= */
+
+function closeAdminConfirmation() {
+
+  const dialog =
+    document.getElementById(
+      "admin-confirm-dialog"
+    );
+
+
+  if (dialog) {
+
+    dialog.classList.remove(
+      "active"
+    );
+
+    dialog.hidden =
+      true;
+
+  }
+
+
+  document.body.classList.remove(
+    "admin-confirm-open"
+  );
+
+
+  adminConfirmationCallback =
+    null;
+
+}
+
+
+/* =========================================================
+   PASSWORD CONTROLS
+   ========================================================= */
+
+function initializePasswordControls() {
+
+  const passwordPairs = [
+
+    [
+      "admin-login-password",
+      "toggle-login-password"
+    ],
+
+    [
+      "profile-current-password",
+      "toggle-current-password"
+    ],
+
+    [
+      "profile-new-password",
+      "toggle-new-password"
+    ],
+
+    [
+      "profile-confirm-password",
+      "toggle-confirm-password"
+    ]
+
+  ];
+
+
+  passwordPairs.forEach(
+    pair => {
+
+      const inputId =
+        pair[0];
+
+      const toggleId =
+        pair[1];
+
+
+      const toggle =
+        document.getElementById(
+          toggleId
+        );
+
+
+      if (!toggle) {
+        return;
+      }
+
+
+      toggle.addEventListener(
+        "click",
+        event => {
+
+          event.preventDefault();
+
+          togglePassword(
+            inputId,
+            toggle
+          );
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   TOGGLE PASSWORD
+   ========================================================= */
+
+function togglePassword(
+  inputId,
+  button
+) {
+
+  const input =
+    document.getElementById(
+      inputId
+    );
+
+
+  if (!input) {
+    return;
+  }
+
+
+  const isPassword =
+    input.type ===
+    "password";
+
+
+  input.type =
+    isPassword
+      ? "text"
+      : "password";
+
+
+  if (button) {
+
+    button.setAttribute(
+      "aria-label",
+      isPassword
+        ? "Password hide करें"
+        : "Password show करें"
+    );
+
+
+    button.setAttribute(
+      "title",
+      isPassword
+        ? "Password hide करें"
+        : "Password show करें"
+    );
+
+
+    const icon =
+      button.querySelector(
+       ("[data-password-icon]")
+      );
+
+
+    if (icon) {
+
+      icon.textContent =
+        isPassword
+          ? "🙈"
+          : "👁️";
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   DASHBOARD QUICK ACTIONS
+   ========================================================= */
+
+function initializeDashboardControls() {
+
+  const quickActions =
+    document.getElementById(
+      "quick-actions"
+    );
+
+
+  if (!quickActions) {
+    return;
+  }
+
+
+  quickActions.addEventListener(
+    "click",
+    event => {
+
+      const actionElement =
+        event.target.closest(
+          "[data-action]"
+        );
+
+
+      if (!actionElement) {
+        return;
+      }
+
+
+      const action =
+        actionElement.getAttribute(
+          "data-action"
+        );
+
+
+      const permission =
+        actionElement.getAttribute(
+          "data-permission"
+        );
+
+
+      if (
+        permission &&
+        !hasAdminPermission(
+          permission
+        )
+      ) {
+
+        showAdminToast(
+          "इस action की permission आपके account में नहीं है।",
+          "warning"
+        );
+
+        return;
+
+      }
+
+
+      handleAdminAction(
+        action
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   ADMIN ACTION ROUTER
+   ========================================================= */
+
+function handleAdminAction(
+  action
+) {
+
+  switch (action) {
+
+    case "create-news":
+
+      switchAdminSection(
+        "news"
+      );
+
+      setTimeout(
+        () => {
+
+          openNewsEditor();
+
+        },
+        100
+      );
+
+      break;
+
+
+    case "manage-breaking":
+
+      switchAdminSection(
+        "breaking"
+      );
+
+      break;
+
+
+    case "manage-live-tv":
+
+      switchAdminSection(
+        "live-tv"
+      );
+
+      break;
+
+
+    case "manage-epaper":
+
+      switchAdminSection(
+        "epaper"
+      );
+
+      break;
+
+
+    case "view-all-news":
+
+      switchAdminSection(
+        "news"
+      );
+
+      break;
+
+
+    default:
+
+      console.warn(
+        `Unknown admin action: ${action}`
+      );
+
+      break;
+
+  }
+
+}
+
+
+/* =========================================================
+   FOOTER INITIALIZATION
+   ========================================================= */
+
+function initializeFooter() {
+
+  const year =
+    document.getElementById(
+      "admin-footer-year"
+    );
+
+
+  if (year) {
+
+    year.textContent =
+      new Date().getFullYear();
+
+  }
+
+}
+
+
+/* =========================================================
+   KEYBOARD SHORTCUTS
+   ========================================================= */
+
+function initializeKeyboardShortcuts() {
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      /* ---------------------------------------
+         Ctrl + K
+         --------------------------------------- */
+
+      if (
+        (event.ctrlKey ||
+         event.metaKey) &&
+        event.key.toLowerCase() === "k"
+      ) {
+
+        event.preventDefault();
+
+        focusAdminSearch();
+
+        return;
+
+      }
+
+
+      /* ---------------------------------------
+         Escape
+         --------------------------------------- */
+
+      if (
+        event.key === "Escape"
+      ) {
+
+        closeAdminModal();
+
+        closeAdminConfirmation();
+
+        closeAdminSidebar();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   FOCUS ADMIN SEARCH
+   ========================================================= */
+
+function focusAdminSearch() {
+
+  const searchInputs = [
+
+    document.getElementById(
+      "news-search"
+    ),
+
+    document.getElementById(
+      "admin-search"
+    ),
+
+    document.querySelector(
+      "[data-admin-search]"
+    )
+
+  ];
+
+
+  const input =
+    searchInputs.find(
+      element =>
+        element &&
+        !element.hidden &&
+        element.offsetParent !== null
+    );
+
+
+  if (input) {
+
+    input.focus();
+
+    input.select();
+
+  }
+
+}
+
+
+/* =========================================================
+   LOGOUT
+   ========================================================= */
+
+         async function handleAdminLogout() {
+
+  const confirmed =
+    await showAdminConfirmation({
+
+      title:
+        "Logout",
+
+      message:
+        "क्या आप Admin Panel से logout करना चाहते हैं?",
+
+      icon:
+        "🚪",
+
+      confirmText:
+        "Logout",
+
+      cancelText:
+        "Cancel"
+
+    });
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    /* ---------------------------------------
+       Backend logout
+       --------------------------------------- */
+
+    await adminApiRequest(
+      "/admin/logout",
+      {
+        method: "POST"
+      }
+    );
+
+  } catch (error) {
+
+    /*
+      Backend logout fail होने पर भी
+      local session clear करना जरूरी है।
+    */
+
+    console.warn(
+      "Backend logout request failed:",
+      error.message
+    );
+
+  } finally {
+
+    clearAdminSession();
+
+    showAdminLoginScreen();
+
+    showAdminToast(
+      "आप successfully logout हो गए हैं।",
+      "success"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOGOUT BUTTON INITIALIZATION
+   ========================================================= */
+
+function initializeLogoutButton() {
+
+  const button =
+    document.getElementById(
+      "admin-logout-button"
+    );
+
+
+  if (!button) {
+    return;
+  }
+
+
+  button.addEventListener(
+    "click",
+    event => {
+
+      event.preventDefault();
+
+      handleAdminLogout();
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   PROFILE CONTROLS
+   ========================================================= */
+
+function initializeProfileControls() {
+
+  const passwordForm =
+    document.getElementById(
+      "profile-password-form"
+    );
+
+
+  if (passwordForm) {
+
+    passwordForm.addEventListener(
+      "submit",
+      handlePasswordChange
+    );
+
+  }
+
+
+  const logoutAllButton =
+    document.getElementById(
+      "logout-all-sessions-button"
+    );
+
+
+  if (logoutAllButton) {
+
+    logoutAllButton.addEventListener(
+      "click",
+      handleLogoutAllSessions
+    );
+
+  }
+
+
+  initializeLogoutButton();
+
+}
+
+
+/* =========================================================
+   PASSWORD CHANGE
+   ========================================================= */
+
+async function handlePasswordChange(
+  event
+) {
+
+  event.preventDefault();
+
+
+  const currentPassword =
+    document.getElementById(
+      "profile-current-password"
+    )?.value || "";
+
+
+  const newPassword =
+    document.getElementById(
+      "profile-new-password"
+    )?.value || "";
+
+
+  const confirmPassword =
+    document.getElementById(
+      "profile-confirm-password"
+    )?.value || "";
+
+
+  const submitButton =
+    event.submitter ||
+    document.querySelector(
+      "#profile-password-form button[type='submit']"
+    );
+
+
+  if (!currentPassword) {
+
+    showAdminToast(
+      "Current password दर्ज करें।",
+      "warning"
+    );
+
+    return;
+
+  }
+
+
+  if (!newPassword) {
+
+    showAdminToast(
+      "New password दर्ज करें।",
+      "warning"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    newPassword.length < 8
+  ) {
+
+    showAdminToast(
+      "New password कम से कम 8 characters का होना चाहिए।",
+      "warning"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    newPassword !==
+    confirmPassword
+  ) {
+
+    showAdminToast(
+      "New password और confirm password match नहीं कर रहे हैं।",
+      "warning"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    currentPassword ===
+    newPassword
+  ) {
+
+    showAdminToast(
+      "New password current password से अलग होना चाहिए।",
+      "warning"
+    );
+
+    return;
+
+  }
+
+
+  setButtonLoading(
+    submitButton,
+    true,
+    "Password बदल रहा है..."
+  );
+
+
+  try {
+
+    const data =
+      await adminApiRequest(
+        "/admin/change-password",
+        {
+          method: "POST",
+
+          body:
+            JSON.stringify({
+
+              currentPassword,
+
+              newPassword
+
+            })
+
+        }
+      );
+
+
+    if (
+      !data ||
+      data.success !== true
+    ) {
+
+      throw new Error(
+        data?.message ||
+        "Password change failed."
+      );
+
+    }
+
+
+    showAdminToast(
+      data.message ||
+      "Password successfully बदल दिया गया है।",
+      "success"
+    );
+
+
+    event.target.reset();
+
+  } catch (error) {
+
+    console.error(
+      "Password change error:",
+      error
+    );
+
+
+    showAdminToast(
+      error.message ||
+      "Password change नहीं हो पाया।",
+      "error"
+    );
+
+  } finally {
+
+    setButtonLoading(
+      submitButton,
+      false,
+      "Change Password"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   LOGOUT ALL SESSIONS
+   ========================================================= */
+
+async function handleLogoutAllSessions() {
+
+  const confirmed =
+    await showAdminConfirmation({
+
+      title:
+        "Logout All Sessions",
+
+      message:
+        "क्या आप सभी active Admin sessions को logout करना चाहते हैं?",
+
+      icon:
+        "🔐",
+
+      confirmText:
+        "Logout All",
+
+      cancelText:
+        "Cancel"
+
+    });
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const data =
+      await adminApiRequest(
+        "/admin/logout-all",
+        {
+          method: "POST"
+        }
+      );
+
+
+    showAdminToast(
+      data.message ||
+      "सभी sessions logout कर दिए गए हैं।",
+      "success"
+    );
+
+
+    clearAdminSession();
+
+    showAdminLoginScreen();
+
+  } catch (error) {
+
+    console.error(
+      "Logout all sessions error:",
+      error
+    );
+
+
+    showAdminToast(
+      error.message ||
+      "Sessions logout नहीं हो सके।",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PROFILE LOAD
+   ========================================================= */
+
+function loadProfile() {
+
+  if (
+    adminState.admin
+  ) {
+
+    updateAdminUI(
+      adminState.admin
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   PART 2/20 END
+   ========================================================= */
