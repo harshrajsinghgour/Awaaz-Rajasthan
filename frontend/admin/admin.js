@@ -10971,9 +10971,9 @@ function getNewsImageURL(
     return image;
   }
 
-  const baseURL =
-    getAPIBaseURL();
-
+  
+const baseURL =
+  ADMIN_API_ROOT;
   if (
     image.startsWith("/")
   ) {
