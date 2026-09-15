@@ -22621,3 +22621,2884 @@ function initializeCreateAdminButton() {
 // OPEN ADMIN EDITOR
 // ========================================
 
+async function openAdminEditor(
+  admin = null
+) {
+  if (
+    !isCurrentAdminOwner()
+  ) {
+    return;
+  }
+
+  await loadAdminPermissions();
+
+  const isEdit =
+    Boolean(
+      admin
+    );
+
+  const permissions =
+    adminState.admins
+      ?.permissions ||
+    [];
+
+  const currentPermissions =
+    admin?.permissions ||
+    [];
+
+  const permissionHTML =
+    permissions
+      .map(
+        (permission) => {
+          const value =
+            typeof permission ===
+            "string"
+              ? permission
+              : permission.key ||
+                permission.name ||
+                permission.value ||
+                "";
+
+          const label =
+            typeof permission ===
+            "string"
+              ? permission
+              : permission.label ||
+                permission.title ||
+                value;
+
+          const checked =
+            currentPermissions
+              .includes(
+                value
+              );
+
+          return `
+            <label
+              class="admin-permission-option"
+            >
+              <input
+                type="checkbox"
+                name="permissions"
+                value="${escapeHTML(
+                  value
+                )}"
+                ${
+                  checked
+                    ? "checked"
+                    : ""
+                }
+              >
+
+              <span>
+                ${escapeHTML(
+                  label
+                )}
+              </span>
+            </label>
+          `;
+        }
+      )
+      .join("");
+
+  const body = `
+    <form
+      id="managed-admin-form"
+      class="admin-form"
+      novalidate
+    >
+
+      <input
+        type="hidden"
+        id="managed-admin-id"
+        value="${escapeHTML(
+          admin?.id ||
+            ""
+        )}"
+      >
+
+      <div
+        class="admin-form-group"
+      >
+        <label
+          for="managed-admin-id-input"
+        >
+          Admin ID
+        </label>
+
+        <input
+          type="text"
+          id="managed-admin-id-input"
+          name="adminId"
+          autocomplete="off"
+          required
+          value="${escapeHTML(
+            admin?.adminId ||
+              ""
+          )}"
+          ${
+            isEdit
+              ? "readonly"
+              : ""
+          }
+        >
+      </div>
+
+      <div
+        class="admin-form-group"
+      >
+        <label
+          for="managed-admin-name"
+        >
+          नाम
+        </label>
+
+        <input
+          type="text"
+          id="managed-admin-name"
+          name="name"
+          required
+          value="${escapeHTML(
+            admin?.name ||
+              ""
+          )}"
+        >
+      </div>
+
+      <div
+        class="admin-form-group"
+      >
+        <label
+          for="managed-admin-email"
+        >
+          Email
+        </label>
+
+        <input
+          type="email"
+          id="managed-admin-email"
+          name="email"
+          value="${escapeHTML(
+            admin?.email ||
+              ""
+          )}"
+        >
+      </div>
+
+      <div
+        class="admin-form-group"
+      >
+        <label
+          for="managed-admin-role"
+        >
+          भूमिका
+        </label>
+
+        <select
+          id="managed-admin-role"
+          name="role"
+          ${
+            admin?.role ===
+            "owner"
+              ? "disabled"
+              : ""
+          }
+        >
+          <option
+            value="admin"
+            ${
+              admin?.role ===
+              "admin"
+                ? "selected"
+                : ""
+            }
+          >
+            Admin
+          </option>
+
+          <option
+            value="editor"
+            ${
+              admin?.role ===
+              "editor"
+                ? "selected"
+                : ""
+            }
+          >
+            Editor
+          </option>
+
+          <option
+            value="reporter"
+            ${
+              admin?.role ===
+              "reporter"
+                ? "selected"
+                : ""
+            }
+          >
+            Reporter
+          </option>
+        </select>
+      </div>
+
+      <div
+        class="admin-form-group"
+      >
+        <label>
+          Permissions
+        </label>
+
+        <div
+          class="admin-permissions-list"
+        >
+          ${
+            permissionHTML ||
+            `
+              <p>
+                Permissions उपलब्ध नहीं हैं।
+              </p>
+            `
+          }
+        </div>
+      </div>
+
+      ${
+        !isEdit
+          ? `
+            <div
+              class="admin-form-group"
+            >
+              <label
+                for="managed-admin-password"
+              >
+                Password
+              </label>
+
+              <input
+                type="password"
+                id="managed-admin-password"
+                name="password"
+                autocomplete="new-password"
+                required
+              >
+            </div>
+
+            <div
+              class="admin-form-group"
+            >
+              <label
+                for="managed-admin-confirm-password"
+              >
+                Password दोबारा दर्ज करें
+              </label>
+
+              <input
+                type="password"
+                id="managed-admin-confirm-password"
+                name="confirmPassword"
+                autocomplete="new-password"
+                required
+              >
+            </div>
+          `
+          : ""
+      }
+
+      <div
+        id="managed-admin-form-error"
+        class="admin-form-error"
+        hidden
+      ></div>
+
+    </form>
+  `;
+
+  openAdminModal({
+    icon: isEdit
+      ? "✏️"
+      : "👤",
+    eyebrow:
+      isEdit
+        ? "Admin Update"
+        : "New Admin",
+    title:
+      isEdit
+        ? "Admin संपादित करें"
+        : "नया Admin बनाएं",
+    body,
+    confirmText:
+      isEdit
+        ? "Save Changes"
+        : "Create Admin",
+    cancelText:
+      "रद्द करें",
+    onConfirm:
+      async () => {
+        return submitManagedAdminForm(
+          admin
+        );
+      }
+  });
+}
+
+
+// ========================================
+// SUBMIT ADMIN FORM
+// ========================================
+
+async function submitManagedAdminForm(
+  existingAdmin = null
+) {
+  const form =
+    document.getElementById(
+      "managed-admin-form"
+    );
+
+  if (!form) {
+    return false;
+  }
+
+  const errorBox =
+    document.getElementById(
+      "managed-admin-form-error"
+    );
+
+  const adminIdInput =
+    document.getElementById(
+      "managed-admin-id-input"
+    );
+
+  const nameInput =
+    document.getElementById(
+      "managed-admin-name"
+    );
+
+  const emailInput =
+    document.getElementById(
+      "managed-admin-email"
+    );
+
+  const roleInput =
+    document.getElementById(
+      "managed-admin-role"
+    );
+
+  const passwordInput =
+    document.getElementById(
+      "managed-admin-password"
+    );
+
+  const confirmPasswordInput =
+    document.getElementById(
+      "managed-admin-confirm-password"
+    );
+
+  const adminId =
+    adminIdInput
+      ?.value
+      ?.trim() ||
+    "";
+
+  const name =
+    nameInput
+      ?.value
+      ?.trim() ||
+    "";
+
+  const email =
+    emailInput
+      ?.value
+      ?.trim() ||
+    "";
+
+  const role =
+    roleInput
+      ?.value ||
+    "admin";
+
+  if (!name) {
+    showAdminFormError(
+      errorBox,
+      "नाम आवश्यक है।"
+    );
+
+    return false;
+  }
+
+  if (
+    !existingAdmin &&
+    !adminId
+  ) {
+    showAdminFormError(
+      errorBox,
+      "Admin ID आवश्यक है।"
+    );
+
+    return false;
+  }
+
+  if (
+    !existingAdmin &&
+    !passwordInput?.value
+  ) {
+    showAdminFormError(
+      errorBox,
+      "Password आवश्यक है।"
+    );
+
+    return false;
+  }
+
+  if (
+    passwordInput &&
+    confirmPasswordInput &&
+    passwordInput.value !==
+      confirmPasswordInput.value
+  ) {
+    showAdminFormError(
+      errorBox,
+      "दोनों Password समान होने चाहिए।"
+    );
+
+    return false;
+  }
+
+  const permissionInputs =
+    form.querySelectorAll(
+      "input[name='permissions']:checked"
+    );
+
+  const permissions =
+    Array.from(
+      permissionInputs
+    ).map(
+      (input) =>
+        input.value
+    );
+
+  const payload = {
+    name,
+    email,
+    role,
+    permissions
+  };
+
+  if (!existingAdmin) {
+    payload.adminId =
+      adminId;
+
+    payload.password =
+      passwordInput.value;
+  }
+
+  try {
+    if (
+      existingAdmin
+    ) {
+      await adminAPIRequest(
+        `/api/admin/admins/${encodeURIComponent(
+          existingAdmin.id
+        )}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(
+            payload
+          )
+        }
+      );
+
+      showAdminToast(
+        "success",
+        "Admin अपडेट",
+        "Admin की जानकारी सफलतापूर्वक अपडेट हो गई।"
+      );
+    } else {
+      await adminAPIRequest(
+        "/api/admin/admins",
+        {
+          method: "POST",
+          body: JSON.stringify(
+            payload
+          )
+        }
+      );
+
+      showAdminToast(
+        "success",
+        "Admin बनाया गया",
+        "नया Admin सफलतापूर्वक बनाया गया।"
+      );
+    }
+
+    closeAdminModal();
+
+    await loadAdmins(
+      true
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Admin save error:",
+      error
+    );
+
+    showAdminFormError(
+      errorBox,
+      error?.message ||
+        "Admin save नहीं हो सका।"
+    );
+
+    return false;
+  }
+}
+
+
+// ========================================
+// FORM ERROR
+// ========================================
+
+function showAdminFormError(
+  element,
+  message
+) {
+  if (!element) {
+    showAdminToast(
+      "error",
+      "Validation Error",
+      message
+    );
+
+    return;
+  }
+
+  element.textContent =
+    message;
+
+  element.hidden =
+    false;
+}
+
+
+// ========================================
+// TOGGLE ADMIN ACTIVE STATUS
+// ========================================
+      
+async function toggleManagedAdmin(
+  admin
+) {
+  if (
+    !admin ||
+    admin.role ===
+      "owner"
+  ) {
+    return;
+  }
+
+  const action =
+    admin.isActive
+      ? "deactivate"
+      : "activate";
+
+  const confirmed =
+    await showAdminConfirm({
+      icon:
+        admin.isActive
+          ? "⏸️"
+          : "▶️",
+      title:
+        admin.isActive
+          ? "Admin निष्क्रिय करें?"
+          : "Admin सक्रिय करें?",
+      message:
+        admin.isActive
+          ? `${admin.name} को निष्क्रिय करने की पुष्टि करें।`
+          : `${admin.name} को फिर से सक्रिय करने की पुष्टि करें।`,
+      confirmText:
+        admin.isActive
+          ? "निष्क्रिय करें"
+          : "सक्रिय करें",
+      cancelText:
+        "रद्द करें"
+    });
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    await adminAPIRequest(
+      `/api/admin/admins/${encodeURIComponent(
+        admin.id
+      )}/${action}`,
+      {
+        method: "PATCH"
+      }
+    );
+
+    showAdminToast(
+      "success",
+      "Status अपडेट",
+      admin.isActive
+        ? "Admin निष्क्रिय कर दिया गया।"
+        : "Admin सक्रिय कर दिया गया।"
+    );
+
+    await loadAdmins(
+      true
+    );
+  } catch (error) {
+    console.error(
+      "Admin status error:",
+      error
+    );
+
+    showAdminToast(
+      "error",
+      "Status अपडेट नहीं हुआ",
+      error?.message ||
+        "Admin status बदलने में समस्या हुई।"
+    );
+  }
+}
+
+
+// ========================================
+// DELETE ADMIN
+// ========================================
+
+async function deleteManagedAdmin(
+  admin
+) {
+  if (
+    !admin ||
+    admin.role ===
+      "owner"
+  ) {
+    return;
+  }
+
+  if (
+    admin.id ===
+    (
+      adminState.admin
+        ?.id ||
+      ""
+    )
+  ) {
+    showAdminToast(
+      "warning",
+      "अनुमति नहीं",
+      "आप अपने वर्तमान Admin account को यहां से delete नहीं कर सकते।"
+    );
+
+    return;
+  }
+
+  const confirmed =
+    await showAdminConfirm({
+      icon: "🗑️",
+      title:
+        "Admin Delete करें?",
+      message:
+        `${admin.name} का Admin account स्थायी रूप से delete किया जाएगा।`,
+      confirmText:
+        "Delete",
+      cancelText:
+        "रद्द करें",
+      danger: true
+    });
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    await adminAPIRequest(
+      `/api/admin/admins/${encodeURIComponent(
+        admin.id
+      )}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    showAdminToast(
+      "success",
+      "Admin Delete",
+      "Admin account सफलतापूर्वक delete हो गया।"
+    );
+
+    await loadAdmins(
+      true
+    );
+  } catch (error) {
+    console.error(
+      "Admin delete error:",
+      error
+    );
+
+    showAdminToast(
+      "error",
+      "Delete नहीं हुआ",
+      error?.message ||
+        "Admin delete करने में समस्या हुई।"
+    );
+  }
+}
+
+
+// ========================================
+// ADMIN PASSWORD RESET
+// ========================================
+
+function openAdminPasswordReset(
+  admin
+) {
+  if (
+    !admin ||
+    admin.role ===
+      "owner"
+  ) {
+    showAdminToast(
+      "warning",
+      "अनुमति नहीं",
+      "Owner का password यहां से reset नहीं किया जा सकता।"
+    );
+
+    return;
+  }
+
+  const body = `
+    <form
+      id="admin-password-reset-form"
+      class="admin-form"
+      novalidate
+    >
+
+      <input
+        type="hidden"
+        id="reset-admin-id"
+        value="${escapeHTML(
+          admin.id
+        )}"
+      >
+
+      <p>
+        <strong>
+          ${escapeHTML(
+            admin.name
+          )}
+        </strong>
+        का नया password सेट करें।
+      </p>
+
+      <div
+        class="admin-form-group"
+      >
+        <label
+          for="reset-admin-password"
+        >
+          नया Password
+        </label>
+
+        <input
+          type="password"
+          id="reset-admin-password"
+          autocomplete="new-password"
+          required
+        >
+      </div>
+
+      <div
+        class="admin-form-group"
+      >
+        <label
+          for="reset-admin-confirm-password"
+        >
+          Password दोबारा दर्ज करें
+        </label>
+
+        <input
+          type="password"
+          id="reset-admin-confirm-password"
+          autocomplete="new-password"
+          required
+        >
+      </div>
+
+      <div
+        id="reset-admin-error"
+        class="admin-form-error"
+        hidden
+      ></div>
+
+    </form>
+  `;
+
+  openAdminModal({
+    icon: "🔐",
+    eyebrow:
+      "Password Reset",
+    title:
+      "Admin Password बदलें",
+    body,
+    confirmText:
+      "Password Save करें",
+    cancelText:
+      "रद्द करें",
+    onConfirm:
+      async () => {
+        return submitAdminPasswordReset();
+      }
+  });
+}
+
+
+// ========================================
+// SUBMIT ADMIN PASSWORD RESET
+// ========================================
+
+async function submitAdminPasswordReset() {
+  const id =
+    document.getElementById(
+      "reset-admin-id"
+    )?.value;
+
+  const password =
+    document.getElementById(
+      "reset-admin-password"
+    )?.value ||
+    "";
+
+  const confirmPassword =
+    document.getElementById(
+      "reset-admin-confirm-password"
+    )?.value ||
+    "";
+
+  const errorBox =
+    document.getElementById(
+      "reset-admin-error"
+    );
+
+  if (!id) {
+    showAdminFormError(
+      errorBox,
+      "Admin ID उपलब्ध नहीं है।"
+    );
+
+    return false;
+  }
+
+  if (
+    password.length <
+    8
+  ) {
+    showAdminFormError(
+      errorBox,
+      "Password कम से कम 8 characters का होना चाहिए।"
+    );
+
+    return false;
+  }
+
+  if (
+    password !==
+    confirmPassword
+  ) {
+    showAdminFormError(
+      errorBox,
+      "दोनों Password समान होने चाहिए।"
+    );
+
+    return false;
+  }
+
+  try {
+    await adminAPIRequest(
+      `/api/admin/admins/${encodeURIComponent(
+        id
+      )}/password`,
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          password
+        })
+      }
+    );
+
+    closeAdminModal();
+
+    showAdminToast(
+      "success",
+      "Password अपडेट",
+      "Admin password सफलतापूर्वक बदल दिया गया।"
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Admin password reset error:",
+      error
+    );
+
+    showAdminFormError(
+      errorBox,
+      error?.message ||
+        "Password update नहीं हो सका।"
+    );
+
+    return false;
+  }
+}
+
+
+// ========================================
+// INITIALIZE ADMINS SECTION
+// ========================================
+
+function initializeAdminsSection() {
+  initializeAdminSearch();
+
+  initializeAdminRoleFilter();
+
+  initializeAdminStatusFilter();
+
+  initializeAdminRefresh();
+
+  initializeCreateAdminButton();
+
+  const previous =
+    document.getElementById(
+      "admins-prev-page"
+    );
+
+  if (previous) {
+    previous.addEventListener(
+      "click",
+      goToPreviousAdminPage
+    );
+  }
+
+  const next =
+    document.getElementById(
+      "admins-next-page"
+    );
+
+  if (next) {
+    next.addEventListener(
+      "click",
+      goToNextAdminPage
+    );
+  }
+}
+
+
+// ========================================
+// GET ADMIN ITEMS
+// ========================================
+
+function getAdminItems() {
+  return [
+    ...(adminState.admins
+      ?.filteredItems ||
+      [])
+  ];
+         }
+// ========================================
+// ADMIN.JS
+// PART 24 / 25
+// SETTINGS + PROFILE + PASSWORD
+// ========================================
+
+
+// ========================================
+// SETTINGS STATE
+// ========================================
+
+if (!adminState.settings) {
+  adminState.settings = {
+    loaded: false,
+    loading: false,
+    saving: false,
+    data: {}
+  };
+}
+
+
+// ========================================
+// DEFAULT SITE SETTINGS
+// ========================================
+
+const DEFAULT_SITE_SETTINGS = {
+  siteName:
+    "आवाज राजस्थान",
+
+  siteTagline:
+    "राजस्थान की हर खबर, सबसे पहले",
+
+  siteDescription:
+    "राजस्थान केंद्रित प्रोफेशनल न्यूज़ वेबसाइट।",
+
+  contactEmail:
+    "",
+
+  contactPhone:
+    "",
+
+  breakingEnabled:
+    true,
+
+  trendingEnabled:
+    true,
+
+  videoEnabled:
+    true,
+
+  liveTVEnabled:
+    false,
+
+  liveBlogEnabled:
+    false,
+
+  epaperEnabled:
+    true,
+
+  facebook:
+    "",
+
+  instagram:
+    "",
+
+  youtube:
+    "",
+
+  twitter:
+    ""
+};
+
+
+// ========================================
+// LOAD SETTINGS
+// ========================================
+
+async function loadSettings(
+  forceRefresh = false
+) {
+  if (
+    !adminState.isAuthenticated
+  ) {
+    return {};
+  }
+
+  const state =
+    adminState.settings;
+
+  if (
+    state.loading
+  ) {
+    return state.data;
+  }
+
+  if (
+    state.loaded &&
+    !forceRefresh
+  ) {
+    populateSettingsForm(
+      state.data
+    );
+
+    return state.data;
+  }
+
+  state.loading =
+    true;
+
+  try {
+    /*
+     * वर्तमान backend में settings के लिए
+     * कोई confirmed GET route उपलब्ध नहीं है।
+     *
+     * इसलिए frontend default values रखता है।
+     * बाद में backend में settings route
+     * जोड़ने पर इसी function में endpoint
+     * connect किया जा सकता है।
+     */
+
+    state.data = {
+      ...DEFAULT_SITE_SETTINGS
+    };
+
+    state.loaded =
+      true;
+
+    populateSettingsForm(
+      state.data
+    );
+
+    return state.data;
+  } catch (error) {
+    console.error(
+      "Settings loading error:",
+      error
+    );
+
+    showAdminToast(
+      "error",
+      "Settings लोड नहीं हुईं",
+      error?.message ||
+        "Site settings प्राप्त करने में समस्या हुई।"
+    );
+
+    return state.data;
+  } finally {
+    state.loading =
+      false;
+  }
+}
+
+
+// ========================================
+// POPULATE SETTINGS FORM
+// ========================================
+
+function populateSettingsForm(
+  settings
+) {
+  const data = {
+    ...DEFAULT_SITE_SETTINGS,
+    ...(settings || {})
+  };
+
+  setInputValue(
+    "setting-site-name",
+    data.siteName
+  );
+
+  setInputValue(
+    "setting-site-tagline",
+    data.siteTagline
+  );
+
+  setInputValue(
+    "setting-site-description",
+    data.siteDescription
+  );
+
+  setInputValue(
+    "setting-contact-email",
+    data.contactEmail
+  );
+
+  setInputValue(
+    "setting-contact-phone",
+    data.contactPhone
+  );
+
+  setCheckboxValue(
+    "setting-breaking-enabled",
+    data.breakingEnabled
+  );
+
+  setCheckboxValue(
+    "setting-trending-enabled",
+    data.trendingEnabled
+  );
+
+  setCheckboxValue(
+    "setting-video-enabled",
+    data.videoEnabled
+  );
+
+  setCheckboxValue(
+    "setting-live-tv-enabled",
+    data.liveTVEnabled
+  );
+
+  setCheckboxValue(
+    "setting-live-blog-enabled",
+    data.liveBlogEnabled
+  );
+
+  setCheckboxValue(
+    "setting-epaper-enabled",
+    data.epaperEnabled
+  );
+
+  setInputValue(
+    "setting-facebook",
+    data.facebook
+  );
+
+  setInputValue(
+    "setting-instagram",
+    data.instagram
+  );
+
+  setInputValue(
+    "setting-youtube",
+    data.youtube
+  );
+
+  setInputValue(
+    "setting-twitter",
+    data.twitter
+  );
+}
+
+
+// ========================================
+// READ SETTINGS FORM
+// ========================================
+
+function readSettingsForm() {
+  return {
+    siteName:
+      getInputValue(
+        "setting-site-name"
+      ),
+
+    siteTagline:
+      getInputValue(
+        "setting-site-tagline"
+      ),
+
+    siteDescription:
+      getInputValue(
+        "setting-site-description"
+      ),
+
+    contactEmail:
+      getInputValue(
+        "setting-contact-email"
+      ),
+
+    contactPhone:
+      getInputValue(
+        "setting-contact-phone"
+      ),
+
+    breakingEnabled:
+      getCheckboxValue(
+        "setting-breaking-enabled"
+      ),
+
+    trendingEnabled:
+      getCheckboxValue(
+        "setting-trending-enabled"
+      ),
+
+    videoEnabled:
+      getCheckboxValue(
+        "setting-video-enabled"
+      ),
+
+    liveTVEnabled:
+      getCheckboxValue(
+        "setting-live-tv-enabled"
+      ),
+
+    liveBlogEnabled:
+      getCheckboxValue(
+        "setting-live-blog-enabled"
+      ),
+
+    epaperEnabled:
+      getCheckboxValue(
+        "setting-epaper-enabled"
+      ),
+
+    facebook:
+      getInputValue(
+        "setting-facebook"
+      ),
+
+    instagram:
+      getInputValue(
+        "setting-instagram"
+      ),
+
+    youtube:
+      getInputValue(
+        "setting-youtube"
+      ),
+
+    twitter:
+      getInputValue(
+        "setting-twitter"
+      )
+  };
+}
+
+
+// ========================================
+// SAVE SETTINGS
+// ========================================
+
+async function saveSettings() {
+  if (
+    !adminState.isAuthenticated
+  ) {
+    return false;
+  }
+
+  const settings =
+    readSettingsForm();
+
+  if (
+    !settings.siteName
+  ) {
+    showAdminToast(
+      "warning",
+      "Site Name आवश्यक है",
+      "कृपया Site Name दर्ज करें।"
+    );
+
+    return false;
+  }
+
+  /*
+   * वर्तमान backend में settings update
+   * endpoint confirmed नहीं है।
+   *
+   * इसलिए किसी काल्पनिक API endpoint को
+   * call नहीं किया जा रहा है।
+   */
+
+  adminState.settings.data =
+    settings;
+
+  adminState.settings.loaded =
+    true;
+
+  showAdminToast(
+    "warning",
+    "Settings Save API उपलब्ध नहीं",
+    "वर्तमान backend में site settings के लिए सुरक्षित update endpoint नहीं है।"
+  );
+
+  return false;
+}
+
+
+// ========================================
+// RESET SETTINGS
+// ========================================
+
+function resetSettings() {
+  const confirmed =
+    window.confirm(
+      "क्या आप settings को default values पर reset करना चाहते हैं?"
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  adminState.settings.data =
+    {
+      ...DEFAULT_SITE_SETTINGS
+    };
+
+  populateSettingsForm(
+    adminState.settings.data
+  );
+
+  showAdminToast(
+    "success",
+    "Settings Reset",
+    "Settings default values पर वापस आ गई हैं।"
+  );
+}
+
+
+// ========================================
+// SETTINGS BUTTONS
+// ========================================
+
+function initializeSettingsSection() {
+  const saveButton =
+    document.getElementById(
+      "settings-save-button"
+    );
+
+  if (saveButton) {
+    saveButton.addEventListener(
+      "click",
+      async () => {
+        setButtonLoading(
+          saveButton,
+          true
+        );
+
+        try {
+          await saveSettings();
+        } finally {
+          setButtonLoading(
+            saveButton,
+            false
+          );
+        }
+      }
+    );
+  }
+
+  const resetButton =
+    document.getElementById(
+      "settings-reset-button"
+    );
+
+  if (resetButton) {
+    resetButton.addEventListener(
+      "click",
+      resetSettings
+    );
+  }
+}
+
+
+// ========================================
+// PROFILE STATE
+// ========================================
+
+if (!adminState.profile) {
+  adminState.profile = {
+    loading: false,
+    loaded: false
+  };
+}
+
+
+// ========================================
+// RENDER PROFILE
+// ========================================
+
+function renderAdminProfile() {
+  const admin =
+    adminState.admin ||
+    {};
+
+  updateElementText(
+    "profile-name",
+    admin.name ||
+      admin.fullName ||
+      admin.adminId ||
+      "-"
+  );
+
+  updateElementText(
+    "profile-email",
+    admin.email ||
+      "-"
+  );
+
+  updateElementText(
+    "profile-role",
+    getAdminRoleLabel(
+      admin.role
+    )
+  );
+
+  updateElementText(
+    "profile-admin-id",
+    admin.adminId ||
+      "-"
+  );
+
+  updateElementText(
+    "profile-account-status",
+    admin.isActive === false
+      ? "निष्क्रिय"
+      : "सक्रिय"
+  );
+
+  updateElementText(
+    "profile-last-login",
+    formatDateTime(
+      admin.lastLogin ||
+        admin.lastLoginAt
+    )
+  );
+
+  updateElementText(
+    "profile-created-at",
+    formatDateTime(
+      admin.createdAt
+    )
+  );
+
+  const avatar =
+    document.getElementById(
+      "profile-avatar"
+    );
+
+  if (avatar) {
+    const name =
+      admin.name ||
+      admin.adminId ||
+      "A";
+
+    avatar.textContent =
+      getInitials(
+        name
+      );
+  }
+}
+
+
+// ========================================
+// PROFILE INITIALIZATION
+// ========================================
+
+function initializeProfileSection() {
+  renderAdminProfile();
+
+  initializePasswordForm();
+
+  initializeLogoutAllSessions();
+}
+
+
+// ========================================
+// PASSWORD FORM
+// ========================================
+
+function initializePasswordForm() {
+  const form =
+    document.getElementById(
+      "profile-password-form"
+    );
+
+  if (!form) {
+    return;
+  }
+
+  form.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
+
+      await changeAdminPassword();
+    }
+  );
+}
+
+
+// ========================================
+// CHANGE ADMIN PASSWORD
+// ========================================
+
+async function changeAdminPassword() {
+  const currentPassword =
+    getInputValue(
+      "profile-current-password"
+    );
+
+  const newPassword =
+    getInputValue(
+      "profile-new-password"
+    );
+
+  const confirmPassword =
+    getInputValue(
+      "profile-confirm-password"
+    );
+
+  if (
+    !currentPassword
+  ) {
+    showAdminToast(
+      "warning",
+      "Current Password",
+      "वर्तमान password दर्ज करें।"
+    );
+
+    return false;
+  }
+
+  if (
+    newPassword.length <
+    8
+  ) {
+    showAdminToast(
+      "warning",
+      "Password कमजोर है",
+      "नया password कम से कम 8 characters का होना चाहिए।"
+    );
+
+    return false;
+  }
+
+  if (
+    newPassword !==
+    confirmPassword
+  ) {
+    showAdminToast(
+      "warning",
+      "Password Match नहीं",
+      "नया password और confirm password समान होना चाहिए।"
+    );
+
+    return false;
+  }
+
+  try {
+    await adminAPIRequest(
+      "/api/admin/change-password",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          currentPassword,
+          newPassword
+        })
+      }
+    );
+
+    const form =
+      document.getElementById(
+        "profile-password-form"
+      );
+
+    if (form) {
+      form.reset();
+    }
+
+    showAdminToast(
+      "success",
+      "Password बदल गया",
+      "आपका Admin password सफलतापूर्वक बदल दिया गया है।"
+    );
+
+    return true;
+  } catch (error) {
+    console.error(
+      "Password change error:",
+      error
+    );
+
+    showAdminToast(
+      "error",
+      "Password नहीं बदला",
+      error?.message ||
+        "Password बदलने में समस्या हुई।"
+    );
+
+    return false;
+  }
+}
+
+
+// ========================================
+// LOGOUT ALL SESSIONS
+// ========================================
+
+function initializeLogoutAllSessions() {
+  const button =
+    document.getElementById(
+      "logout-all-sessions-button"
+    );
+
+  if (!button) {
+    return;
+  }
+
+  button.addEventListener(
+    "click",
+    async () => {
+      const confirmed =
+        await showAdminConfirm({
+          icon: "🔐",
+          title:
+            "सभी Sessions Logout करें?",
+          message:
+            "इससे आपके सभी दूसरे active Admin sessions logout हो जाएंगे।",
+          confirmText:
+            "Logout All",
+          cancelText:
+            "रद्द करें"
+        });
+
+      if (!confirmed) {
+        return;
+      }
+
+      setButtonLoading(
+        button,
+        true
+      );
+
+      try {
+        await adminAPIRequest(
+          "/api/admin/logout-all",
+          {
+            method: "POST"
+          }
+        );
+
+        /*
+         * वर्तमान session भी backend द्वारा
+         * invalidate हो सकता है।
+         */
+
+        clearAdminSession();
+
+        showAdminToast(
+          "success",
+          "Sessions Logout",
+          "सभी Admin sessions logout कर दिए गए हैं।"
+        );
+
+        setTimeout(
+          () => {
+            showAdminLoginScreen();
+          },
+          500
+        );
+      } catch (error) {
+        console.error(
+          "Logout all error:",
+          error
+        );
+
+        showAdminToast(
+          "error",
+          "Logout नहीं हुआ",
+          error?.message ||
+            "सभी sessions logout करने में समस्या हुई।"
+        );
+      } finally {
+        setButtonLoading(
+          button,
+          false
+        );
+      }
+    }
+  );
+}
+
+
+// ========================================
+// ADMIN LOGOUT
+// ========================================
+
+async function logoutAdmin() {
+  try {
+    if (
+      adminState.isAuthenticated
+    ) {
+      await adminAPIRequest(
+        "/api/admin/logout",
+        {
+          method: "POST"
+        }
+      );
+    }
+  } catch (error) {
+    console.warn(
+      "Admin logout request failed:",
+      error
+    );
+  } finally {
+    clearAdminSession();
+
+    showAdminLoginScreen();
+  }
+}
+
+
+// ========================================
+// LOGOUT BUTTON
+// ========================================
+
+function initializeAdminLogout() {
+  const button =
+    document.getElementById(
+      "admin-logout-button"
+    );
+
+  if (!button) {
+    return;
+  }
+
+  button.addEventListener(
+    "click",
+    async () => {
+      const confirmed =
+        await showAdminConfirm({
+          icon: "🚪",
+          title:
+            "Logout करें?",
+          message:
+            "क्या आप Admin Panel से logout करना चाहते हैं?",
+          confirmText:
+            "Logout",
+          cancelText:
+            "रद्द करें"
+        });
+
+      if (!confirmed) {
+        return;
+      }
+
+      setButtonLoading(
+        button,
+        true
+      );
+
+      try {
+        await logoutAdmin();
+      } finally {
+        setButtonLoading(
+          button,
+          false
+        );
+      }
+    }
+  );
+}
+
+
+// ========================================
+// SHOW LOGIN SCREEN
+// ========================================
+
+function showAdminLoginScreen() {
+  const loginScreen =
+    document.getElementById(
+      "admin-login-screen"
+    );
+
+  const panel =
+    document.getElementById(
+      "admin-panel"
+    );
+
+  if (loginScreen) {
+    loginScreen.classList.remove(
+      "hidden"
+    );
+
+    loginScreen.removeAttribute(
+      "hidden"
+    );
+  }
+
+  if (panel) {
+    panel.classList.add(
+      "hidden"
+    );
+
+    panel.setAttribute(
+      "hidden",
+      "hidden"
+    );
+  }
+
+  adminState.isAuthenticated =
+    false;
+
+  adminState.admin =
+    null;
+}
+
+
+// ========================================
+// SHOW ADMIN PANEL
+// ========================================
+
+function showAdminPanel() {
+  const loginScreen =
+    document.getElementById(
+      "admin-login-screen"
+    );
+
+  const panel =
+    document.getElementById(
+      "admin-panel"
+    );
+
+  if (loginScreen) {
+    loginScreen.classList.add(
+      "hidden"
+    );
+
+    loginScreen.setAttribute(
+      "hidden",
+      "hidden"
+    );
+  }
+
+  if (panel) {
+    panel.classList.remove(
+      "hidden"
+    );
+
+    panel.removeAttribute(
+      "hidden"
+    );
+  }
+
+  renderAdminProfile();
+
+  updateAdminHeader();
+
+  updateAdminNavigation();
+}
+
+
+// ========================================
+// ADMIN ACCOUNT REFRESH
+// ========================================
+
+async function refreshAdminProfile() {
+  try {
+    const response =
+      await adminAPIRequest(
+        "/api/admin/me"
+      );
+
+    const data =
+      normalizeAPIResponse(
+        response
+      );
+
+    const admin =
+      data?.admin ||
+      data?.user ||
+      data?.data ||
+      data;
+
+    if (admin) {
+      adminState.admin =
+        normalizeAdminRecord(
+          admin
+        );
+
+      adminState.isAuthenticated =
+        true;
+
+      renderAdminProfile();
+
+      updateAdminHeader();
+
+      updateAdminNavigation();
+    }
+
+    return admin;
+  } catch (error) {
+    console.error(
+      "Admin profile refresh error:",
+      error
+    );
+
+    return null;
+  }
+}
+
+
+// ========================================
+// PROFILE PASSWORD TOGGLE
+// ========================================
+
+function initializeProfilePasswordToggles() {
+  const selectors = [
+    "profile-current-password",
+    "profile-new-password",
+    "profile-confirm-password"
+  ];
+
+  selectors.forEach(
+    (id) => {
+      const input =
+        document.getElementById(
+          id
+        );
+
+      if (!input) {
+        return;
+      }
+
+      const wrapper =
+        input.closest(
+          ".admin-password-field"
+        );
+
+      if (!wrapper) {
+        return;
+      }
+
+      const button =
+        wrapper.querySelector(
+          "[data-password-toggle]"
+        );
+
+      if (!button) {
+        return;
+      }
+
+      button.addEventListener(
+        "click",
+        () => {
+          const isPassword =
+            input.type ===
+            "password";
+
+          input.type =
+            isPassword
+              ? "text"
+              : "password";
+
+          button.setAttribute(
+            "aria-label",
+            isPassword
+              ? "Password छुपाएं"
+              : "Password दिखाएं"
+          );
+        }
+      );
+    }
+  );
+}
+
+
+// ========================================
+// SETTINGS + PROFILE BOOTSTRAP
+// ========================================
+
+function initializeSettingsAndProfile() {
+  initializeSettingsSection();
+
+  initializeProfileSection();
+
+  initializeProfilePasswordToggles();
+
+  initializeAdminLogout();
+}
+/* =========================================================
+   ADMIN.JS
+   PART 25 / 25
+   BOOTSTRAP • INITIALIZATION • EVENTS • RESIZE • KEYBOARD
+   FINAL EXPORTS • DOM READY
+   ========================================================= */
+
+(function () {
+  "use strict";
+
+  /* =======================================================
+     SECTION: GLOBAL EVENT BINDINGS
+     ======================================================= */
+
+  function bindGlobalEvents() {
+    /*
+     * Login form
+     */
+    const loginForm = document.getElementById("admin-login-form");
+
+    if (loginForm) {
+      loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        if (typeof handleAdminLogin === "function") {
+          handleAdminLogin(event);
+        }
+      });
+    }
+
+    /*
+     * Login password toggle
+     */
+    const toggleLoginPassword =
+      document.getElementById("toggle-login-password");
+
+    if (toggleLoginPassword) {
+      toggleLoginPassword.addEventListener("click", function () {
+        const passwordInput =
+          document.getElementById("admin-login-password");
+
+        if (!passwordInput) {
+          return;
+        }
+
+        const isPassword =
+          passwordInput.getAttribute("type") === "password";
+
+        passwordInput.setAttribute(
+          "type",
+          isPassword ? "text" : "password"
+        );
+
+        const icon =
+          toggleLoginPassword.querySelector("[data-password-icon]");
+
+        if (icon) {
+          icon.textContent = isPassword ? "🙈" : "👁";
+        }
+      });
+    }
+
+    /*
+     * Logout
+     */
+    const logoutButton =
+      document.getElementById("admin-logout-button");
+
+    if (logoutButton) {
+      logoutButton.addEventListener("click", function () {
+        if (typeof handleAdminLogout === "function") {
+          handleAdminLogout();
+        }
+      });
+    }
+
+    /*
+     * Mobile sidebar
+     */
+    const mobileMenuButton =
+      document.getElementById("admin-mobile-menu-button");
+
+    if (mobileMenuButton) {
+      mobileMenuButton.addEventListener("click", function () {
+        if (typeof toggleAdminSidebar === "function") {
+          toggleAdminSidebar();
+        }
+      });
+    }
+
+    /*
+     * Sidebar overlay
+     */
+    const sidebarOverlay =
+      document.getElementById("admin-sidebar-overlay");
+
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener("click", function () {
+        if (typeof closeAdminSidebar === "function") {
+          closeAdminSidebar();
+        }
+      });
+    }
+
+    /*
+     * Header profile
+     */
+    const headerProfileButton =
+      document.getElementById("admin-header-profile-button");
+
+    if (headerProfileButton) {
+      headerProfileButton.addEventListener("click", function () {
+        if (typeof navigateToAdminSection === "function") {
+          navigateToAdminSection("profile");
+        }
+      });
+    }
+
+    /*
+     * Notification button
+     */
+    const notificationButton =
+      document.getElementById("admin-notification-button");
+
+    if (notificationButton) {
+      notificationButton.addEventListener("click", function () {
+        if (typeof showAdminToast === "function") {
+          showAdminToast(
+            "अभी कोई नई सूचना उपलब्ध नहीं है।",
+            "info"
+          );
+        }
+      });
+    }
+
+    /*
+     * Modal close
+     */
+    const modalClose =
+      document.getElementById("admin-modal-close");
+
+    if (modalClose) {
+      modalClose.addEventListener("click", function () {
+        if (typeof closeAdminModal === "function") {
+          closeAdminModal();
+        }
+      });
+    }
+
+    /*
+     * Modal cancel
+     */
+    const modalCancel =
+      document.getElementById("admin-modal-cancel");
+
+    if (modalCancel) {
+      modalCancel.addEventListener("click", function () {
+        if (typeof closeAdminModal === "function") {
+          closeAdminModal(false);
+        }
+      });
+    }
+
+    /*
+     * Confirm dialog cancel
+     */
+    const confirmCancel =
+      document.getElementById("admin-confirm-cancel");
+
+    if (confirmCancel) {
+      confirmCancel.addEventListener("click", function () {
+        if (typeof closeAdminConfirm === "function") {
+          closeAdminConfirm(false);
+        }
+      });
+    }
+
+    /*
+     * Confirm dialog submit
+     */
+    const confirmSubmit =
+      document.getElementById("admin-confirm-submit");
+
+    if (confirmSubmit) {
+      confirmSubmit.addEventListener("click", function () {
+        if (typeof closeAdminConfirm === "function") {
+          closeAdminConfirm(true);
+        }
+      });
+    }
+
+    /*
+     * Modal backdrop
+     */
+    const adminModal =
+      document.getElementById("admin-modal");
+
+    if (adminModal) {
+      adminModal.addEventListener("click", function (event) {
+        if (event.target === adminModal) {
+          if (typeof closeAdminModal === "function") {
+            closeAdminModal();
+          }
+        }
+      });
+    }
+
+    /*
+     * Confirmation backdrop
+     */
+    const confirmDialog =
+      document.getElementById("admin-confirm-dialog");
+
+    if (confirmDialog) {
+      confirmDialog.addEventListener("click", function (event) {
+        if (event.target === confirmDialog) {
+          if (typeof closeAdminConfirm === "function") {
+            closeAdminConfirm(false);
+          }
+        }
+      });
+    }
+  }
+
+
+  /* =======================================================
+     SECTION: QUICK ACTIONS
+     ======================================================= */
+
+  function bindQuickActions() {
+    const quickActions =
+      document.getElementById("quick-actions");
+
+    if (!quickActions) {
+      return;
+    }
+
+    quickActions.addEventListener("click", function (event) {
+      const button =
+        event.target.closest("[data-action]");
+
+      if (!button) {
+        return;
+      }
+
+      const action =
+        button.getAttribute("data-action");
+
+      switch (action) {
+        case "create-news":
+          if (typeof openNewsEditor === "function") {
+            openNewsEditor();
+          }
+          break;
+
+        case "manage-breaking":
+          if (typeof navigateToAdminSection === "function") {
+            navigateToAdminSection("breaking");
+          }
+          break;
+
+        case "manage-live-tv":
+          if (typeof navigateToAdminSection === "function") {
+            navigateToAdminSection("live-tv");
+          }
+          break;
+
+        case "manage-epaper":
+          if (typeof navigateToAdminSection === "function") {
+            navigateToAdminSection("epaper");
+          }
+          break;
+
+        default:
+          break;
+      }
+    });
+  }
+
+
+  /* =======================================================
+     SECTION: SECTION INITIALIZATION
+     ======================================================= */
+
+  function initializeSectionEvents() {
+    /*
+     * News
+     */
+    if (typeof initializeNewsEvents === "function") {
+      initializeNewsEvents();
+    }
+
+    /*
+     * Breaking
+     */
+    if (typeof initializeBreakingEvents === "function") {
+      initializeBreakingEvents();
+    }
+
+    /*
+     * Trending
+     */
+    if (typeof initializeTrendingEvents === "function") {
+      initializeTrendingEvents();
+    }
+
+    /*
+     * Video
+     */
+    if (typeof initializeVideoEvents === "function") {
+      initializeVideoEvents();
+    }
+
+    /*
+     * Live TV
+     */
+    if (typeof initializeLiveTVEvents === "function") {
+      initializeLiveTVEvents();
+    }
+
+    /*
+     * Live Blog
+     */
+    if (typeof initializeLiveBlogEvents === "function") {
+      initializeLiveBlogEvents();
+    }
+
+    /*
+     * ePaper
+     */
+    if (typeof initializeEPaperEvents === "function") {
+      initializeEPaperEvents();
+    }
+
+    /*
+     * Contacts
+     */
+    if (typeof initializeContactsEvents === "function") {
+      initializeContactsEvents();
+    }
+
+    /*
+     * Users
+     */
+    if (typeof initializeUsersEvents === "function") {
+      initializeUsersEvents();
+    }
+
+    /*
+     * Admins
+     */
+    if (typeof initializeAdminsEvents === "function") {
+      initializeAdminsEvents();
+    }
+
+    /*
+     * Settings
+     */
+    if (typeof initializeSettingsEvents === "function") {
+      initializeSettingsEvents();
+    }
+
+    /*
+     * Profile
+     */
+    if (typeof initializeProfileEvents === "function") {
+      initializeProfileEvents();
+    }
+  }
+
+
+  /* =======================================================
+     SECTION: RESPONSIVE EVENTS
+     ======================================================= */
+
+  function handleAdminResize() {
+    if (window.innerWidth > 1024) {
+      if (typeof closeAdminSidebar === "function") {
+        closeAdminSidebar();
+      }
+    }
+
+    if (typeof updateAdminLayout === "function") {
+      updateAdminLayout();
+    }
+  }
+
+
+  /* =======================================================
+     SECTION: KEYBOARD SHORTCUTS
+     ======================================================= */
+
+  function bindKeyboardShortcuts() {
+    document.addEventListener("keydown", function (event) {
+      /*
+       * Escape
+       */
+      if (event.key === "Escape") {
+        const modal =
+          document.getElementById("admin-modal");
+
+        const confirmDialog =
+          document.getElementById("admin-confirm-dialog");
+
+        if (
+          confirmDialog &&
+          !confirmDialog.classList.contains("hidden")
+        ) {
+          if (typeof closeAdminConfirm === "function") {
+            closeAdminConfirm(false);
+          }
+
+          return;
+        }
+
+        if (
+          modal &&
+          !modal.classList.contains("hidden")
+        ) {
+          if (typeof closeAdminModal === "function") {
+            closeAdminModal();
+          }
+
+          return;
+        }
+
+        if (typeof closeAdminSidebar === "function") {
+          closeAdminSidebar();
+        }
+      }
+
+      /*
+       * Ctrl + K
+       * Search shortcut
+       */
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === "k"
+      ) {
+        event.preventDefault();
+
+        const activeSection =
+          document.querySelector(
+            ".admin-section.active"
+          );
+
+        if (!activeSection) {
+          return;
+        }
+
+        const searchInput =
+          activeSection.querySelector(
+            'input[type="search"], input[placeholder*="खोज"], input[placeholder*="Search"]'
+          );
+
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+    });
+  }
+
+
+  /* =======================================================
+     SECTION: FOOTER YEAR
+     ======================================================= */
+
+  function initializeFooterYear() {
+    const footerYear =
+      document.getElementById("admin-footer-year");
+
+    if (footerYear) {
+      footerYear.textContent =
+        new Date().getFullYear();
+    }
+
+    const loginYear =
+      document.getElementById("admin-login-year");
+
+    if (loginYear) {
+      loginYear.textContent =
+        new Date().getFullYear();
+    }
+  }
+
+
+  /* =======================================================
+     SECTION: INITIAL DATA LOADING
+     ======================================================= */
+
+  async function loadInitialAdminData() {
+    if (!adminState || !adminState.isAuthenticated) {
+      return;
+    }
+
+    /*
+     * Profile is already available from session.
+     */
+    if (typeof refreshAdminProfile === "function") {
+      refreshAdminProfile();
+    }
+
+    /*
+     * Dashboard
+     */
+    if (typeof loadDashboardData === "function") {
+      await loadDashboardData();
+    }
+
+    /*
+     * Load current section if required.
+     */
+    const currentSection =
+      adminState.currentSection || "dashboard";
+
+    if (
+      typeof loadAdminSectionData === "function"
+    ) {
+      await loadAdminSectionData(currentSection);
+    }
+  }
+
+
+  /* =======================================================
+     SECTION: ADMIN APPLICATION BOOT
+     ======================================================= */
+
+  async function bootAdminApplication() {
+    try {
+      initializeFooterYear();
+
+      bindGlobalEvents();
+
+      bindQuickActions();
+
+      bindKeyboardShortcuts();
+
+      initializeSectionEvents();
+
+      window.addEventListener(
+        "resize",
+        debounceAdminFunction(
+          handleAdminResize,
+          150
+        )
+      );
+
+      /*
+       * Restore saved section.
+       */
+      const savedSection =
+        typeof getStoredAdminSection === "function"
+          ? getStoredAdminSection()
+          : "dashboard";
+
+      /*
+       * Check existing admin session.
+       */
+      let authenticated = false;
+
+      if (
+        typeof checkAdminAuthentication === "function"
+      ) {
+        authenticated =
+          await checkAdminAuthentication();
+      }
+
+      if (!authenticated) {
+        if (
+          typeof showAdminLoginScreen === "function"
+        ) {
+          showAdminLoginScreen();
+        }
+
+        return;
+      }
+
+      /*
+       * Authentication successful.
+       */
+      adminState.isAuthenticated = true;
+
+      if (
+        typeof showAdminPanel === "function"
+      ) {
+        showAdminPanel();
+      }
+
+      /*
+       * Update permissions and header.
+       */
+      if (
+        typeof updateAdminNavigation === "function"
+      ) {
+        updateAdminNavigation();
+      }
+
+      if (
+        typeof updateAdminHeader === "function"
+      ) {
+        updateAdminHeader();
+      }
+
+      /*
+       * Restore section.
+       */
+      if (
+        typeof navigateToAdminSection === "function"
+      ) {
+        await navigateToAdminSection(
+          savedSection || "dashboard"
+        );
+      }
+
+      /*
+       * Load initial data.
+       */
+      await loadInitialAdminData();
+
+    } catch (error) {
+      console.error(
+        "Admin application boot error:",
+        error
+      );
+
+      if (
+        typeof showAdminToast === "function"
+      ) {
+        showAdminToast(
+          "Admin Panel शुरू करते समय समस्या हुई।",
+          "error"
+        );
+      }
+
+      if (
+        typeof showAdminLoginScreen === "function"
+      ) {
+        showAdminLoginScreen();
+      }
+    }
+  }
+
+
+  /* =======================================================
+     SECTION: SAFETY CHECKS
+     ======================================================= */
+
+  function runAdminSafetyChecks() {
+    const requiredElements = [
+      "admin-login-screen",
+      "admin-login-form",
+      "admin-panel",
+      "admin-content",
+      "admin-modal",
+      "admin-confirm-dialog",
+      "admin-toast-container",
+      "admin-loading-overlay"
+    ];
+
+    const missingElements = [];
+
+    requiredElements.forEach(function (id) {
+      if (!document.getElementById(id)) {
+        missingElements.push(id);
+      }
+    });
+
+    if (missingElements.length > 0) {
+      console.warn(
+        "Admin Panel: कुछ आवश्यक HTML elements नहीं मिले:",
+        missingElements
+      );
+    }
+
+    /*
+     * adminState safety
+     */
+    if (
+      typeof adminState === "undefined" ||
+      !adminState
+    ) {
+      console.error(
+        "Admin Panel: adminState उपलब्ध नहीं है।"
+      );
+
+      return false;
+    }
+
+    return true;
+  }
+
+
+  /* =======================================================
+     SECTION: GLOBAL EXPORTS
+     ======================================================= */
+
+  /*
+   * इन्हें window पर expose किया गया है ताकि
+   * HTML inline actions या दूसरे modules से भी
+   * आवश्यकता पड़ने पर इस्तेमाल किया जा सके।
+   */
+
+  window.AwaazRajasthanAdmin = {
+    state:
+      typeof adminState !== "undefined"
+        ? adminState
+        : null,
+
+    boot:
+      bootAdminApplication,
+
+    login:
+      typeof handleAdminLogin === "function"
+        ? handleAdminLogin
+        : null,
+
+    logout:
+      typeof handleAdminLogout === "function"
+        ? handleAdminLogout
+        : null,
+
+    navigate:
+      typeof navigateToAdminSection === "function"
+        ? navigateToAdminSection
+        : null,
+
+    refresh:
+      typeof loadAdminSectionData === "function"
+        ? loadAdminSectionData
+        : null
+  };
+
+
+  /* =======================================================
+     SECTION: DOM CONTENT LOADED
+     ======================================================= */
+
+  if (
+    document.readyState === "loading"
+  ) {
+    document.addEventListener(
+      "DOMContentLoaded",
+      async function () {
+        if (runAdminSafetyChecks()) {
+          await bootAdminApplication();
+        }
+      },
+      {
+        once: true
+      }
+    );
+  } else {
+    /*
+     * यदि script DOM बनने के बाद load हुई है।
+     */
+    if (runAdminSafetyChecks()) {
+      bootAdminApplication();
+    }
+  }
+
+
+  /* =======================================================
+     SECTION: FINAL GLOBAL FALLBACKS
+     ======================================================= */
+
+  /*
+   * कुछ functions HTML के inline onclick से call हो सकते हैं।
+   * यदि वे पहले से window पर उपलब्ध नहीं हैं तो expose करें।
+   */
+
+  if (
+    typeof handleAdminLogin === "function"
+  ) {
+    window.handleAdminLogin =
+      handleAdminLogin;
+  }
+
+  if (
+    typeof handleAdminLogout === "function"
+  ) {
+    window.handleAdminLogout =
+      handleAdminLogout;
+  }
+
+  if (
+    typeof navigateToAdminSection === "function"
+  ) {
+    window.navigateToAdminSection =
+      navigateToAdminSection;
+  }
+
+  if (
+    typeof openNewsEditor === "function"
+  ) {
+    window.openNewsEditor =
+      openNewsEditor;
+  }
+
+  if (
+    typeof showAdminToast === "function"
+  ) {
+    window.showAdminToast =
+      showAdminToast;
+  }
+
+  if (
+    typeof closeAdminModal === "function"
+  ) {
+    window.closeAdminModal =
+      closeAdminModal;
+  }
+
+  if (
+    typeof closeAdminConfirm === "function"
+  ) {
+    window.closeAdminConfirm =
+      closeAdminConfirm;
+  }
+
+
+  /* =======================================================
+     END OF ADMIN.JS
+     PART 25 / 25
+     ======================================================= */
+
+})();
