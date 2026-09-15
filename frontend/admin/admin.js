@@ -545,7 +545,7 @@ function getStoredAdmin() {
    API REQUEST HELPER
    ========================================================= */
 
-async function adminApiRequest(
+async function adminAPIRequest(
   endpoint,
   options = {}
 ) {
