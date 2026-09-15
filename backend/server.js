@@ -246,6 +246,55 @@ if (fs.existsSync(siteRoutesPath)) {
     );
 }
 
+
+// ========================================================
+// ADVERTISEMENT SYSTEM
+// ========================================================
+// Public Advertisement API
+//
+// GET:
+// /api/ads
+//
+// Optional:
+// /api/ads?position=home_top
+// /api/ads?position=sidebar
+// /api/ads?device=mobile
+// /api/ads?device=desktop
+//
+// Impression:
+// POST /api/ads/:id/impression
+//
+// Click:
+// POST /api/ads/:id/click
+//
+// IMPORTANT:
+// Public users can ONLY read active ads
+// and record impressions/clicks.
+//
+// Ad create/update/toggle/delete is NOT available
+// through this public route.
+//
+// Owner-only Ad Management:
+// /api/admin/ads
+//
+// adminRoutes.js protects those routes with:
+// adminProtect + ownerOnly
+// ========================================================
+
+const adRoutesPath = path.join(
+    __dirname,
+    "routes",
+    "adRoutes.js"
+);
+
+if (fs.existsSync(adRoutesPath)) {
+    app.use(
+        "/api/ads",
+        require("./routes/adRoutes")
+    );
+}
+
+
 /* =========================================================
    404 HANDLER
 ========================================================= */
@@ -310,18 +359,31 @@ const server = app.listen(PORT, () => {
     console.log("       आवाज राजस्थान BACKEND");
     console.log("==========================================");
     console.log(`🚀 Server: http://localhost:${PORT}`);
+
     console.log(
         `📰 News API: http://localhost:${PORT}/api/news`
     );
+
     console.log(
         `🔐 Auth API: http://localhost:${PORT}/api/auth`
     );
+
     console.log(
         `👑 Admin API: http://localhost:${PORT}/api/admin`
     );
+
+    console.log(
+        `📢 Public Ads API: http://localhost:${PORT}/api/ads`
+    );
+
+    console.log(
+        `👑 Owner Ads API: http://localhost:${PORT}/api/admin/ads`
+    );
+
     console.log(
         `❤️ Health: http://localhost:${PORT}/api/health`
     );
+
     console.log("==========================================");
     console.log("");
 });
