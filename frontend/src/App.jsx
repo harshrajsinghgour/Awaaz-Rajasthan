@@ -3849,3 +3849,4143 @@ function App() {
 
         )}
         
+      {/* ===================================================
+          DISTRICT NEWS PAGE
+          =================================================== */}
+
+      {!selectedNews &&
+        activeSection === "district" && (
+
+          <section className="district-page-section">
+
+            {/* =============================================
+                DISTRICT PAGE HEADER
+                ============================================= */}
+
+            <div className="district-page-header">
+
+              <div className="district-page-heading">
+
+                <span className="district-page-kicker">
+                  LOCAL RAJASTHAN
+                </span>
+
+                <h1>
+                  जिला समाचार
+                </h1>
+
+                <p>
+                  राजस्थान के हर जिले की स्थानीय और महत्वपूर्ण खबरें।
+                </p>
+
+              </div>
+
+
+              {/* CURRENT DISTRICT */}
+
+              <button
+                type="button"
+                className="district-current-selector"
+                onClick={() =>
+                  setDistrictModalOpen(true)
+                }
+              >
+
+                <div className="district-current-icon">
+
+                  <MapPin
+                    size={21}
+                  />
+
+                </div>
+
+
+                <div className="district-current-text">
+
+                  <span>
+                    आपका जिला
+                  </span>
+
+                  <strong>
+                    {selectedDistrict}
+                  </strong>
+
+                </div>
+
+
+                <ChevronDown
+                  size={18}
+                />
+
+              </button>
+
+            </div>
+
+
+            {/* =============================================
+                DISTRICT FEATURE BANNER
+                ============================================= */}
+
+            <div className="district-feature-banner">
+
+              <div className="district-feature-background">
+
+                <img
+                  src={NEWS_DATA[11]?.image || FALLBACK_IMAGE}
+                  alt="जिला समाचार"
+                  onError={
+                    handleImageError
+                  }
+                />
+
+              </div>
+
+
+              <div className="district-feature-overlay"></div>
+
+
+              <div className="district-feature-content">
+
+                <div className="district-feature-tag">
+
+                  <MapPin
+                    size={14}
+                  />
+
+                  <span>
+                    LOCAL UPDATE
+                  </span>
+
+                </div>
+
+
+                <h2>
+                  {selectedDistrict} से जुड़ी ताज़ा खबरें
+                </h2>
+
+
+                <p>
+                  अपने जिले की राजनीति, प्रशासन, शिक्षा, अपराध, रोजगार और स्थानीय घटनाओं से जुड़ी महत्वपूर्ण खबरें यहां पढ़ें।
+                </p>
+
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    showToast(
+                      `${selectedDistrict} की लोकल खबरें अपडेट हो रही हैं`
+                    )
+                  }
+                >
+
+                  <span>
+                    ताज़ा खबरें देखें
+                  </span>
+
+                  <ArrowRight
+                    size={17}
+                  />
+
+                </button>
+
+              </div>
+
+
+              <div className="district-feature-location">
+
+                <MapPin
+                  size={15}
+                />
+
+                <span>
+                  {selectedDistrict}, Rajasthan
+                </span>
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                DISTRICT CATEGORY FILTERS
+                ============================================= */}
+
+            <div className="district-category-section">
+
+              <div className="district-category-heading">
+
+                <div>
+
+                  <span>
+                    {selectedDistrict}
+                  </span>
+
+                  <h2>
+                    खबरों की श्रेणी
+                  </h2>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setDistrictModalOpen(
+                      true
+                    )
+                  }
+                >
+
+                  जिला बदलें
+
+                  <ChevronRight
+                    size={15}
+                  />
+
+                </button>
+
+              </div>
+
+
+              <div className="district-category-scroll">
+
+                {[
+                  {
+                    id: "all",
+                    title: "सभी खबरें",
+                    icon: Newspaper
+                  },
+                  {
+                    id: "politics",
+                    title: "राजनीति",
+                    icon: TrendingUp
+                  },
+                  {
+                    id: "crime",
+                    title: "अपराध",
+                    icon: ShieldAlert
+                  },
+                  {
+                    id: "education",
+                    title: "शिक्षा",
+                    icon: GraduationCap
+                  },
+                  {
+                    id: "jobs",
+                    title: "रोजगार",
+                    icon: BriefcaseBusiness
+                  },
+                  {
+                    id: "sports",
+                    title: "खेल",
+                    icon: Trophy
+                  }
+                ].map(
+                  (category) => {
+
+                    const DistrictCategoryIcon =
+                      category.icon;
+
+                    return (
+
+                      <button
+                        type="button"
+                        key={
+                          category.id
+                        }
+                        className={
+                          category.id ===
+                          "all"
+                            ? "district-category-chip active"
+                            : "district-category-chip"
+                        }
+                        onClick={() =>
+                          showToast(
+                            `${category.title} की खबरें`
+                          )
+                        }
+                      >
+
+                        <DistrictCategoryIcon
+                          size={16}
+                        />
+
+                        <span>
+                          {category.title}
+                        </span>
+
+                      </button>
+
+                    );
+
+                  }
+                )}
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                DISTRICT LATEST NEWS
+                ============================================= */}
+
+            <div className="district-latest-section">
+
+              <div className="district-latest-header">
+
+                <div className="section-heading-left">
+
+                  <span className="section-heading-line"></span>
+
+                  <div>
+
+                    <div className="district-latest-title-row">
+
+                      <h2 className="section-title">
+                        {selectedDistrict} की ताज़ा खबरें
+                      </h2>
+
+                      <span className="latest-live-label">
+
+                        <span></span>
+
+                        LIVE
+
+                      </span>
+
+                    </div>
+
+                    <p className="section-subtitle">
+                      स्थानीय स्तर पर सामने आ रही प्रमुख खबरें
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                <span className="district-news-date">
+
+                  <CalendarDays
+                    size={14}
+                  />
+
+                  आज
+
+                </span>
+
+              </div>
+
+
+              <div className="district-latest-grid">
+
+                {NEWS_DATA
+                  .filter(
+                    (news) =>
+                      news.categoryId ===
+                        "rajasthan" ||
+                      news.location ===
+                        selectedDistrict
+                  )
+                  .slice(0, 6)
+                  .map(
+                    (news, index) => (
+
+                      <article
+                        className={
+                          index === 0
+                            ? "district-large-news-card"
+                            : "district-standard-news-card"
+                        }
+                        key={`district-latest-${news.id}`}
+                        onClick={() =>
+                          openNews({
+                            ...news,
+                            location:
+                              selectedDistrict
+                          })
+                        }
+                      >
+
+                        <div className="district-latest-image">
+
+                          <img
+                            src={
+                              news.image
+                            }
+                            alt={
+                              news.title
+                            }
+                            loading="lazy"
+                            onError={
+                              handleImageError
+                            }
+                          />
+
+
+                          <span className="district-latest-category">
+
+                            {news.category}
+
+                          </span>
+
+
+                          {news.breaking && (
+
+                            <span className="district-latest-breaking">
+
+                              <span></span>
+
+                              BREAKING
+
+                            </span>
+
+                          )}
+
+                        </div>
+
+
+                        <div className="district-latest-content">
+
+                          <div className="district-news-meta">
+
+                            <span>
+
+                              <Clock3
+                                size={12}
+                              />
+
+                              {news.time}
+
+                            </span>
+
+
+                            <span>
+
+                              <Eye
+                                size={12}
+                              />
+
+                              {news.views}
+
+                            </span>
+
+                          </div>
+
+
+                          <h3>
+                            {news.title}
+                          </h3>
+
+
+                          <p>
+                            {news.description}
+                          </p>
+
+
+                          <div className="district-news-card-footer">
+
+                            <span>
+
+                              <MapPin
+                                size={12}
+                              />
+
+                              {selectedDistrict}
+
+                            </span>
+
+
+                            <span className="district-card-read">
+
+                              पढ़ें
+
+                              <ArrowRight
+                                size={14}
+                              />
+
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                      </article>
+
+                    )
+                  )}
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                ALL DISTRICTS GRID
+                ============================================= */}
+
+            <div className="all-districts-section">
+
+              <div className="all-districts-heading">
+
+                <div>
+
+                  <span className="district-page-kicker">
+                    RAJASTHAN MAP
+                  </span>
+
+                  <h2>
+                    राजस्थान के सभी जिले
+                  </h2>
+
+                  <p>
+                    किसी भी जिले को चुनकर वहां की स्थानीय खबरें देखें।
+                  </p>
+
+                </div>
+
+
+                <Map
+                  size={30}
+                  strokeWidth={1.7}
+                />
+
+              </div>
+
+
+              <div className="all-districts-grid">
+
+                {DISTRICTS.map(
+                  (district, index) => (
+
+                    <button
+                      type="button"
+                      key={`all-district-${district}`}
+                      className={
+                        district ===
+                        selectedDistrict
+                          ? "all-district-card active"
+                          : "all-district-card"
+                      }
+                      onClick={() => {
+
+                        setSelectedDistrict(
+                          district
+                        );
+
+                        showToast(
+                          `${district} चुना गया`
+                        );
+
+                        window.scrollTo({
+                          top: 0,
+                          behavior:
+                            "smooth"
+                        });
+
+                      }}
+                    >
+
+                      <span className="all-district-number">
+
+                        {String(
+                          index + 1
+                        ).padStart(
+                          2,
+                          "0"
+                        )}
+
+                      </span>
+
+
+                      <span className="all-district-pin">
+
+                        <MapPin
+                          size={15}
+                        />
+
+                      </span>
+
+
+                      <span className="all-district-name">
+
+                        {district}
+
+                      </span>
+
+
+                      <ChevronRight
+                        size={14}
+                        className="all-district-arrow"
+                      />
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+          </section>
+
+        )}
+
+
+      {/* ===================================================
+          DISTRICT SELECTOR MODAL
+          =================================================== */}
+
+      {districtModalOpen && (
+
+        <div
+          className="modal-overlay district-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="जिला चुनें"
+          onMouseDown={(event) => {
+
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+
+              setDistrictModalOpen(
+                false
+              );
+
+            }
+
+          }}
+        >
+
+          <div className="district-modal">
+
+
+            {/* =============================================
+                MODAL HEADER
+                ============================================= */}
+
+            <div className="district-modal-header">
+
+              <div>
+
+                <span className="district-modal-kicker">
+                  LOCAL NEWS
+                </span>
+
+                <h2>
+                  अपना जिला चुनें
+                </h2>
+
+                <p>
+                  जिस जिले की खबरें पढ़ना चाहते हैं उसे चुनें।
+                </p>
+
+              </div>
+
+
+              <button
+                type="button"
+                className="modal-close-button"
+                aria-label="बंद करें"
+                onClick={() =>
+                  setDistrictModalOpen(
+                    false
+                  )
+                }
+              >
+
+                <X
+                  size={20}
+                />
+
+              </button>
+
+            </div>
+
+
+            {/* =============================================
+                MODAL SEARCH
+                ============================================= */}
+
+            <div className="district-modal-search">
+
+              <Search
+                size={18}
+              />
+
+              <input
+                type="search"
+                placeholder="जिला खोजें..."
+                aria-label="जिला खोजें"
+                onChange={(event) => {
+
+                  const value =
+                    event.target.value
+                      .trim()
+                      .toLowerCase();
+
+                  const buttons =
+                    document.querySelectorAll(
+                      ".district-modal-list button"
+                    );
+
+                  buttons.forEach(
+                    (button) => {
+
+                      const text =
+                        button.textContent
+                          .trim()
+                          .toLowerCase();
+
+                      button.style.display =
+                        !value ||
+                        text.includes(
+                          value
+                        )
+                          ? ""
+                          : "none";
+
+                    }
+                  );
+
+                }}
+              />
+
+            </div>
+
+
+            {/* =============================================
+                POPULAR DISTRICTS
+                ============================================= */}
+
+            <div className="popular-districts">
+
+              <span>
+                लोकप्रिय
+              </span>
+
+
+              <div>
+
+                {[
+                  "जयपुर",
+                  "जोधपुर",
+                  "उदयपुर",
+                  "कोटा",
+                  "अजमेर",
+                  "भीलवाड़ा"
+                ].map(
+                  (district) => (
+
+                    <button
+                      type="button"
+                      key={`popular-${district}`}
+                      className={
+                        selectedDistrict ===
+                        district
+                          ? "popular-district active"
+                          : "popular-district"
+                      }
+                      onClick={() => {
+
+                        setSelectedDistrict(
+                          district
+                        );
+
+                        setDistrictModalOpen(
+                          false
+                        );
+
+                        showToast(
+                          `${district} की खबरें चुनी गईं`
+                        );
+
+                      }}
+                    >
+
+                      {district}
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                DISTRICT LIST
+                ============================================= */}
+
+             <div className="district-modal-list">
+
+              {DISTRICTS.map(
+                (district, index) => (
+
+                  <button
+                    type="button"
+                    key={`modal-district-${district}`}
+                    className={
+                      selectedDistrict ===
+                      district
+                        ? "district-modal-item active"
+                        : "district-modal-item"
+                    }
+                    onClick={() => {
+
+                      setSelectedDistrict(
+                        district
+                      );
+
+                      setDistrictModalOpen(
+                        false
+                      );
+
+                      showToast(
+                        `${district} की खबरें चुनी गईं`
+                      );
+
+                    }}
+                  >
+
+                    <span className="modal-district-index">
+
+                      {String(
+                        index + 1
+                      ).padStart(
+                        2,
+                        "0"
+                      )}
+
+                    </span>
+
+
+                    <span className="modal-district-icon">
+
+                      <MapPin
+                        size={16}
+                      />
+
+                    </span>
+
+
+                    <span className="modal-district-name">
+
+                      {district}
+
+                    </span>
+
+
+                    {selectedDistrict ===
+                      district && (
+
+                      <span className="district-selected-check">
+
+                        ✓
+
+                      </span>
+
+                    )}
+
+                  </button>
+
+                )
+              )}
+
+            </div>
+
+
+            {/* =============================================
+                MODAL FOOTER
+                ============================================= */}
+
+            <div className="district-modal-footer">
+
+              <div>
+
+                <MapPin
+                  size={15}
+                />
+
+                <span>
+                  आपका चयन:
+                </span>
+
+                <strong>
+                  {selectedDistrict}
+                </strong>
+
+              </div>
+
+
+              <button
+                type="button"
+                onClick={() => {
+
+                  setDistrictModalOpen(
+                    false
+                  );
+
+                  navigateTo(
+                    "district"
+                  );
+
+                }}
+              >
+
+                जिला समाचार देखें
+
+                <ArrowRight
+                  size={15}
+                />
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ===================================================
+          PART 6 END
+          =================================================== */}
+              {/* ===================================================
+          CATEGORY FEATURED NEWS
+          =================================================== */}
+
+      {!selectedNews &&
+        activeSection !== "home" &&
+        activeSection !== "district" && (
+
+          <section className="category-featured-section">
+
+
+            {/* =============================================
+                CATEGORY HERO
+                ============================================= */}
+
+            <div className="category-featured-hero">
+
+              <div className="category-featured-hero-content">
+
+                <span className="category-featured-kicker">
+                  AWAAZ RAJASTHAN • SPECIAL COVERAGE
+                </span>
+
+                <h1>
+                  {pageTitle}
+                </h1>
+
+                <p>
+                  {getCategoryDescription(
+                    activeSection
+                  )}
+                </p>
+
+
+                <div className="category-featured-hero-meta">
+
+                  <span>
+
+                    <Newspaper
+                      size={14}
+                    />
+
+                    ताज़ा खबरें
+
+                  </span>
+
+
+                  <span>
+
+                    <Clock3
+                      size={14}
+                    />
+
+                    लगातार अपडेट
+
+                  </span>
+
+
+                  <span>
+
+                    <ShieldCheck
+                      size={14}
+                    />
+
+                    सत्यापित जानकारी
+
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div className="category-featured-hero-pattern">
+
+                <div className="category-pattern-circle circle-one"></div>
+
+                <div className="category-pattern-circle circle-two"></div>
+
+                <div className="category-pattern-circle circle-three"></div>
+
+                <Newspaper
+                  size={90}
+                  strokeWidth={1}
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                FEATURED CATEGORY STORIES
+                ============================================= */}
+
+            <div className="category-featured-grid">
+
+              {categoryNews
+                .slice(0, 3)
+                .map(
+                  (news, index) => (
+
+                    <article
+                      key={`featured-category-${news.id}`}
+                      className={
+                        index === 0
+                          ? "category-featured-main-card"
+                          : "category-featured-small-card"
+                      }
+                      onClick={() =>
+                        openNews(news)
+                      }
+                    >
+
+                      <div className="category-featured-image">
+
+                        <img
+                          src={
+                            news.image
+                          }
+                          alt={
+                            news.title
+                          }
+                          loading="lazy"
+                          onError={
+                            handleImageError
+                          }
+                        />
+
+
+                        <div className="category-featured-image-overlay"></div>
+
+
+                        <span className="category-featured-label">
+
+                          {index === 0
+                            ? "मुख्य खबर"
+                            : "ताज़ा खबर"}
+
+                        </span>
+
+
+                        {news.breaking && (
+
+                          <span className="category-featured-breaking">
+
+                            <span></span>
+
+                            BREAKING
+
+                          </span>
+
+                        )}
+
+
+                        <div className="category-featured-image-content">
+
+                          <div className="category-featured-meta">
+
+                            <span>
+                              {news.category}
+                            </span>
+
+                            <span>
+                              •
+                            </span>
+
+                            <span>
+                              {news.time}
+                            </span>
+
+                          </div>
+
+
+                          <h2>
+                            {news.title}
+                          </h2>
+
+
+                          <div className="category-featured-location">
+
+                            <MapPin
+                              size={12}
+                            />
+
+                            <span>
+                              {news.location}
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </article>
+
+                  )
+                )}
+
+            </div>
+
+
+            {/* =============================================
+                CATEGORY NEWS TABS
+                ============================================= */}
+
+            <div className="category-news-tabs">
+
+              <div className="category-tabs-heading">
+
+                <div>
+
+                  <span>
+                    NEWS DESK
+                  </span>
+
+                  <h2>
+                    {pageTitle} की सभी खबरें
+                  </h2>
+
+                </div>
+
+
+                <div className="category-tabs-total">
+
+                  <span>
+                    कुल
+                  </span>
+
+                  <strong>
+                    {categoryNews.length}
+                  </strong>
+
+                  <span>
+                    खबरें
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div className="category-tab-buttons">
+
+                {[
+                  {
+                    id: "latest",
+                    label: "लेटेस्ट",
+                    icon: Clock3
+                  },
+                  {
+                    id: "popular",
+                    label: "लोकप्रिय",
+                    icon: Flame
+                  },
+                  {
+                    id: "breaking",
+                    label: "ब्रेकिंग",
+                    icon: Zap
+                  }
+                ].map(
+                  (tab) => {
+
+                    const TabIcon =
+                      tab.icon;
+
+                    return (
+
+                      <button
+                        type="button"
+                        key={tab.id}
+                        className={
+                          categoryTab ===
+                          tab.id
+                            ? "category-tab-button active"
+                            : "category-tab-button"
+                        }
+                        onClick={() =>
+                          setCategoryTab(
+                            tab.id
+                          )
+                        }
+                      >
+
+                        <TabIcon
+                          size={15}
+                        />
+
+                        <span>
+                          {tab.label}
+                        </span>
+
+                      </button>
+
+                    );
+
+                  }
+                )}
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                FILTERED CATEGORY NEWS
+                ============================================= */}
+
+            <div className="category-filtered-layout">
+
+
+              {/* =========================================
+                  MAIN CATEGORY FEED
+                  ========================================= */}
+
+              <div className="category-filtered-feed">
+
+                {getFilteredCategoryNews(
+                  categoryNews,
+                  categoryTab
+                )
+                  .map(
+                    (news, index) => (
+
+                      <article
+                        className="category-feed-card"
+                        key={`category-feed-${news.id}`}
+                        onClick={() =>
+                          openNews(news)
+                        }
+                      >
+
+                        {/* NUMBER */}
+
+                        <div className="category-feed-number">
+
+                          {String(
+                            index + 1
+                          ).padStart(
+                            2,
+                            "0"
+                          )}
+
+                        </div>
+
+
+                        {/* IMAGE */}
+
+                        <div className="category-feed-image">
+
+                          <img
+                            src={
+                              news.image
+                            }
+                            alt={
+                              news.title
+                            }
+                            loading="lazy"
+                            onError={
+                              handleImageError
+                            }
+                          />
+
+
+                          {news.breaking && (
+
+                            <span>
+
+                              <span></span>
+
+                              BREAKING
+
+                            </span>
+
+                          )}
+
+                        </div>
+
+
+                        {/* CONTENT */}
+
+                        <div className="category-feed-content">
+
+                          <div className="category-feed-meta">
+
+                            <span className="category-feed-category">
+
+                              {news.category}
+
+                            </span>
+
+
+                            <span>
+                              •
+                            </span>
+
+
+                            <span>
+
+                              <MapPin
+                                size={11}
+                              />
+
+                              {news.location}
+
+                            </span>
+
+
+                            <span>
+                              •
+                            </span>
+
+
+                            <span>
+
+                              <Clock3
+                                size={11}
+                              />
+
+                              {news.time}
+
+                            </span>
+
+                          </div>
+
+
+                          <h3>
+                            {news.title}
+                          </h3>
+
+
+                          <p>
+                            {news.description}
+                          </p>
+
+
+                          <div className="category-feed-footer">
+
+                            <div className="category-feed-author">
+
+                              <span>
+                                AR
+                              </span>
+
+                              <strong>
+                                {news.author}
+                              </strong>
+
+                            </div>
+
+
+                            <div className="category-feed-actions">
+
+                              <span>
+
+                                <Eye
+                                  size={13}
+                                />
+
+                                {news.views}
+
+                              </span>
+
+
+                              <button
+                                type="button"
+                                aria-label="बुकमार्क"
+                                className={
+                                  bookmarkedNews.includes(
+                                    news.id
+                                  )
+                                    ? "news-icon-action active"
+                                    : "news-icon-action"
+                                }
+                                onClick={(event) => {
+
+                                  event.stopPropagation();
+
+                                  toggleBookmark(
+                                    news.id
+                                  );
+
+                                }}
+                              >
+
+                                {bookmarkedNews.includes(
+                                  news.id
+                                ) ? (
+
+                                  <BookmarkCheck
+                                    size={15}
+                                  />
+
+                                ) : (
+
+                                  <Bookmark
+                                    size={15}
+                                  />
+
+                                )}
+
+                              </button>
+
+
+                              <button
+                                type="button"
+                                aria-label="शेयर"
+                                className="news-icon-action"
+                                onClick={(event) => {
+
+                                  event.stopPropagation();
+
+                                  shareNews(
+                                    news
+                                  );
+
+                                }}
+                              >
+
+                                <Share2
+                                  size={15}
+                                />
+
+                              </button>
+
+                            </div>
+
+                          </div>
+
+                        </div>
+
+
+                        {/* ARROW */}
+
+                        <div className="category-feed-arrow">
+
+                          <ArrowUpRight
+                            size={18}
+                          />
+
+                        </div>
+
+                      </article>
+
+                    )
+                  )}
+
+
+                {/* EMPTY CATEGORY */}
+
+                {categoryNews.length === 0 && (
+
+                  <div className="category-empty-box">
+
+                    <div>
+
+                      <FileQuestion
+                        size={34}
+                      />
+
+                    </div>
+
+                    <h3>
+                      इस सेक्शन में अभी खबरें नहीं हैं
+                    </h3>
+
+                    <p>
+                      नई खबरें उपलब्ध होते ही यहां दिखाई जाएंगी।
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigateTo(
+                          "home"
+                        )
+                      }
+                    >
+
+                      होम पर वापस जाएं
+
+                      <ArrowRight
+                        size={15}
+                      />
+
+                    </button>
+
+                  </div>
+
+                )}
+
+              </div>
+
+
+              {/* =========================================
+                  CATEGORY SIDEBAR
+                  ========================================= */}
+
+              <aside className="category-right-sidebar">
+
+
+                {/* =========================================
+                    QUICK CATEGORY MENU
+                    ========================================= */}
+
+                <div className="category-sidebar-card">
+
+                  <div className="category-sidebar-title">
+
+                    <div>
+
+                      <span>
+                        EXPLORE
+                      </span>
+
+                      <h3>
+                        अन्य सेक्शन
+                      </h3>
+
+                    </div>
+
+
+                    <Grid2X2
+                      size={19}
+                    />
+
+                  </div>
+
+
+                  <div className="category-sidebar-links">
+
+                    {CATEGORIES
+                      .filter(
+                        (category) =>
+                          category.id !==
+                          activeSection
+                      )
+                      .slice(0, 7)
+                      .map(
+                        (category) => {
+
+                          const CategorySideIcon =
+                            category.icon;
+
+                          return (
+
+                            <button
+                              type="button"
+                              key={`side-category-${category.id}`}
+                              onClick={() =>
+                                navigateTo(
+                                  category.id
+                                )
+                              }
+                            >
+
+                              <span className="category-side-icon">
+
+                                <CategorySideIcon
+                                  size={15}
+                                />
+
+                              </span>
+
+
+                              <span>
+                                {category.title}
+                              </span>
+
+
+                              <ChevronRight
+                                size={14}
+                              />
+
+                            </button>
+
+                          );
+
+                        }
+                      )}
+
+                  </div>
+
+                </div>
+
+
+                {/* =========================================
+                    LATEST UPDATE CARD
+                    ========================================= */}
+
+                <div className="category-sidebar-card latest-update-card">
+
+                  <div className="category-sidebar-title">
+
+                    <div>
+
+                      <span>
+                        LIVE DESK
+                      </span>
+
+                      <h3>
+                        ताज़ा अपडेट
+                      </h3>
+
+                    </div>
+
+
+                    <span className="sidebar-live-pulse">
+                      LIVE
+                    </span>
+
+                  </div>
+
+
+                  <div className="latest-update-list">
+
+                    {NEWS_DATA
+                      .slice(0, 4)
+                      .map(
+                        (news) => (
+
+                          <button
+                            type="button"
+                            key={`update-${news.id}`}
+                            onClick={() =>
+                              openNews(
+                                news
+                              )
+                            }
+                          >
+
+                            <div className="latest-update-time">
+
+                              <span></span>
+
+                              <small>
+                                {news.time}
+                              </small>
+
+                            </div>
+
+
+                            <strong>
+                              {news.title}
+                            </strong>
+
+                          </button>
+
+                        )
+                      )}
+
+                  </div>
+
+                </div>
+
+
+                {/* =========================================
+                    EDITORIAL TRUST CARD
+                    ========================================= */}
+
+                  <div className="category-sidebar-card editorial-card">
+
+                  <div className="editorial-icon">
+
+                    <ShieldCheck
+                      size={23}
+                    />
+
+                  </div>
+
+
+                  <span className="category-sidebar-kicker">
+                    OUR PROMISE
+                  </span>
+
+
+                  <h3>
+                    खबर पहले नहीं,
+                    <br />
+                    सही पहले।
+                  </h3>
+
+
+                  <p>
+                    आवाज़ राजस्थान का उद्देश्य आपको तेज़, जिम्मेदार और भरोसेमंद समाचार उपलब्ध कराना है।
+                  </p>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigateTo(
+                        "info"
+                      )
+                    }
+                  >
+
+                    हमारे बारे में
+
+                    <ArrowRight
+                      size={15}
+                    />
+
+                  </button>
+
+                </div>
+
+
+              </aside>
+
+            </div>
+
+          </section>
+
+        )}
+
+
+      {/* ===================================================
+          SPECIAL CATEGORY QUICK SECTIONS
+          =================================================== */}
+
+      {!selectedNews &&
+        activeSection === "home" && (
+
+          <section className="home-category-sections">
+
+
+            {/* =============================================
+                RAJASTHAN NEWS
+                ============================================= */}
+
+            <div className="home-category-block">
+
+              <div className="home-category-header">
+
+                <div className="home-category-title">
+
+                  <span className="home-category-accent"></span>
+
+                  <div>
+
+                    <span>
+                      RAJASTHAN
+                    </span>
+
+                    <h2>
+                      राजस्थान की खबरें
+                    </h2>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigateTo(
+                      "rajasthan"
+                    )
+                  }
+                >
+
+                  सभी देखें
+
+                  <ArrowRight
+                    size={15}
+                  />
+
+                </button>
+
+              </div>
+
+
+              <div className="home-category-grid">
+
+                {NEWS_DATA
+                  .filter(
+                    (news) =>
+                      news.categoryId ===
+                      "rajasthan"
+                  )
+                  .slice(0, 4)
+                  .map(
+                    (news, index) => (
+
+                      <article
+                        className={
+                          index === 0
+                            ? "home-category-card featured"
+                            : "home-category-card"
+                        }
+                        key={`rajasthan-home-${news.id}`}
+                        onClick={() =>
+                          openNews(news)
+                        }
+                      >
+
+                        <div className="home-category-card-image">
+
+                          <img
+                            src={
+                              news.image
+                            }
+                            alt={
+                              news.title
+                            }
+                            loading="lazy"
+                            onError={
+                              handleImageError
+                            }
+                          />
+
+                          <span>
+                            {news.category}
+                          </span>
+
+                        </div>
+
+
+                        <div className="home-category-card-content">
+
+                          <div>
+
+                            <MapPin
+                              size={11}
+                            />
+
+                            <span>
+                              {news.location}
+                            </span>
+
+                            <Clock3
+                              size={11}
+                            />
+
+                            <span>
+                              {news.time}
+                            </span>
+
+                          </div>
+
+
+                          <h3>
+                            {news.title}
+                          </h3>
+
+
+                          <p>
+                            {news.description}
+                          </p>
+
+
+                          <span className="home-category-read">
+
+                            पूरी खबर पढ़ें
+
+                            <ArrowRight
+                              size={14}
+                            />
+
+                          </span>
+
+                        </div>
+
+                      </article>
+
+                    )
+                  )}
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                EDUCATION + JOBS SPLIT
+                ============================================= */}
+
+            <div className="home-dual-category-grid">
+
+
+              {/* EDUCATION */}
+
+              <div className="home-mini-category-block">
+
+                <div className="home-mini-category-header">
+
+                  <div>
+
+                    <span>
+                      EDUCATION
+                    </span>
+
+                    <h2>
+                      शिक्षा
+                    </h2>
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigateTo(
+                        "education"
+                      )
+                    }
+                  >
+
+                    <ArrowUpRight
+                      size={17}
+                    />
+
+                  </button>
+
+                </div>
+
+
+                <div className="home-mini-news-list">
+
+                  {NEWS_DATA
+                    .filter(
+                      (news) =>
+                        news.categoryId ===
+                        "education"
+                    )
+                    .slice(0, 3)
+                    .map(
+                      (news) => (
+
+                        <button
+                          type="button"
+                          key={`education-mini-${news.id}`}
+                          onClick={() =>
+                            openNews(
+                              news
+                            )
+                          }
+                        >
+
+                          <div className="home-mini-news-image">
+
+                            <img
+                              src={
+                                news.image
+                              }
+                              alt={
+                                news.title
+                              }
+                              loading="lazy"
+                              onError={
+                                handleImageError
+                              }
+                            />
+
+                          </div>
+
+
+                          <div>
+
+                            <span>
+                              {news.time}
+                            </span>
+
+                            <strong>
+                              {news.title}
+                            </strong>
+
+                          </div>
+
+
+                          <ChevronRight
+                            size={15}
+                          />
+
+                        </button>
+
+                      )
+                    )}
+
+                </div>
+
+              </div>
+
+
+              {/* JOBS */}
+
+              <div className="home-mini-category-block">
+
+                <div className="home-mini-category-header">
+
+                  <div>
+
+                    <span>
+                      CAREER
+                    </span>
+
+                    <h2>
+                      रोजगार
+                    </h2>
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigateTo(
+                        "jobs"
+                      )
+                    }
+                  >
+
+                    <ArrowUpRight
+                      size={17}
+                    />
+
+                  </button>
+
+                </div>
+
+
+                <div className="home-mini-news-list">
+
+                  {NEWS_DATA
+                    .filter(
+                      (news) =>
+                        news.categoryId ===
+                        "jobs"
+                    )
+                    .slice(0, 3)
+                    .map(
+                      (news) => (
+
+                        <button
+                          type="button"
+                          key={`jobs-mini-${news.id}`}
+                          onClick={() =>
+                            openNews(
+                              news
+                            )
+                          }
+                        >
+
+                          <div className="home-mini-news-image">
+
+                            <img
+                              src={
+                                news.image
+                              }
+                              alt={
+                                news.title
+                              }
+                              loading="lazy"
+                              onError={
+                                handleImageError
+                              }
+                            />
+
+                          </div>
+
+
+                          <div>
+
+                            <span>
+                              {news.time}
+                            </span>
+
+                            <strong>
+                              {news.title}
+                            </strong>
+
+                          </div>
+
+
+                          <ChevronRight
+                            size={15}
+                          />
+
+                        </button>
+
+                      )
+                    )}
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        )}
+              {/* ===================================================
+          POLITICS + NATIONAL + SPORTS
+          HOME SPECIAL COVERAGE
+          =================================================== */}
+
+      {!selectedNews &&
+        activeSection === "home" && (
+
+          <section className="home-special-coverage">
+
+
+            {/* =================================================
+                POLITICS SECTION
+                ================================================= */}
+
+            <div className="special-coverage-block">
+
+              <div className="special-section-header">
+
+                <div className="special-section-title">
+
+                  <span className="special-section-marker"></span>
+
+                  <div>
+
+                    <span className="special-section-kicker">
+                      POLITICS DESK
+                    </span>
+
+                    <h2>
+                      राजनीति
+                    </h2>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  className="special-see-all"
+                  onClick={() =>
+                    navigateTo("politics")
+                  }
+                >
+
+                  सभी खबरें
+
+                  <ArrowRight
+                    size={15}
+                  />
+
+                </button>
+
+              </div>
+
+
+              <div className="politics-news-layout">
+
+
+                {/* MAIN POLITICS STORY */}
+
+                <div className="politics-main-story">
+
+                  {NEWS_DATA
+                    .filter(
+                      (news) =>
+                        news.categoryId ===
+                        "politics"
+                    )
+                    .slice(0, 1)
+                    .map(
+                      (news) => (
+
+                        <article
+                          key={`politics-main-${news.id}`}
+                          onClick={() =>
+                            openNews(news)
+                          }
+                        >
+
+                          <div className="politics-main-image">
+
+                            <img
+                              src={
+                                news.image
+                              }
+                              alt={
+                                news.title
+                              }
+                              loading="lazy"
+                              onError={
+                                handleImageError
+                              }
+                            />
+
+
+                            <div className="politics-image-overlay"></div>
+
+
+                            <span className="politics-main-label">
+
+                              राजनीति
+
+                            </span>
+
+
+                            <div className="politics-main-content">
+
+                              <div className="politics-meta">
+
+                                <span>
+
+                                  <MapPin
+                                    size={12}
+                                  />
+
+                                  {news.location}
+
+                                </span>
+
+
+                                <span>
+
+                                  <Clock3
+                                    size={12}
+                                  />
+
+                                  {news.time}
+
+                                </span>
+
+                              </div>
+
+
+                              <h3>
+                                {news.title}
+                              </h3>
+
+
+                              <p>
+                                {news.description}
+                              </p>
+
+
+                              <span className="politics-read">
+
+                                पूरी खबर पढ़ें
+
+                                <ArrowRight
+                                  size={14}
+                                />
+
+                              </span>
+
+                            </div>
+
+                          </div>
+
+                        </article>
+
+                      )
+                    )}
+
+                </div>
+
+
+                {/* POLITICS LIST */}
+
+                <div className="politics-side-list">
+
+                  {NEWS_DATA
+                    .filter(
+                      (news) =>
+                        news.categoryId ===
+                        "politics"
+                    )
+                    .slice(1, 5)
+                    .map(
+                      (
+                        news,
+                        index
+                      ) => (
+
+                        <article
+                          className="politics-list-card"
+                          key={`politics-side-${news.id}`}
+                          onClick={() =>
+                            openNews(
+                              news
+                            )
+                          }
+                        >
+
+                          <div className="politics-list-number">
+
+                            {String(
+                              index + 1
+                            ).padStart(
+                              2,
+                              "0"
+                            )}
+
+                          </div>
+
+
+                          <div className="politics-list-image">
+
+                            <img
+                              src={
+                                news.image
+                              }
+                              alt={
+                                news.title
+                              }
+                              loading="lazy"
+                              onError={
+                                handleImageError
+                              }
+                            />
+
+                          </div>
+
+
+                          <div className="politics-list-content">
+
+                            <div>
+
+                              <span>
+                                {news.time}
+                              </span>
+
+                              <span>
+                                •
+                              </span>
+
+                              <span>
+                                {news.location}
+                              </span>
+
+                            </div>
+
+
+                            <h3>
+                              {news.title}
+                            </h3>
+
+
+                            <p>
+                              {news.description}
+                            </p>
+
+
+                            <span className="politics-list-arrow">
+
+                              <ArrowUpRight
+                                size={15}
+                              />
+
+                            </span>
+
+                          </div>
+
+                        </article>
+
+                      )
+                    )}
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* =================================================
+                NATIONAL NEWS
+                ================================================= */}
+
+            <div className="special-coverage-block national-special-block">
+
+              <div className="special-section-header">
+
+                <div className="special-section-title">
+
+                  <span className="special-section-marker"></span>
+
+                  <div>
+
+                    <span className="special-section-kicker">
+                      NATIONAL DESK
+                    </span>
+
+                    <h2>
+                      देश की बड़ी खबरें
+                    </h2>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  className="special-see-all"
+                  onClick={() =>
+                    navigateTo(
+                      "national"
+                    )
+                  }
+                >
+
+                  सभी देखें
+
+                  <ArrowRight
+                    size={15}
+                  />
+
+                </button>
+
+              </div>
+
+
+              <div className="national-news-grid">
+
+                {NEWS_DATA
+                  .filter(
+                    (news) =>
+                      news.categoryId ===
+                      "national"
+                  )
+                  .slice(0, 6)
+                  .map(
+                    (news, index) => (
+
+                      <article
+                        className={
+                          index === 0
+                            ? "national-news-card featured"
+                            : "national-news-card"
+                        }
+                        key={`national-${news.id}`}
+                        onClick={() =>
+                          openNews(
+                            news
+                          )
+                        }
+                      >
+
+                        <div className="national-news-image">
+
+                          <img
+                            src={
+                              news.image
+                            }
+                            alt={
+                              news.title
+                            }
+                            loading="lazy"
+                            onError={
+                              handleImageError
+                            }
+                          />
+
+
+                          <span className="national-news-category">
+
+                            {news.category}
+
+                          </span>
+
+
+                          {news.breaking && (
+
+                            <span className="national-breaking">
+
+                              <span></span>
+
+                              BREAKING
+
+                            </span>
+
+                          )}
+
+                        </div>
+
+
+                        <div className="national-news-content">
+
+                          <div className="national-news-meta">
+
+                            <span>
+
+                              <Clock3
+                                size={11}
+                              />
+
+                              {news.time}
+
+                            </span>
+
+
+                            <span>
+
+                              <Eye
+                                size={11}
+                              />
+
+                              {news.views}
+
+                            </span>
+
+                          </div>
+
+
+                          <h3>
+                            {news.title}
+                          </h3>
+
+
+                          <p>
+                            {news.description}
+                          </p>
+
+
+                          <div className="national-news-footer">
+
+                            <span>
+
+                              <MapPin
+                                size={11}
+                              />
+
+                              {news.location}
+
+                            </span>
+
+
+                            <span>
+
+                              पढ़ें
+
+                              <ArrowRight
+                                size={13}
+                              />
+
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                      </article>
+
+                    )
+                  )}
+
+              </div>
+
+            </div>
+
+
+            {/* =================================================
+                SPORTS SECTION
+                ================================================= */}
+
+            <div className="sports-special-block">
+
+              <div className="sports-header">
+
+                <div className="sports-title">
+
+                  <div className="sports-title-icon">
+
+                    <Trophy
+                      size={22}
+                    />
+
+                  </div>
+
+
+                  <div>
+
+                    <span>
+                      SPORTS DESK
+                    </span>
+
+                    <h2>
+                      खेल जगत
+                    </h2>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigateTo(
+                      "sports"
+                    )
+                  }
+                >
+
+                  और खेल खबरें
+
+                  <ArrowRight
+                    size={15}
+                  />
+
+                </button>
+
+              </div>
+
+
+              <div className="sports-news-grid">
+
+                {NEWS_DATA
+                  .filter(
+                    (news) =>
+                      news.categoryId ===
+                      "sports"
+                  )
+                  .slice(0, 5)
+                  .map(
+                    (news, index) => (
+
+                      <article
+                        className={
+                          index === 0
+                            ? "sports-news-card sports-featured"
+                            : "sports-news-card"
+                        }
+                        key={`sports-${news.id}`}
+                        onClick={() =>
+                          openNews(
+                            news
+                          )
+                        }
+                      >
+
+                        <div className="sports-news-image">
+
+                          <img
+                            src={
+                              news.image
+                            }
+                            alt={
+                              news.title
+                            }
+                            loading="lazy"
+                            onError={
+                              handleImageError
+                            }
+                          />
+
+
+                          <div className="sports-image-gradient"></div>
+
+
+                          <span className="sports-category-label">
+
+                            SPORTS
+
+                          </span>
+
+
+                          <div className="sports-news-overlay-content">
+
+                            <div>
+
+                              <span>
+                                {news.time}
+                              </span>
+
+                              <span>
+                                •
+                              </span>
+
+                              <span>
+                                {news.location}
+                              </span>
+
+                            </div>
+
+
+                            <h3>
+                              {news.title}
+                            </h3>
+
+
+                            <span className="sports-read">
+
+                              पढ़ें
+
+                              <ArrowRight
+                                size={14}
+                              />
+
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                      </article>
+
+                    )
+                  )}
+
+              </div>
+
+            </div>
+
+
+            {/* =================================================
+                MULTIMEDIA / VIDEO NEWS
+                ================================================= */}
+
+            <div className="multimedia-section">
+
+              <div className="multimedia-header">
+
+                <div className="multimedia-heading">
+
+                  <div className="multimedia-icon">
+
+                    <Play
+                      size={18}
+                      fill="currentColor"
+                    />
+
+                  </div>
+
+
+                  <div>
+
+                    <span>
+                      AWAAZ MULTIMEDIA
+                    </span>
+
+                    <h2>
+                      वीडियो न्यूज़
+                    </h2>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setVideoModalOpen(
+                      true
+                    )
+                  }
+                >
+
+                  सभी वीडियो
+
+                  <ArrowRight
+                    size={15}
+                  />
+
+                </button>
+
+              </div>
+
+
+              <div className="multimedia-grid">
+
+
+                {/* =========================================
+                    FEATURED VIDEO
+                    ========================================= */}
+
+                <article
+                  className="featured-video-card"
+                  onClick={() =>
+                    setVideoModalOpen(
+                      true
+                    )
+                  }
+                >
+
+                  <div className="video-thumbnail">
+
+                    <img
+                      src={
+                        VIDEO_DATA[0]?.thumbnail ||
+                        FALLBACK_IMAGE
+                      }
+                      alt={
+                        VIDEO_DATA[0]?.title ||
+                        "वीडियो न्यूज़"
+                      }
+                      loading="lazy"
+                      onError={
+                        handleImageError
+                      }
+                    />
+
+
+                    <div className="video-overlay"></div>
+
+
+                    <div className="video-play-button">
+
+                      <Play
+                        size={23}
+                        fill="currentColor"
+                      />
+
+                    </div>
+
+
+                    <span className="video-duration">
+                      03:42
+                    </span>
+
+
+                    <div className="featured-video-content">
+
+                      <span>
+                        VIDEO REPORT
+                      </span>
+
+                      <h3>
+                        {VIDEO_DATA[0]?.title ||
+                          "आवाज़ राजस्थान की खास वीडियो रिपोर्ट"}
+                      </h3>
+
+                      <div>
+
+                        <Eye
+                          size={12}
+                        />
+
+                        <span>
+                          {VIDEO_DATA[0]?.views ||
+                            "12K"}
+                        </span>
+
+                        <Clock3
+                          size={12}
+                        />
+
+                        <span>
+                          अभी
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </article>
+
+
+                {/* =========================================
+                    SMALL VIDEOS
+                    ========================================= */}
+
+                 <div className="small-video-list">
+
+                  {VIDEO_DATA
+                    .slice(1, 5)
+                    .map(
+                      (video) => (
+
+                        <article
+                          className="small-video-card"
+                          key={`video-${video.id}`}
+                          onClick={() =>
+                            setVideoModalOpen(
+                              true
+                            )
+                          }
+                        >
+
+                          <div className="small-video-thumbnail">
+
+                            <img
+                              src={
+                                video.thumbnail ||
+                                FALLBACK_IMAGE
+                              }
+                              alt={
+                                video.title
+                              }
+                              loading="lazy"
+                              onError={
+                                handleImageError
+                              }
+                            />
+
+
+                            <div className="small-video-play">
+
+                              <Play
+                                size={14}
+                                fill="currentColor"
+                              />
+
+                            </div>
+
+
+                            <span>
+                              {video.duration ||
+                                "02:30"}
+                            </span>
+
+                          </div>
+
+
+                          <div className="small-video-content">
+
+                            <span>
+                              {video.category ||
+                                "वीडियो"}
+                            </span>
+
+                            <h3>
+                              {video.title}
+                            </h3>
+
+                            <small>
+
+                              <Eye
+                                size={11}
+                              />
+
+                              {video.views ||
+                                "2.4K"}
+
+                            </small>
+
+                          </div>
+
+                        </article>
+
+                      )
+                    )}
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* =================================================
+                PHOTO STORIES
+                ================================================= */}
+
+            <div className="photo-story-section">
+
+              <div className="photo-story-header">
+
+                <div>
+
+                  <span>
+                    AWAAZ PHOTO STORIES
+                  </span>
+
+                  <h2>
+                    तस्वीरों में खबर
+                  </h2>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    showToast(
+                      "फोटो स्टोरी सेक्शन जल्द अपडेट होगा"
+                    )
+                  }
+                >
+
+                  सभी फोटो
+
+                  <ArrowRight
+                    size={15}
+                  />
+
+                </button>
+
+              </div>
+
+
+              <div className="photo-story-grid">
+
+                {PHOTO_STORIES
+                  .slice(0, 4)
+                  .map(
+                    (
+                      photo,
+                      index
+                    ) => (
+
+                      <article
+                        className={
+                          index === 0
+                            ? "photo-story-card large"
+                            : "photo-story-card"
+                        }
+                        key={`photo-story-${photo.id}`}
+                        onClick={() =>
+                          showToast(
+                            "फोटो स्टोरी जल्द उपलब्ध होगी"
+                          )
+                        }
+                      >
+
+                        <div className="photo-story-image">
+
+                          <img
+                            src={
+                              photo.image
+                            }
+                            alt={
+                              photo.title
+                            }
+                            loading="lazy"
+                            onError={
+                              handleImageError
+                            }
+                          />
+
+
+                          <div className="photo-story-overlay"></div>
+
+
+                          <span className="photo-story-count">
+
+                            <Images
+                              size={13}
+                            />
+
+                            {photo.count ||
+                              "12"}
+
+                          </span>
+
+
+                          <div className="photo-story-content">
+
+                            <span>
+                              PHOTO STORY
+                            </span>
+
+                            <h3>
+                              {photo.title}
+                            </h3>
+
+                            <p>
+                              {photo.description}
+                            </p>
+
+                          </div>
+
+                        </div>
+
+                      </article>
+
+                    )
+                  )}
+
+              </div>
+
+            </div>
+
+          </section>
+
+        )}
+              {/* ===================================================
+          CURRENT AFFAIRS SECTION
+          =================================================== */}
+
+      {!selectedNews &&
+        activeSection === "current-affairs" && (
+
+          <section className="current-affairs-page">
+
+
+            {/* =============================================
+                CURRENT AFFAIRS HERO
+                ============================================= */}
+
+            <div className="current-affairs-hero">
+
+              <div className="current-affairs-hero-content">
+
+                <span className="current-affairs-kicker">
+                  AWAAZ RAJASTHAN • DAILY UPDATE
+                </span>
+
+                <h1>
+                  करंट अफेयर्स
+                </h1>
+
+                <p>
+                  देश-दुनिया और राजस्थान से जुड़ी आज की महत्वपूर्ण घटनाओं और अपडेट को एक जगह पढ़ें।
+                </p>
+
+
+                <div className="current-affairs-hero-meta">
+
+                  <span>
+
+                    <CalendarDays
+                      size={14}
+                    />
+
+                    आज का अपडेट
+
+                  </span>
+
+
+                  <span>
+
+                    <RefreshCw
+                      size={14}
+                    />
+
+                    रोज़ अपडेट
+
+                  </span>
+
+
+                  <span>
+
+                    <CheckCircle2
+                      size={14}
+                    />
+
+                    महत्वपूर्ण तथ्य
+
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div className="current-affairs-hero-visual">
+
+                <div className="ca-visual-ring ring-one"></div>
+
+                <div className="ca-visual-ring ring-two"></div>
+
+                <div className="ca-visual-ring ring-three"></div>
+
+
+                <div className="ca-visual-center">
+
+                  <CalendarDays
+                    size={42}
+                    strokeWidth={1.4}
+                  />
+
+                  <span>
+                    DAILY
+                  </span>
+
+                  <strong>
+                    CURRENT
+                  </strong>
+
+                  <strong>
+                    AFFAIRS
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                DATE / DAY BAR
+                ============================================= */}
+
+            <div className="current-affairs-date-bar">
+
+              <div className="ca-date-left">
+
+                <div className="ca-date-icon">
+
+                  <CalendarDays
+                    size={18}
+                  />
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    आज की तारीख
+                  </span>
+
+                  <strong>
+                    {getTodayHindiDate()}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <button
+                type="button"
+                onClick={() =>
+                  showToast(
+                    "आज के करंट अफेयर्स अपडेट हो रहे हैं"
+                  )
+                }
+              >
+
+                <RefreshCw
+                  size={15}
+                />
+
+                अपडेट करें
+
+              </button>
+
+            </div>
+
+
+            {/* =============================================
+                CURRENT AFFAIRS CATEGORY TABS
+                ============================================= */}
+
+            <div className="ca-category-tabs-wrapper">
+
+              <div className="ca-category-tabs">
+
+                {[
+                  {
+                    id: "national",
+                    title: "राष्ट्रीय",
+                    icon: Flag
+                  },
+                  {
+                    id: "international",
+                    title: "अंतरराष्ट्रीय",
+                    icon: Globe2
+                  },
+                  {
+                    id: "rajasthan",
+                    title: "राजस्थान",
+                    icon: Map
+                  },
+                  {
+                    id: "economy",
+                    title: "अर्थव्यवस्था",
+                    icon: IndianRupee
+                  },
+                  {
+                    id: "science",
+                    title: "विज्ञान",
+                    icon: FlaskConical
+                  },
+                  {
+                    id: "sports",
+                    title: "खेल",
+                    icon: Trophy
+                  }
+                ].map(
+                  (tab) => {
+
+                    const CATabIcon =
+                      tab.icon;
+
+                    return (
+
+                      <button
+                        type="button"
+                        key={tab.id}
+                        className={
+                          currentAffairsTab ===
+                          tab.id
+                            ? "ca-category-tab active"
+                            : "ca-category-tab"
+                        }
+                        onClick={() =>
+                          setCurrentAffairsTab(
+                            tab.id
+                          )
+                        }
+                      >
+
+                        <CATabIcon
+                          size={16}
+                        />
+
+                        <span>
+                          {tab.title}
+                        </span>
+
+                      </button>
+
+                    );
+
+                  }
+                )}
+
+              </div>
+
+            </div>
+
+
+            {/* =============================================
+                CURRENT AFFAIRS MAIN CONTENT
+                ============================================= */}
+
+            <div className="current-affairs-content">
+
+
+              {/* =========================================
+                  LEFT — DAILY AFFAIRS
+                  ========================================= */}
+
+              <div className="ca-main-column">
+
+                <div className="ca-section-heading">
+
+                  <div>
+
+                    <span>
+                      DAILY BRIEFING
+                    </span>
+
+                    <h2>
+                      आज के महत्वपूर्ण करंट अफेयर्स
+                    </h2>
+
+                  </div>
+
+
+                  <span className="ca-live-badge">
+
+                    <span></span>
+
+                    LIVE
+
+                  </span>
+
+                </div>
+
+
+                <div className="ca-news-list">
+
+                  {getCurrentAffairsData(
+                    currentAffairsTab
+                  )
+                    .map(
+                      (
+                        item,
+                        index
+                      ) => (
+
+                        <article
+                          className={
+                            index === 0
+                              ? "ca-news-card featured"
+                              : "ca-news-card"
+                          }
+                          key={`ca-news-${item.id}`}
+                        >
+
+                          <div className="ca-news-number">
+
+                            {String(
+                              index + 1
+                            ).padStart(
+                              2,
+                              "0"
+                            )}
+
+                          </div>
+
+
+                          <div className="ca-news-content">
+
+                            <div className="ca-news-meta">
+
+                              <span className="ca-news-category">
+
+                                {item.category ||
+                                  "करंट अफेयर्स"}
+
+                              </span>
+
+
+                              <span>
+                                •
+                              </span>
+
+
+                              <span>
+
+                                <Clock3
+                                  size={11}
+                                />
+
+                                {item.time ||
+                                  "आज"}
+
+                              </span>
+
+                            </div>
+
+
+                            <h3>
+                              {item.title}
+                            </h3>
+
+
+                            <p>
+                              {item.description}
+                            </p>
+
+
+                            <div className="ca-news-bottom">
+
+                              <span>
+
+                                <BookOpen
+                                  size={12}
+                                />
+
+                                महत्वपूर्ण तथ्य
+
+                              </span>
+
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  openCurrentAffair(
+                                    item
+                                  )
+                                }
+                              >
+
+                                विस्तार से पढ़ें
+
+                                <ArrowRight
+                                  size={14}
+                                />
+
+                              </button>
+
+                            </div>
+
+                          </div>
+
+
+                          <div className="ca-news-image">
+
+                            <img
+                              src={
+                                item.image ||
+                                FALLBACK_IMAGE
+                              }
+                              alt={
+                                item.title
+                              }
+                              loading="lazy"
+                              onError={
+                                handleImageError
+                              }
+                            />
+
+                          </div>
+
+                        </article>
+
+                      )
+                    )}
+
+                </div>
+
+
+                {/* =========================================
+                    DAILY QUIZ PROMOTION
+                    ========================================= */}
+
+                <div className="ca-quiz-banner">
+
+                  <div className="ca-quiz-icon">
+
+                    <Brain
+                      size={28}
+                    />
+
+                  </div>
+
+
+                  <div className="ca-quiz-content">
+
+                    <span>
+                      DAILY CURRENT AFFAIRS QUIZ
+                    </span>
+
+                    <h3>
+                      आज के करंट अफेयर्स से कितना याद है?
+                    </h3>
+
+                    <p>
+                      महत्वपूर्ण घटनाओं पर आधारित क्विज़ देकर अपनी तैयारी जांचें।
+                    </p>
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigateTo(
+                        "quiz"
+                      )
+                    }
+                  >
+
+                    क्विज़ शुरू करें
+
+                    <ArrowRight
+                      size={16}
+                    />
+
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              {/* =========================================
+                  RIGHT SIDEBAR
+                  ========================================= */}
+
+              <aside className="ca-sidebar">
+
+
+                {/* =========================================
+                    IMPORTANT TODAY
+                    ========================================= */}
+
+                <div className="ca-sidebar-card">
+
+                  <div className="ca-sidebar-heading">
+
+                    <div>
+
+                      <span>
+                        QUICK REVISION
+                      </span>
+
+                      <h3>
+                        आज के मुख्य बिंदु
+                      </h3>
+
+                    </div>
+
+
+                    <Zap
+                      size={18}
+                    />
+
+                  </div>
+
+
+                  <div className="ca-important-points">
+
+                    {[
+                      "राष्ट्रीय स्तर की प्रमुख घटनाएं",
+                      "राजस्थान से जुड़े महत्वपूर्ण अपडेट",
+                      "नई सरकारी योजनाएं एवं फैसले",
+                      "अर्थव्यवस्था से जुड़े प्रमुख आंकड़े",
+                      "खेल जगत की महत्वपूर्ण खबरें"
+                    ].map(
+                      (
+                        point,
+                        index
+                      ) => (
+
+                        <div
+                          className="ca-important-point"
+                          key={`important-${index}`}
+                        >
+
+                          <span>
+                            {index + 1}
+                          </span>
+
+                          <p>
+                            {point}
+                          </p>
+
+                        </div>
+
+                      )
+                    )}
+
+                  </div>
+
+                </div>
+
+
+                {/* =========================================
+                    CURRENT AFFAIRS STREAK
+                    ========================================= */}
+
+                <div className="ca-streak-card">
+
+                  <div className="ca-streak-top">
+
+                    <div className="ca-streak-icon">
+
+                      <Flame
+                        size={21}
+                      />
+
+                    </div>
+
+
+                    <div>
+
+                      <span>
+                        YOUR STREAK
+                      </span>
+
+                      <h3>
+                        Daily Reading
+                      </h3>
+
+                    </div>
+
+                  </div>
+
+
+                  <div className="ca-streak-number">
+
+                    <strong>
+                      7
+                    </strong>
+
+                    <span>
+                      दिन
+                    </span>
+
+                  </div>
+
+
+                  <div className="ca-streak-days">
+
+                    {[
+                      "M",
+                      "T",
+                      "W",
+                      "T",
+                      "F",
+                      "S",
+                      "S"
+                    ].map(
+                      (
+                        day,
+                        index
+                      ) => (
+
+                        <span
+                          key={`streak-${index}`}
+                          className={
+                            index <
+                            6
+                              ? "completed"
+                              : ""
+                          }
+                        >
+
+                          {index <
+                          6
+                            ? "✓"
+                            : day}
+
+                        </span>
+
+                      )
+                    )}
+
+                  </div>
+
+
+                  <p>
+                    लगातार करंट अफेयर्स पढ़कर अपनी तैयारी मजबूत करें।
+                  </p>
+
+                </div>
+
+
+                {/* =========================================
+                    SAVED AFFAIRS
+                    ========================================= */}
+
+                <div className="ca-sidebar-card">
+
+                  <div className="ca-sidebar-heading">
+
+                    <div>
+
+                      <span>
+                        MY NOTES
+                      </span>
+
+                      <h3>
+                        सेव किए गए अपडेट
+                      </h3>
+
+                    </div>
+
+
+                    <Bookmark
+                      size={18}
+                    />
+
+                  </div>
+
+
+                  <div className="ca-saved-empty">
+
+                    <div>
+
+                      <Bookmark
+                        size={22}
+                      />
+
+                    </div>
+
+                    <p>
+                      महत्वपूर्ण करंट अफेयर्स को सेव करके बाद में दोबारा पढ़ें।
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        navigateTo(
+                          "notes"
+                        )
+                      }
+                    >
+
+                      मेरे नोट्स
+
+                      <ArrowRight
+                        size={14}
+                      />
+
+                    </button>
+
+                  </div>
+
+                </div>
+
+
+                {/* =========================================
+                    EXAM FOCUS
+                    ========================================= */}
+
+                <div className="ca-exam-focus-card">
+
+                  <div className="ca-exam-focus-icon">
+
+                    <GraduationCap
+                      size={21}
+                    />
+
+                  </div>
+
+
+                  <span>
+                    EXAM FOCUS
+                  </span>
+
+
+                  <h3>
+                    प्रतियोगी परीक्षाओं के लिए उपयोगी
+                  </h3>
+
+
+                  <p>
+                    RAS, UPSC, SSC, रेलवे और अन्य परीक्षाओं के लिए महत्वपूर्ण करंट अफेयर्स।
+                  </p>
+
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigateTo(
+                        "quiz"
+                      )
+                    }
+                  >
+
+                    तैयारी शुरू करें
+
+                    <ArrowRight
+                      size={14}
+                    />
+
+                  </button>
+
+                </div>
+
+              </aside>
+
+            </div>
+
+
+            {/* =============================================
+                MONTHLY CURRENT AFFAIRS
+                ============================================= */}
+
+            <div className="monthly-ca-section">
+
+              <div className="monthly-ca-header">
+
+                <div>
+
+                  <span>
+                    ARCHIVE
+                  </span>
+
+                  <h2>
+                    करंट अफेयर्स आर्काइव
+                  </h2>
+
+                  <p>
+                    पिछले महीनों के महत्वपूर्ण करंट अफेयर्स पढ़ें।
+                  </p>
+
+                </div>
+
+
+                <Archive
+                  size={28}
+                />
+
+              </div>
+
+
+              <div className="monthly-ca-grid">
+
+                {[
+                  "सितंबर 2026",
+                  "अगस्त 2026",
+                  "जुलाई 2026",
+                  "जून 2026",
+                  "मई 2026",
+                  "अप्रैल 2026"
+                ].map(
+                  (
+                    month,
+                    index
+                  ) => (
+
+                    <button
+                      type="button"
+                      key={`month-${index}`}
+                      onClick={() =>
+                        showToast(
+                          `${month} का करंट अफेयर्स जल्द उपलब्ध होगा`
+                        )
+                      }
+                    >
+
+                      <div className="monthly-ca-icon">
+
+                        <CalendarDays
+                          size={17}
+                        />
+
+                      </div>
+
+
+                      <div>
+
+                        <strong>
+                          {month}
+                        </strong>
+
+                        <span>
+                          करंट अफेयर्स
+                        </span>
+
+                      </div>
+
+
+                      <ChevronRight
+                        size={16}
+                      />
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+          </section>
+
+        )}
+
+
+      {/* ===================================================
+          CURRENT AFFAIR DETAIL MODAL
+        =================================================== */}
+
+      {selectedCurrentAffair && (
+
+        <div
+          className="modal-overlay ca-detail-overlay"
+          role="dialog"
+          aria-modal="true"
+          onMouseDown={(event) => {
+
+            if (
+              event.target ===
+              event.currentTarget
+            ) {
+
+              setSelectedCurrentAffair(
+                null
+              );
+
+            }
+
+          }}
+        >
+
+          <div className="ca-detail-modal">
+
+
+            {/* HEADER */}
+
+            <div className="ca-detail-header">
+
+              <div>
+
+                <span>
+                  CURRENT AFFAIRS
+                </span>
+
+                <h2>
+                  महत्वपूर्ण अपडेट
+                </h2>
+
+              </div>
+
+
+              <button
+                type="button"
+                className="modal-close-button"
+                onClick={() =>
+                  setSelectedCurrentAffair(
+                    null
+                  )
+                }
+              >
+
+                <X
+                  size={20}
+                />
+
+              </button>
+
+            </div>
+
+
+            {/* IMAGE */}
+
+            <div className="ca-detail-image">
+
+              <img
+                src={
+                  selectedCurrentAffair.image ||
+                  FALLBACK_IMAGE
+                }
+                alt={
+                  selectedCurrentAffair.title
+                }
+                onError={
+                  handleImageError
+                }
+              />
+
+            </div>
+
+
+            {/* CONTENT */}
+
+            <div className="ca-detail-body">
+
+              <div className="ca-detail-meta">
+
+                <span>
+
+                  {selectedCurrentAffair.category ||
+                    "करंट अफेयर्स"}
+
+                </span>
+
+
+                <span>
+                  •
+                </span>
+
+
+                <span>
+
+                  <Clock3
+                    size={12}
+                  />
+
+                  {selectedCurrentAffair.time ||
+                    "आज"}
+
+                </span>
+
+              </div>
+
+
+              <h2>
+                {selectedCurrentAffair.title}
+              </h2>
+
+
+              <p>
+                {selectedCurrentAffair.description}
+              </p>
+
+
+              <div className="ca-detail-fact-box">
+
+                <div className="ca-detail-fact-icon">
+
+                  <Lightbulb
+                    size={20}
+                  />
+
+                </div>
+
+
+                <div>
+
+                  <span>
+                    IMPORTANT FACT
+                  </span>
+
+                  <p>
+                    इस घटना से संबंधित महत्वपूर्ण जानकारी को परीक्षा की दृष्टि से जरूर याद रखें।
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <div className="ca-detail-actions">
+
+                <button
+                  type="button"
+                  onClick={() => {
+
+                    showToast(
+                      "करंट अफेयर सेव कर दिया गया"
+                    );
+
+                  }}
+                >
+
+                  <Bookmark
+                    size={16}
+                  />
+
+                  सेव करें
+
+                </button>
+
+
+                <button
+                  type="button"
+                  onClick={() => {
+
+                    shareNews(
+                      selectedCurrentAffair
+                    );
+
+                  }}
+                >
+
+                  <Share2
+                    size={16}
+                  />
+
+                  शेयर करें
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ===================================================
+          PART 9 END
+          =================================================== */}
+        
