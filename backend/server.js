@@ -284,6 +284,51 @@ if (fs.existsSync(adminAdRoutesPath)) {
 
 
 /* ========================================================
+   OWNER AD ANALYTICS
+======================================================== */
+
+// Owner-only Advertisement Analytics
+//
+// GET:
+// /api/admin/ad-analytics
+//
+// GET SINGLE:
+// /api/admin/ad-analytics/:id
+//
+// Analytics में:
+// - Total Ads
+// - Active Ads
+// - Inactive Ads
+// - Total Impressions
+// - Total Clicks
+// - CTR
+// - Best Performing Ads
+// - Position-wise Analytics
+//
+// Security:
+// adminProtect + ownerOnly
+//
+// Normal Admin:
+// ❌ Access denied
+//
+// Public:
+// ❌ Access denied
+
+const adminAdAnalyticsRoutesPath = path.join(
+    __dirname,
+    "routes",
+    "adminAdAnalyticsRoutes.js"
+);
+
+if (fs.existsSync(adminAdAnalyticsRoutesPath)) {
+    app.use(
+        "/api/admin/ad-analytics",
+        require("./routes/adminAdAnalyticsRoutes")
+    );
+}
+
+
+/* ========================================================
    NEWS
 ======================================================== */
 
@@ -378,6 +423,10 @@ if (fs.existsSync(siteRoutesPath)) {
 // Owner-only Ad Settings:
 //
 // /api/admin/ad-settings
+//
+// Owner-only Ad Analytics:
+//
+// /api/admin/ad-analytics
 
 const adRoutesPath = path.join(
     __dirname,
@@ -485,6 +534,10 @@ const server = app.listen(PORT, () => {
 
     console.log(
         `⚙️ Owner Ad Settings: http://localhost:${PORT}/api/admin/ad-settings`
+    );
+
+    console.log(
+        `📊 Owner Ad Analytics: http://localhost:${PORT}/api/admin/ad-analytics`
     );
 
     console.log(
