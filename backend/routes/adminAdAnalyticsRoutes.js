@@ -3,97 +3,169 @@
 const express = require("express");
 
 const {
-    getAdAnalytics,
-    getSingleAdAnalytics
-} = require("../controllers/adAnalyticsController");
+  adminProtect,
+  ownerOnly,
+} = require("../middleware/adminMiddleware");
 
 const {
-    adminProtect,
-    ownerOnly
-} = require("../middleware/adminMiddleware");
+  getOverallAnalytics,
+  getAdAnalytics,
+  getTopAds,
+  getPositionAnalytics,
+  getDeviceAnalytics,
+} = require("../controllers/adminAdAnalyticsController");
 
 const router = express.Router();
 
 
-/* ========================================================
-   OWNER AD ANALYTICS
-======================================================== */
+/* =========================================================
+   OWNER-ONLY AD ANALYTICS
+========================================================= */
 
 /*
-   IMPORTANT:
+  इस पूरे route को केवल Owner access कर सकता है।
 
-   ये सभी routes केवल Owner के लिए हैं।
+  Normal Admin:
+  ❌ Analytics access नहीं
 
-   Admin:
-   ❌ Access denied
+  Public User:
+  ❌ Analytics access नहीं
 
-   Public:
-   ❌ Access denied
-
-   Owner:
-   ✅ Full Analytics Access
+  Owner:
+  ✅ Full Analytics
 */
 
 
-/* ========================================================
-   GET ALL AD ANALYTICS
-======================================================== */
-
-/*
-   GET /api/admin/ad-analytics
-
-   इसमें मिलेगा:
-
-   - Total Ads
-   - Active Ads
-   - Inactive Ads
-   - Total Impressions
-   - Total Clicks
-   - Overall CTR
-   - Best Ads by Clicks
-   - Best Ads by Impressions
-   - Best Ads by CTR
-   - Position-wise Analytics
-*/
-
-router.get(
-    "/",
-    adminProtect,
-    ownerOnly,
-    getAdAnalytics
+router.use(
+  adminProtect,
+  ownerOnly
 );
 
 
-/* ========================================================
-   GET SINGLE AD ANALYTICS
-======================================================== */
+/* =========================================================
+   OVERALL ANALYTICS
+========================================================= */
 
 /*
-   GET /api/admin/ad-analytics/:id
+  GET /api/admin/ad-analytics
 
-   किसी एक Advertisement की performance:
+  इसमें मिलेगा:
 
-   - Impressions
-   - Clicks
-   - CTR
-   - Position
-   - Ad Type
-   - Active Status
-   - Priority
-   - Start Date
-   - End Date
+  - Total Ads
+  - Active Ads
+  - Inactive Ads
+  - Total Impressions
+  - Total Clicks
+  - Overall CTR
+  - Total Revenue
 */
 
 router.get(
-    "/:id",
-    adminProtect,
-    ownerOnly,
-    getSingleAdAnalytics
+  "/",
+  getOverallAnalytics
 );
 
 
-/* ========================================================
-   EXPORT ROUTER
-======================================================== */
+/* =========================================================
+   TOP PERFORMING ADS
+========================================================= */
+
+/*
+  GET /api/admin/ad-analytics/top
+
+  Optional:
+
+  ?limit=10
+
+  Example:
+
+  /api/admin/ad-analytics/top?limit=20
+
+  इसमें सबसे अच्छा perform करने वाले
+  advertisements मिलेंगे।
+*/
+
+router.get(
+  "/top",
+  getTopAds
+);
+
+
+/* =========================================================
+   POSITION ANALYTICS
+========================================================= */
+
+/*
+  GET /api/admin/ad-analytics/positions
+
+  Position-wise analytics:
+
+  - Header
+  - Home Top
+  - Home Middle
+  - Sidebar
+  - News
+  - Footer
+  - Popup
+  - Sticky
+  - आदि
+*/
+
+router.get(
+  "/positions",
+  getPositionAnalytics
+);
+
+
+/* =========================================================
+   DEVICE ANALYTICS
+========================================================= */
+
+/*
+  GET /api/admin/ad-analytics/devices
+
+  Device-wise analytics:
+
+  - Mobile
+  - Desktop
+
+  Data:
+
+  - Ads
+  - Impressions
+  - Clicks
+  - CTR
+  - Revenue
+*/
+
+router.get(
+  "/devices",
+  getDeviceAnalytics
+);
+
+
+/* =========================================================
+   SINGLE AD ANALYTICS
+========================================================= */
+
+/*
+  GET /api/admin/ad-analytics/:id
+
+  किसी एक advertisement की पूरी analytics।
+
+  Example:
+
+  /api/admin/ad-analytics/AD_ID
+*/
+
+router.get(
+  "/:id",
+  getAdAnalytics
+);
+
+
+/* =========================================================
+   EXPORT
+========================================================= */
 
 module.exports = router;
