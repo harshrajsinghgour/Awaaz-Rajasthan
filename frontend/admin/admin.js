@@ -8734,7 +8734,7 @@ async function checkDashboardSystemStatus() {
   try {
     const siteResponse =
       await fetch(
-        `${getAPIBaseURL()}/api/site/live-tv`,
+        `${ADMIN_API_BASE_URL}/site/live-tv`,
         {
           method: "GET",
           headers: {
