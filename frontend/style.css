@@ -532,20 +532,26 @@ ol {
    SCREEN SYSTEM
    ========================================================= */
 
-.screen {
+/* =========================================================
+   PAGE SCREEN SYSTEM - FIX
+   ========================================================= */
+
+.page-screen {
   display: none;
   min-height: 500px;
 }
 
-.screen.active,
-.screen.is-active {
+.page-screen.active-screen {
   display: block;
 }
 
-#home-screen {
-  display: block;
-}
+/* =========================================================
+   PAGE TRANSITION
+   ========================================================= */
 
+.page-screen.active-screen {
+  animation: screenFade 0.25s ease;
+}
 
 /* =========================================================
    PAGE HEADER
