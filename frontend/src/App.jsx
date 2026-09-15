@@ -1,83 +1,268 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 import {
-  Home,
-  Search,
   Menu,
+  Search,
   X,
+  Home,
   MapPin,
+  Newspaper,
+  Play,
+  BookOpen,
+  Bell,
   ChevronRight,
   ChevronLeft,
-  Bell,
-  Bookmark,
-  Share2,
-  Clock3,
-  Eye,
-  Play,
-  Video,
-  Newspaper,
-  Radio,
-  Grid3X3,
-  MoreHorizontal,
   ArrowRight,
-  TrendingUp,
-  CloudSun,
-  Sun,
-  CalendarDays,
+  Clock3,
+  Share2,
+  Bookmark,
+  BookmarkCheck,
+  MessageCircle,
+  Eye,
   User,
+  Radio,
+  FileText,
+  Video,
+  CalendarDays,
+  TrendingUp,
+  Map,
+  Building2,
+  GraduationCap,
+  BriefcaseBusiness,
+  Trophy,
+  CloudSun,
+  MoreHorizontal,
+  Instagram,
+  Facebook,
+  Youtube,
+  Send,
   Settings,
-  Info,
   Phone,
   Mail,
-  Facebook,
-  Instagram,
-  Youtube,
-  Twitter,
-  Send,
-  CheckCircle2,
-  Flame,
-  NewspaperIcon,
-  Globe2,
-  ShieldCheck,
-  BriefcaseBusiness,
-  GraduationCap,
-  HeartPulse,
-  Trophy,
-  Landmark,
-  Plane,
-  ShoppingBag,
-  Mic,
-  Volume2,
-  RefreshCw,
   ExternalLink,
-  AlertCircle,
-  BookmarkCheck,
-  Image as ImageIcon
+  Flame,
+  Zap,
+  NewspaperIcon,
+  CircleUserRound
 } from "lucide-react";
 
+/*
+========================================================
+                 AWAAZ RAJASTHAN
+              PROFESSIONAL NEWS PORTAL
+========================================================
 
-/* =========================================================
+  PART 4-A
+  - React imports
+  - Icons
+  - Main news data
+  - District data
+  - Category data
+========================================================
+*/
+
+
+/* =====================================================
    BRAND CONFIGURATION
-========================================================= */
+===================================================== */
 
 const BRAND = {
   name: "आवाज़ राजस्थान",
-  englishName: "Awaaz Rajasthan",
+  englishName: "AWAAZ RAJASTHAN",
   tagline: "आपकी आवाज़, आपका राजस्थान",
-  description:
-    "राजस्थान की हर बड़ी खबर, हर जिले की आवाज़ और देश-दुनिया की ताज़ा जानकारी।",
-  primary: "#c90000",
-  dark: "#071a35",
-  navy: "#071a35",
-  gold: "#e7b51d"
+
+  colors: {
+    red: "#c90000",
+    darkRed: "#9f0000",
+    navy: "#07182d",
+    dark: "#050b14",
+    gold: "#d7a63b",
+    white: "#ffffff",
+    light: "#f5f6f8",
+    text: "#111827",
+    muted: "#667085",
+    border: "#e5e7eb"
+  }
 };
 
 
-/* =========================================================
-   DISTRICTS
-========================================================= */
+/* =====================================================
+   MAIN NEWS DATA
+===================================================== */
 
-const districts = [
+const NEWS_DATA = [
+  {
+    id: 1,
+    category: "राजस्थान",
+    title:
+      "राजस्थान में मौसम ने बदला मिजाज, कई जिलों में बारिश का अलर्ट",
+    shortTitle:
+      "राजस्थान में बदला मौसम, कई जिलों में बारिश का अलर्ट",
+    location: "जयपुर",
+    time: "10 मिनट पहले",
+    author: "आवाज़ राजस्थान डेस्क",
+    image:
+      "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=1200&q=85",
+    views: "12.4K",
+    featured: true,
+    breaking: true
+  },
+
+  {
+    id: 2,
+    category: "राजस्थान",
+    title:
+      "जयपुर में ट्रैफिक व्यवस्था को लेकर बड़ा बदलाव, नई व्यवस्था लागू",
+    shortTitle:
+      "जयपुर में ट्रैफिक व्यवस्था में बड़ा बदलाव",
+    location: "जयपुर",
+    time: "25 मिनट पहले",
+    author: "जयपुर ब्यूरो",
+    image:
+      "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=80",
+    views: "8.7K"
+  },
+
+  {
+    id: 3,
+    category: "शिक्षा",
+    title:
+      "राजस्थान के विद्यार्थियों के लिए महत्वपूर्ण अपडेट, परीक्षा को लेकर नई सूचना",
+    shortTitle:
+      "विद्यार्थियों के लिए महत्वपूर्ण परीक्षा अपडेट",
+    location: "राजस्थान",
+    time: "42 मिनट पहले",
+    author: "एजुकेशन डेस्क",
+    image:
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=80",
+    views: "15.2K"
+  },
+
+  {
+    id: 4,
+    category: "राजनीति",
+    title:
+      "राजस्थान की राजनीति में आज का दिन अहम, नेताओं की बैठकों का दौर जारी",
+    shortTitle:
+      "राजस्थान की राजनीति में आज का दिन अहम",
+    location: "जयपुर",
+    time: "1 घंटा पहले",
+    author: "राजनीति डेस्क",
+    image:
+      "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=900&q=80",
+    views: "10.8K"
+  },
+
+  {
+    id: 5,
+    category: "रोजगार",
+    title:
+      "सरकारी नौकरी की तैयारी कर रहे युवाओं के लिए नई भर्तियों को लेकर अपडेट",
+    shortTitle:
+      "युवाओं के लिए नई भर्तियों को लेकर बड़ा अपडेट",
+    location: "राजस्थान",
+    time: "1 घंटा पहले",
+    author: "रोजगार डेस्क",
+    image:
+      "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=80",
+    views: "18.1K"
+  },
+
+  {
+    id: 6,
+    category: "अपराध",
+    title:
+      "पुलिस की बड़ी कार्रवाई, मामले में कई महत्वपूर्ण सुराग सामने आए",
+    shortTitle:
+      "पुलिस की बड़ी कार्रवाई, कई सुराग मिले",
+    location: "भीलवाड़ा",
+    time: "2 घंटे पहले",
+    author: "क्राइम रिपोर्टर",
+    image:
+      "https://images.unsplash.com/photo-1453873531674-2151bcd01707?auto=format&fit=crop&w=900&q=80",
+    views: "7.4K"
+  },
+
+  {
+    id: 7,
+    category: "खेल",
+    title:
+      "राजस्थान के खिलाड़ियों का शानदार प्रदर्शन, प्रतियोगिता में जीते कई पदक",
+    shortTitle:
+      "राजस्थान के खिलाड़ियों का शानदार प्रदर्शन",
+    location: "उदयपुर",
+    time: "2 घंटे पहले",
+    author: "स्पोर्ट्स डेस्क",
+    image:
+      "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=900&q=80",
+    views: "6.9K"
+  },
+
+  {
+    id: 8,
+    category: "देश",
+    title:
+      "देशभर में आज की प्रमुख खबरें, जानिए दिनभर के बड़े अपडेट",
+    shortTitle:
+      "देशभर की आज की प्रमुख खबरें",
+    location: "नई दिल्ली",
+    time: "3 घंटे पहले",
+    author: "नेशनल डेस्क",
+    image:
+      "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=900&q=80",
+    views: "21.3K"
+  },
+
+  {
+    id: 9,
+    category: "बिजनेस",
+    title:
+      "बाजार में आज उतार-चढ़ाव, निवेशकों की नजर महत्वपूर्ण आंकड़ों पर",
+    shortTitle:
+      "बाजार में आज उतार-चढ़ाव",
+    location: "मुंबई",
+    time: "3 घंटे पहले",
+    author: "बिजनेस डेस्क",
+    image:
+      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=900&q=80",
+    views: "9.8K"
+  },
+
+  {
+    id: 10,
+    category: "लाइफस्टाइल",
+    title:
+      "बदलती लाइफस्टाइल में सेहत का रखें ध्यान, विशेषज्ञों ने बताए जरूरी उपाय",
+    shortTitle:
+      "लाइफस्टाइल में सेहत का रखें ध्यान",
+    location: "जयपुर",
+    time: "4 घंटे पहले",
+    author: "लाइफस्टाइल डेस्क",
+    image:
+      "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=900&q=80",
+    views: "5.6K"
+  }
+];
+
+
+/* =====================================================
+   BREAKING NEWS DATA
+===================================================== */
+
+const BREAKING_NEWS = [
+  "राजस्थान में मौसम ने बदला मिजाज, कई जिलों में बारिश का अलर्ट",
+  "सरकारी नौकरी की तैयारी कर रहे युवाओं के लिए महत्वपूर्ण अपडेट",
+  "जयपुर में ट्रैफिक व्यवस्था को लेकर बड़ा बदलाव",
+  "राजस्थान के विद्यार्थियों के लिए परीक्षा से जुड़ी नई सूचना",
+  "प्रदेश में आज की बड़ी राजनीतिक बैठक पर सभी की नजर"
+];
+
+
+/* =====================================================
+   DISTRICT DATA
+===================================================== */
+
+const DISTRICTS = [
   "अजमेर",
   "अलवर",
   "बांसवाड़ा",
@@ -95,7 +280,7 @@ const districts = [
   "हनुमानगढ़",
   "जयपुर",
   "जैसलमेर",
-  "जालोर",
+  "जालौर",
   "झालावाड़",
   "झुंझुनूं",
   "जोधपुर",
@@ -114,321 +299,177 @@ const districts = [
 ];
 
 
-/* =========================================================
-   NAVIGATION
-========================================================= */
+/* =====================================================
+   CATEGORY DATA
+===================================================== */
 
-const topCategories = [
-  {
-    id: "home",
-    label: "होम",
-    icon: Home
-  },
+const CATEGORIES = [
   {
     id: "rajasthan",
-    label: "राजस्थान",
-    icon: Landmark
-  },
-  {
-    id: "districts",
-    label: "जिले",
+    name: "राजस्थान",
     icon: MapPin
   },
   {
+    id: "national",
+    name: "देश",
+    icon: Building2
+  },
+  {
     id: "politics",
-    label: "राजनीति",
-    icon: BriefcaseBusiness
+    name: "राजनीति",
+    icon: TrendingUp
   },
   {
     id: "crime",
-    label: "अपराध",
-    icon: ShieldCheck
-  }
-];
-
-
-const moreCategories = [
-  {
-    id: "national",
-    label: "देश",
-    icon: Landmark
-  },
-  {
-    id: "international",
-    label: "विदेश",
-    icon: Globe2
+    name: "अपराध",
+    icon: Bell
   },
   {
     id: "education",
-    label: "शिक्षा",
+    name: "शिक्षा",
     icon: GraduationCap
   },
   {
-    id: "health",
-    label: "स्वास्थ्य",
-    icon: HeartPulse
+    id: "jobs",
+    name: "रोजगार",
+    icon: BriefcaseBusiness
   },
   {
     id: "sports",
-    label: "खेल",
+    name: "खेल",
     icon: Trophy
   },
   {
     id: "business",
-    label: "व्यापार",
-    icon: ShoppingBag
+    name: "बिजनेस",
+    icon: TrendingUp
   },
   {
-    id: "entertainment",
-    label: "मनोरंजन",
+    id: "weather",
+    name: "मौसम",
+    icon: CloudSun
+  },
+  {
+    id: "lifestyle",
+    name: "लाइफस्टाइल",
+    icon: User
+  }
+];
+
+
+/* =====================================================
+   QUICK FEATURES
+===================================================== */
+
+const QUICK_FEATURES = [
+  {
+    id: "live",
+    title: "लाइव टीवी",
+    subtitle: "अभी देखें",
     icon: Radio
   },
-  {
-    id: "technology",
-    label: "टेक्नोलॉजी",
-    icon: Grid3X3
-  },
-  {
-    id: "tourism",
-    label: "पर्यटन",
-    icon: Plane
-  }
-];
-
-
-/* =========================================================
-   NEWS DATA
-========================================================= */
-
-const newsData = [
-  {
-    id: 1,
-    category: "राजस्थान",
-    district: "जयपुर",
-    title:
-      "राजस्थान में पर्यटन को मिलेगा नया आयाम, सरकार ने जारी की बड़ी योजना",
-    description:
-      "राज्य में पर्यटन सुविधाओं के विस्तार और नए पर्यटन स्थलों को विकसित करने के लिए सरकार ने नई योजना की घोषणा की है।",
-    image:
-      "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=1200&q=80",
-    time: "2 घंटे पहले",
-    views: "12.4K",
-    trending: true
-  },
-
-  {
-    id: 2,
-    category: "राजनीति",
-    district: "जयपुर",
-    title:
-      "राजस्थान की राजनीति में बड़ा घटनाक्रम, नेताओं की अहम बैठक आज",
-    description:
-      "राजधानी जयपुर में आज होने वाली महत्वपूर्ण बैठक पर सभी की नजरें टिकी हुई हैं।",
-    image:
-      "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80",
-    time: "1 घंटे पहले",
-    views: "8.7K",
-    trending: true
-  },
-
-  {
-    id: 3,
-    category: "राजस्थान",
-    district: "उदयपुर",
-    title:
-      "उदयपुर बना देश का पसंदीदा पर्यटन शहर, पर्यटकों की संख्या में रिकॉर्ड बढ़ोतरी",
-    description:
-      "झीलों की नगरी उदयपुर में इस वर्ष बड़ी संख्या में देशी और विदेशी पर्यटक पहुंचे।",
-    image:
-      "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80",
-    time: "3 घंटे पहले",
-    views: "11.2K"
-  },
-
-  {
-    id: 4,
-    category: "अपराध",
-    district: "जयपुर",
-    title:
-      "जयपुर में पुलिस की बड़ी कार्रवाई, कई मामलों में आरोपियों से पूछताछ",
-    description:
-      "राजधानी में पुलिस ने अलग-अलग मामलों में कार्रवाई करते हुए कई संदिग्धों को हिरासत में लिया।",
-    image:
-      "https://images.unsplash.com/photo-1453873531674-2151bcd01707?auto=format&fit=crop&w=1200&q=80",
-    time: "4 घंटे पहले",
-    views: "7.1K"
-  },
-
-  {
-    id: 5,
-    category: "शिक्षा",
-    district: "कोटा",
-    title:
-      "कोटा में विद्यार्थियों के लिए नई सुविधा, शिक्षा व्यवस्था में बड़ा बदलाव",
-    description:
-      "विद्यार्थियों की सुविधा और बेहतर शिक्षा व्यवस्था के लिए नई पहल शुरू की जा रही है।",
-    image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80",
-    time: "5 घंटे पहले",
-    views: "6.3K"
-  },
-
-  {
-    id: 6,
-    category: "मौसम",
-    district: "जोधपुर",
-    title:
-      "राजस्थान में मौसम ने बदला मिजाज, कई जिलों में बारिश का अलर्ट",
-    description:
-      "मौसम विभाग ने राज्य के कई जिलों के लिए बारिश और तेज हवाओं को लेकर अलर्ट जारी किया है।",
-    image:
-      "https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?auto=format&fit=crop&w=1200&q=80",
-    time: "6 घंटे पहले",
-    views: "9.8K"
-  },
-
-  {
-    id: 7,
-    category: "देश",
-    district: "",
-    title:
-      "देशभर में कई महत्वपूर्ण फैसले, आज की प्रमुख खबरों पर एक नजर",
-    description:
-      "देशभर से दिन की महत्वपूर्ण खबरें और बड़े अपडेट लगातार सामने आ रहे हैं।",
-    image:
-      "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80",
-    time: "7 घंटे पहले",
-    views: "5.9K"
-  },
-
-  {
-    id: 8,
-    category: "खेल",
-    district: "जयपुर",
-    title:
-      "राजस्थान के खिलाड़ियों का शानदार प्रदर्शन, प्रतियोगिता में जीते कई पदक",
-    description:
-      "राजस्थान के खिलाड़ियों ने राष्ट्रीय स्तर की प्रतियोगिता में शानदार प्रदर्शन किया।",
-    image:
-      "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1200&q=80",
-    time: "8 घंटे पहले",
-    views: "4.6K"
-  }
-];
-
-
-/* =========================================================
-   QUICK FEATURES
-========================================================= */
-
-const quickFeatures = [
   {
     id: "epaper",
     title: "ई-पेपर",
     subtitle: "आज का अखबार",
-    icon: Newspaper,
-    color: "red"
+    icon: Newspaper
   },
   {
-    id: "live",
-    title: "लाइव टीवी",
-    subtitle: "सीधे देखें",
-    icon: Video,
-    color: "blue"
+    id: "district",
+    title: "जिला खबरें",
+    subtitle: "अपने जिले की खबर",
+    icon: Map
   },
   {
-    id: "videos",
+    id: "video",
     title: "वीडियो",
-    subtitle: "ताज़ा वीडियो",
-    icon: Play,
-    color: "orange"
+    subtitle: "ताजा वीडियो",
+    icon: Video
+  },
+  {
+    id: "jobs",
+    title: "सरकारी नौकरी",
+    subtitle: "भर्ती अपडेट",
+    icon: BriefcaseBusiness
+  },
+  {
+    id: "education",
+    title: "शिक्षा",
+    subtitle: "एजुकेशन अपडेट",
+    icon: GraduationCap
+  }
+];
+
+
+/* =====================================================
+   TOP MENU ITEMS
+===================================================== */
+
+const MENU_ITEMS = [
+  {
+    id: "home",
+    title: "होम",
+    icon: Home
+  },
+  {
+    id: "rajasthan",
+    title: "राजस्थान",
+    icon: MapPin
   },
   {
     id: "district",
     title: "जिला समाचार",
-    subtitle: "अपने जिले की खबर",
-    icon: MapPin,
-    color: "pink"
+    icon: Map
   },
   {
-    id: "photos",
-    title: "फोटो गैलरी",
-    subtitle: "तस्वीरें देखें",
-    icon: ImageIcon,
-    color: "green"
+    id: "live",
+    title: "लाइव टीवी",
+    icon: Radio
   },
   {
-    id: "weather",
-    title: "मौसम",
-    subtitle: "आज का मौसम",
-    icon: CloudSun,
-    color: "yellow"
+    id: "epaper",
+    title: "ई-पेपर",
+    icon: Newspaper
+  },
+  {
+    id: "videos",
+    title: "वीडियो",
+    icon: Video
   },
   {
     id: "jobs",
-    title: "रोजगार",
-    subtitle: "नौकरी अपडेट",
-    icon: BriefcaseBusiness,
-    color: "purple"
+    title: "सरकारी नौकरी",
+    icon: BriefcaseBusiness
   },
   {
-    id: "results",
-    title: "रिजल्ट",
-    subtitle: "परीक्षा परिणाम",
-    icon: CheckCircle2,
-    color: "teal"
+    id: "education",
+    title: "शिक्षा",
+    icon: GraduationCap
   }
 ];
 
 
-/* =========================================================
-   VIDEOS
-========================================================= */
+/* =====================================================
+   UTILITY DATA
+===================================================== */
 
-const videos = [
-  {
-    id: 1,
-    title: "राजस्थान की बड़ी खबरें एक नजर में",
-    duration: "03:24",
-    image:
-      "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: 2,
-    title: "राजस्थान का लोक संगीत और संस्कृति",
-    duration: "04:12",
-    image:
-      "https://images.unsplash.com/photo-1533130061792-64b345e4a833?auto=format&fit=crop&w=900&q=80"
-  },
-  {
-    id: 3,
-    title: "जयपुर की खास खबरें",
-    duration: "02:48",
-    image:
-      "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=900&q=80"
-  }
-];
+const TODAY = new Intl.DateTimeFormat("hi-IN", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+}).format(new Date());
 
 
-/* =========================================================
-   UTILITY
-========================================================= */
+/* =====================================================
+   APP START
+===================================================== */
 
-function formatDate() {
-  return new Intl.DateTimeFormat("hi-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  }).format(new Date());
-}
+function App() {
 
+  const [activeSection, setActiveSection] = useState("home");
 
-/* =========================================================
-   APP
-========================================================= */
-
-export default function App() {
-  const [activePage, setActivePage] = useState("home");
+  const [selectedNews, setSelectedNews] = useState(null);
 
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -436,454 +477,190 @@ export default function App() {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [districtOpen, setDistrictOpen] = useState(false);
 
-  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("जयपुर");
 
-  const [selectedArticle, setSelectedArticle] = useState(null);
+  const [bookmarkedNews, setBookmarkedNews] = useState([]);
 
-  const [bookmarked, setBookmarked] = useState([]);
+  const [showAllDistricts, setShowAllDistricts] =
+    useState(false);
 
   const [toast, setToast] = useState("");
 
-  const [darkMode, setDarkMode] = useState(false);
+  /*
+  ======================================================
+    TOAST MESSAGE
+  ======================================================
+  */
+
+  const showToast = (message) => {
+    setToast(message);
+
+    window.setTimeout(() => {
+      setToast("");
+    }, 2200);
+  };
 
 
-  /* =======================================================
-     FILTERED SEARCH
-  ======================================================= */
+  /*
+  ======================================================
+    BOOKMARK
+  ======================================================
+  */
 
-  const searchedNews = useMemo(() => {
-    if (!searchText.trim()) {
-      return newsData;
-    }
+  const toggleBookmark = (id) => {
 
-    const query = searchText.toLowerCase();
+    setBookmarkedNews((previous) => {
 
-    return newsData.filter((item) => {
-      return (
-        item.title.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query) ||
-        item.district.toLowerCase().includes(query)
-      );
-    });
-  }, [searchText]);
-
-
-  /* =======================================================
-     BOOKMARK
-  ======================================================= */
-
-  function toggleBookmark(id) {
-    setBookmarked((previous) => {
       if (previous.includes(id)) {
+
         showToast("खबर बुकमार्क से हटा दी गई");
-        return previous.filter((item) => item !== id);
+
+        return previous.filter(
+          (item) => item !== id
+        );
       }
 
       showToast("खबर बुकमार्क कर दी गई");
+
       return [...previous, id];
     });
-  }
+  };
 
 
-  /* =======================================================
-     TOAST
-  ======================================================= */
+  /*
+  ======================================================
+    OPEN NEWS
+  ======================================================
+  */
 
-  function showToast(message) {
-    setToast(message);
+  const openNews = (news) => {
 
-    setTimeout(() => {
-      setToast("");
-    }, 2500);
-  }
+    setSelectedNews(news);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
 
 
-  /* =======================================================
-     NAVIGATION
-  ======================================================= */
+  /*
+  ======================================================
+    CLOSE NEWS
+  ======================================================
+  */
 
-  function navigate(page) {
-    setActivePage(page);
-    setSelectedArticle(null);
+  const closeNews = () => {
+    setSelectedNews(null);
+  };
+
+
+  /*
+  ======================================================
+    NAVIGATION
+  ======================================================
+  */
+
+  const navigateTo = (section) => {
+
+    setActiveSection(section);
+
     setMenuOpen(false);
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    });
-  }
+    setDistrictOpen(false);
 
-
-  /* =======================================================
-     OPEN ARTICLE
-  ======================================================= */
-
-  function openArticle(article) {
-    setSelectedArticle(article);
+    setSelectedNews(null);
 
     window.scrollTo({
       top: 0,
       behavior: "smooth"
     });
-  }
+  };
 
 
-  /* =======================================================
-     SHARE
-  ======================================================= */
+  /*
+  ======================================================
+    SEARCH FILTER
+  ======================================================
+  */
 
-  async function shareArticle(article) {
-    const shareData = {
-      title: article.title,
-      text: `${article.title} — ${BRAND.name}`,
-      url: window.location.href
-    };
+  const filteredNews = NEWS_DATA.filter((news) => {
 
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(
-          `${article.title} ${window.location.href}`
-        );
-
-        showToast("लिंक कॉपी कर दिया गया");
-      }
-    } catch (error) {
-      console.log(error);
+    if (!searchText.trim()) {
+      return true;
     }
-  }
 
+    const search = searchText
+      .toLowerCase()
+      .trim();
+
+    return (
+      news.title.toLowerCase().includes(search) ||
+      news.category.toLowerCase().includes(search) ||
+      news.location.toLowerCase().includes(search)
+    );
+  });
+
+
+  /*
+  ======================================================
+    CURRENT PAGE TITLE
+  ======================================================
+  */
+
+  const getPageTitle = () => {
+
+    switch (activeSection) {
+
+      case "rajasthan":
+        return "राजस्थान";
+
+      case "district":
+        return "जिला समाचार";
+
+      case "live":
+        return "लाइव टीवी";
+
+      case "epaper":
+        return "ई-पेपर";
+
+      case "videos":
+        return "वीडियो";
+
+      case "jobs":
+        return "सरकारी नौकरी";
+
+      case "education":
+        return "शिक्षा";
+
+      default:
+        return "ताजा खबरें";
+    }
+  };
+
+
+  /*
+  ======================================================
+    MAIN RETURN
+  ======================================================
+  */
 
   return (
-    <div className={darkMode ? "app dark-mode" : "app"}>
+    <div className="awaaz-app">
 
-      {/* ==================================================
-          TOP DESKTOP BRAND BAR
-      ================================================== */}
+      {/* ===============================================
+          APP WILL CONTINUE IN PART 4-B
+      =============================================== */}
 
-      <header className="site-header">
+    </div>
+  );
+}
 
-        <div className="top-header">
 
-          <div className="header-container">
+/* =====================================================
+   EXPORT
+===================================================== */
 
-            <button
-              className="mobile-menu-button"
-              onClick={() => setMenuOpen(true)}
-              aria-label="मेन्यू"
-            >
-              <Menu size={23} />
-            </button>
-
-
-            <div
-              className="brand-area"
-              onClick={() => navigate("home")}
-            >
-
-              <img
-                src="/logo.png"
-                alt="आवाज़ राजस्थान"
-                className="brand-logo"
-              />
-
-              <div className="brand-text">
-
-                <div className="brand-name">
-                  आवाज़ <span>राजस्थान</span>
-                </div>
-
-                <div className="brand-tagline">
-                  — आपकी आवाज़, आपका राजस्थान —
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div className="header-right">
-
-              <div className="header-date">
-                <CalendarDays size={15} />
-                <span>{formatDate()}</span>
-              </div>
-
-
-              <button
-                className="header-icon-button"
-                onClick={() => setNotificationOpen(!notificationOpen)}
-                aria-label="सूचनाएं"
-              >
-                <Bell size={21} />
-
-                <span className="notification-dot"></span>
-              </button>
-
-
-              <button
-                className="header-icon-button"
-                onClick={() => setSearchOpen(!searchOpen)}
-                aria-label="खोजें"
-              >
-                {searchOpen ? <X size={22} /> : <Search size={22} />}
-              </button>
-
-
-              <button
-                className="header-menu-button"
-                onClick={() => setMenuOpen(true)}
-              >
-                <Menu size={22} />
-                <span>मेन्यू</span>
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-        {/* =================================================
-            SEARCH BAR
-        ================================================= */}
-
-        {searchOpen && (
-          <div className="search-panel">
-
-            <div className="search-container">
-
-              <Search size={20} />
-
-              <input
-                autoFocus
-                type="text"
-                placeholder="खबर, शहर, जिला या विषय खोजें..."
-                value={searchText}
-                onChange={(event) =>
-                  setSearchText(event.target.value)
-                }
-              />
-
-              {searchText && (
-                <button
-                  onClick={() => setSearchText("")}
-                  className="clear-search"
-                >
-                  <X size={18} />
-                </button>
-              )}
-
-            </div>
-
-          </div>
-        )}
-
-
-        {/* =================================================
-            NOTIFICATION PANEL
-        ================================================= */}
-
-        {notificationOpen && (
-          <div className="notification-panel">
-
-            <div className="notification-header">
-              <strong>ताज़ा सूचनाएं</strong>
-
-              <button
-                onClick={() => setNotificationOpen(false)}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="notification-item">
-              <div className="notification-icon">
-                <Flame size={18} />
-              </div>
-
-              <div>
-                <strong>ब्रेकिंग न्यूज़</strong>
-                <p>राजस्थान से बड़ी खबरें लगातार अपडेट हो रही हैं।</p>
-              </div>
-            </div>
-
-            <div className="notification-item">
-              <div className="notification-icon">
-                <CloudSun size={18} />
-              </div>
-
-              <div>
-                <strong>मौसम अपडेट</strong>
-                <p>कई जिलों में बारिश का अलर्ट जारी।</p>
-              </div>
-            </div>
-
-          </div>
-        )}
-
-
-        {/* =================================================
-            BREAKING TICKER
-        ================================================= */}
-
-        <div className="breaking-bar">
-
-          <div className="breaking-inner">
-
-            <div className="breaking-label">
-              <Flame size={17} />
-              <span>ब्रेकिंग न्यूज़</span>
-            </div>
-
-            <div className="ticker-content">
-
-              <span>
-                राजस्थान में मानसून को लेकर मौसम विभाग का बड़ा अपडेट...
-              </span>
-
-              <span>
-                जयपुर में नई विकास परियोजनाओं को मिली मंजूरी...
-              </span>
-
-              <span>
-                राजस्थान के कई जिलों में बारिश का अलर्ट...
-              </span>
-
-            </div>
-
-            <button className="ticker-arrow">
-              <ChevronRight size={18} />
-            </button>
-
-          </div>
-
-        </div>
-
-
-        {/* =================================================
-            PRIMARY NAVIGATION
-        ================================================= */}
-
-        <nav className="main-navigation">
-
-          <div className="navigation-container">
-
-            {topCategories.map((item) => {
-
-              const Icon = item.icon;
-
-              return (
-                <button
-                  key={item.id}
-                  className={
-                    activePage === item.id
-                      ? "nav-item active"
-                      : "nav-item"
-                  }
-                  onClick={() => navigate(item.id)}
-                >
-
-                  <Icon size={17} />
-
-                  <span>{item.label}</span>
-
-                </button>
-              );
-            })}
-
-
-            <button
-              className="nav-item"
-              onClick={() => navigate("national")}
-            >
-              <Globe2 size={17} />
-              <span>देश-दुनिया</span>
-            </button>
-
-
-            <button
-              className="nav-item"
-              onClick={() => setMenuOpen(true)}
-            >
-              <MoreHorizontal size={18} />
-              <span>अन्य</span>
-            </button>
-
-          </div>
-
-        </nav>
-
-      </header>
-
-
-      {/* ==================================================
-          MAIN CONTENT
-      ================================================== */}
-
-      <main className="main-content">
-
-        {selectedArticle ? (
-
-          <ArticlePage
-            article={selectedArticle}
-            bookmarked={bookmarked.includes(selectedArticle.id)}
-            onBack={() => setSelectedArticle(null)}
-            onBookmark={() => toggleBookmark(selectedArticle.id)}
-            onShare={() => shareArticle(selectedArticle)}
-            onOpenArticle={openArticle}
-          />
-
-        ) : activePage === "home" ? (
-
-          <HomePage
-            news={searchedNews}
-            bookmarked={bookmarked}
-            onBookmark={toggleBookmark}
-            onShare={shareArticle}
-            onOpenArticle={openArticle}
-            onNavigate={navigate}
-            onDistrict={setSelectedDistrict}
-            selectedDistrict={selectedDistrict}
-          />
-
-        ) : activePage === "districts" ? (
-
-          <DistrictPage
-            selectedDistrict={selectedDistrict}
-            setSelectedDistrict={setSelectedDistrict}
-            onOpenArticle={openArticle}
-            onNavigate={navigate}
-          />
-
-        ) : activePage === "epaper" ? (
-
-          <EPaperPage />
-
-        ) : activePage === "live" ? (
-
-          <LivePage />
-
-        ) : activePage === "videos" ? (
-
-          <VideosPage
-            videos={videos}
-          />
-
-        ) : activePage === "photos" ? (
-
-          <PhotosPage />
-
-        ) : activePage === "weather" ? (
-
-          <WeatherPage />
-
-        ) : (
-
-          <CategoryPage
-            category={activePage}
-            news={newsData}
+export default App;
