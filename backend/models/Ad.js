@@ -1,8 +1,17 @@
+"use strict";
+
 const mongoose = require("mongoose");
+
+/* =========================================================
+   ADVERTISEMENT SCHEMA
+========================================================= */
 
 const adSchema = new mongoose.Schema(
   {
-    // Basic information
+    /* =====================================================
+       BASIC INFORMATION
+    ===================================================== */
+
     name: {
       type: String,
       required: true,
@@ -17,7 +26,17 @@ const adSchema = new mongoose.Schema(
       default: "",
     },
 
-    // Advertisement type
+    campaignName: {
+      type: String,
+      trim: true,
+      maxlength: 150,
+      default: "",
+    },
+
+    /* =====================================================
+       ADVERTISEMENT TYPE
+    ===================================================== */
+
     adType: {
       type: String,
       enum: [
@@ -31,9 +50,13 @@ const adSchema = new mongoose.Schema(
         "custom",
       ],
       default: "banner",
+      index: true,
     },
 
-    // Advertisement placement
+    /* =====================================================
+       ADVERTISEMENT POSITION
+    ===================================================== */
+
     position: {
       type: String,
       enum: [
@@ -54,21 +77,36 @@ const adSchema = new mongoose.Schema(
         "custom",
       ],
       default: "home_middle",
+      index: true,
     },
 
-    // Desktop / mobile control
+    customPosition: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+      default: "",
+    },
+
+    /* =====================================================
+       DEVICE TARGETING
+    ===================================================== */
+
     devices: {
       desktop: {
         type: Boolean,
         default: true,
       },
+
       mobile: {
         type: Boolean,
         default: true,
       },
     },
 
-    // Creative
+    /* =====================================================
+       CREATIVE / MEDIA
+    ===================================================== */
+
     imageUrl: {
       type: String,
       trim: true,
@@ -93,19 +131,25 @@ const adSchema = new mongoose.Schema(
       default: "",
     },
 
-    // Ad HTML/code if required in future
     customCode: {
       type: String,
       default: "",
     },
 
-    // Status
+    /* =====================================================
+       STATUS
+    ===================================================== */
+
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
 
-    // Scheduling
+    /* =====================================================
+       SCHEDULING
+    ===================================================== */
+
     startDate: {
       type: Date,
       default: null,
@@ -116,20 +160,61 @@ const adSchema = new mongoose.Schema(
       default: null,
     },
 
-    // Priority
+    /* =====================================================
+       PRIORITY
+    ===================================================== */
+
     priority: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
-    // Frequency control
+    /* =====================================================
+       FREQUENCY CONTROL
+    ===================================================== */
+
     frequency: {
       type: Number,
       default: 1,
       min: 1,
     },
 
-    // Analytics
+    frequencyUnit: {
+      type: String,
+      enum: [
+        "view",
+        "session",
+        "minute",
+        "hour",
+        "day",
+      ],
+      default: "view",
+    },
+
+    /* =====================================================
+       POPUP / STICKY CONTROL
+    ===================================================== */
+
+    showPopupOnce: {
+      type: Boolean,
+      default: true,
+    },
+
+    stickyEnabled: {
+      type: Boolean,
+      default: false,
+    },
+
+    closeButtonEnabled: {
+      type: Boolean,
+      default: true,
+    },
+
+    /* =====================================================
+       ANALYTICS COUNTERS
+    ===================================================== */
+
     impressions: {
       type: Number,
       default: 0,
@@ -142,7 +227,78 @@ const adSchema = new mongoose.Schema(
       min: 0,
     },
 
-    // Owner information
+    /* =====================================================
+       REVENUE / BILLING
+    ===================================================== */
+
+    billingType: {
+      type: String,
+      enum: [
+        "free",
+        "fixed",
+        "cpc",
+        "cpm",
+      ],
+      default: "fixed",
+    },
+
+    price: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    budget: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    amountReceived: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: [
+        "not_required",
+        "pending",
+        "partial",
+        "paid",
+      ],
+      default: "not_required",
+    },
+
+    paymentReference: {
+      type: String,
+      trim: true,
+      maxlength: 150,
+      default: "",
+    },
+
+    /* =====================================================
+       CAMPAIGN STATUS
+    ===================================================== */
+
+    campaignStatus: {
+      type: String,
+      enum: [
+        "draft",
+        "scheduled",
+        "running",
+        "paused",
+        "completed",
+        "cancelled",
+      ],
+      default: "draft",
+    },
+
+    /* =====================================================
+       OWNER INFORMATION
+    ===================================================== */
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "AdminUser",
@@ -160,7 +316,11 @@ const adSchema = new mongoose.Schema(
   }
 );
 
-// Useful indexes
+
+/* =========================================================
+   INDEXES
+========================================================= */
+
 adSchema.index({
   isActive: 1,
   position: 1,
@@ -176,5 +336,62 @@ adSchema.index({
   adType: 1,
   position: 1,
 });
+
+adSchema.index({
+  campaignStatus: 1,
+});
+
+adSchema.index({
+  advertiserName: 1,
+});
+
+adSchema.index({
+  paymentStatus: 1,
+});
+
+
+/* =========================================================
+   VIRTUAL CTR
+========================================================= */
+
+adSchema.virtual("ctr").get(function () {
+  if (!this.impressions || this.impressions <= 0) {
+    return 0;
+  }
+
+  return Number(
+    ((this.clicks / this.impressions) * 100).toFixed(2)
+  );
+});
+
+
+/* =========================================================
+   VIRTUAL PENDING AMOUNT
+========================================================= */
+
+adSchema.virtual("pendingAmount").get(function () {
+  const budget = Number(this.budget || 0);
+  const received = Number(this.amountReceived || 0);
+
+  return Math.max(budget - received, 0);
+});
+
+
+/* =========================================================
+   JSON VIRTUALS
+========================================================= */
+
+adSchema.set("toJSON", {
+  virtuals: true,
+});
+
+adSchema.set("toObject", {
+  virtuals: true,
+});
+
+
+/* =========================================================
+   MODEL
+========================================================= */
 
 module.exports = mongoose.model("Ad", adSchema);
