@@ -24,6 +24,15 @@ const {
 } = require("../controllers/adminController");
 
 const {
+  getAds,
+  getAdById,
+  createAd,
+  updateAd,
+  toggleAd,
+  deleteAd
+} = require("../controllers/adController");
+
+const {
   adminProtect,
   ownerOnly
 } = require("../middleware/adminMiddleware");
@@ -172,6 +181,73 @@ router.delete(
   ownerOnly,
   deleteAdmin
 );
+
+
+
+// ========================================
+// AD MANAGEMENT
+// OWNER ONLY
+// ========================================
+
+// Get all Ads
+// GET /api/admin/ads
+router.get(
+  "/ads",
+  adminProtect,
+  ownerOnly,
+  getAds
+);
+
+
+// Get single Ad
+// GET /api/admin/ads/:id
+router.get(
+  "/ads/:id",
+  adminProtect,
+  ownerOnly,
+  getAdById
+);
+
+
+// Create new Ad
+// POST /api/admin/ads
+router.post(
+  "/ads",
+  adminProtect,
+  ownerOnly,
+  createAd
+);
+
+
+// Update Ad
+// PUT /api/admin/ads/:id
+router.put(
+  "/ads/:id",
+  adminProtect,
+  ownerOnly,
+  updateAd
+);
+
+
+// Toggle Ad ON / OFF
+// PATCH /api/admin/ads/:id/toggle
+router.patch(
+  "/ads/:id/toggle",
+  adminProtect,
+  ownerOnly,
+  toggleAd
+);
+
+
+// Delete Ad
+// DELETE /api/admin/ads/:id
+router.delete(
+  "/ads/:id",
+  adminProtect,
+  ownerOnly,
+  deleteAd
+);
+
 
 
 module.exports = router;
