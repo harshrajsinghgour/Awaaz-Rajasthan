@@ -615,11 +615,16 @@ async function adminAPIRequest(
 
   try {
 
-    response =
-      await fetch(
-        `${ADMIN_API_BASE_URL}${endpoint}`,
-        requestOptions
-      );
+    const normalizedEndpoint =
+  endpoint.startsWith("/api/")
+    ? endpoint.slice(4)
+    : endpoint;
+
+response =
+  await fetch(
+    `${ADMIN_API_BASE_URL}${normalizedEndpoint}`,
+    requestOptions
+  );
 
   } catch (error) {
 
@@ -731,7 +736,7 @@ async function adminAPIRequest(
   return data;
 
 }
-
+const adminApiRequest = adminAPIRequest;
 
 /* =========================================================
    ADMIN UNAUTHORIZED HANDLER
