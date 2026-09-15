@@ -19740,7 +19740,8 @@ function updateContactStats() {
     "contacts-resolved-count",
     formatNumber(
       resolvedCount
-    );
+    )
+  );
 
   const badge =
     document.getElementById(
