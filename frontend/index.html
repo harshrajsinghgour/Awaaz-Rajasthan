@@ -10770,4 +10770,1178 @@
                 </div>
 
     </section>
-    
+   index.html — PART 32/50
+<!-- ================================================
+             VIDEO PLAYER MODAL
+             ================================================ -->
+
+        <div
+            class="video-modal"
+            id="videoModal"
+            aria-hidden="true"
+        >
+
+            <div
+                class="video-modal-backdrop"
+                data-video-close
+            ></div>
+
+
+            <div
+                class="video-modal-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-label="वीडियो प्लेयर"
+            >
+
+                <button
+                    type="button"
+                    class="video-modal-close"
+                    id="videoModalClose"
+                    aria-label="वीडियो बंद करें"
+                >
+
+                    <i
+                        class="fa-solid fa-xmark"
+                    ></i>
+
+                </button>
+
+
+                <div class="video-modal-header">
+
+                    <div>
+
+                        <span class="mini-label">
+                            VOICE RAJASTHAN VIDEO
+                        </span>
+
+                        <h3 id="videoModalTitle">
+                            राजस्थान की बड़ी खबर
+                        </h3>
+
+                    </div>
+
+
+                    <span
+                        class="video-modal-live"
+                        id="videoModalLive"
+                    >
+
+                        <span></span>
+
+                        VIDEO
+
+                    </span>
+
+                </div>
+
+
+                <div class="video-player-container">
+
+                    <div
+                        class="video-player-placeholder"
+                        id="videoPlayerContainer"
+                    >
+
+                        <div class="video-player-screen">
+
+                            <div class="video-player-loading">
+
+                                <span class="video-loading-spinner"></span>
+
+                                <span>
+                                    वीडियो लोड हो रहा है...
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="video-player-controls">
+
+                            <button
+                                type="button"
+                                class="video-control-button"
+                                id="videoPlayPauseButton"
+                                aria-label="वीडियो चलाएं या रोकें"
+                            >
+
+                                <i
+                                    class="fa-solid fa-play"
+                                ></i>
+
+                            </button>
+
+
+                            <div class="video-progress-container">
+
+                                <div
+                                    class="video-progress-track"
+                                    id="videoProgressTrack"
+                                >
+
+                                    <span
+                                        class="video-progress-value"
+                                        id="videoProgressValue"
+                                    ></span>
+
+                                </div>
+
+                            </div>
+
+
+                            <span
+                                class="video-current-time"
+                                id="videoCurrentTime"
+                            >
+                                00:00
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="video-control-button"
+                                id="videoMuteButton"
+                                aria-label="आवाज़ बंद या चालू करें"
+                            >
+
+                                <i
+                                    class="fa-solid fa-volume-high"
+                                ></i>
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="video-control-button"
+                                id="videoFullscreenButton"
+                                aria-label="फुल स्क्रीन"
+                            >
+
+                                <i
+                                    class="fa-solid fa-expand"
+                                ></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="video-modal-details">
+
+                    <div class="video-modal-meta">
+
+                        <span>
+
+                            <i
+                                class="fa-solid fa-location-dot"
+                            ></i>
+
+                            राजस्थान
+
+                        </span>
+
+
+                        <span>
+
+                            <i
+                                class="fa-regular fa-clock"
+                            ></i>
+
+                            आज
+
+                        </span>
+
+
+                        <span>
+
+                            <i
+                                class="fa-solid fa-eye"
+                            ></i>
+
+                            12.5K views
+
+                        </span>
+
+                    </div>
+
+
+                    <p id="videoModalDescription">
+
+                        राजस्थान की ताजा और महत्वपूर्ण खबरों का
+                        वीडियो अपडेट। पूरी खबर और सभी जरूरी
+                        जानकारी यहां देखें।
+
+                    </p>
+
+
+                    <div class="video-modal-actions">
+
+                        <button
+                            type="button"
+                            class="video-modal-action"
+                            id="videoModalShare"
+                        >
+
+                            <i
+                                class="fa-solid fa-share-nodes"
+                            ></i>
+
+                            शेयर करें
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="video-modal-action"
+                            id="videoModalSave"
+                        >
+
+                            <i
+                                class="fa-regular fa-bookmark"
+                            ></i>
+
+                            सेव करें
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================
+             PODCAST SECTION
+             ================================================ -->
+
+        <section
+            class="podcast-section"
+            id="podcast"
+        >
+
+            <div class="container">
+
+                <div class="section-heading">
+
+                    <div class="section-title-wrap">
+
+                        <span class="section-title-line"></span>
+
+                        <h2>
+                            आवाज़ पॉडकास्ट
+                        </h2>
+
+                    </div>
+
+
+                    <a
+                        href="#all-podcasts"
+                        class="section-view-all"
+                    >
+
+                        सभी एपिसोड
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                    </a>
+
+                </div>
+
+
+                <div class="podcast-card">
+
+                    <div class="podcast-visual">
+
+                        <div class="podcast-circle">
+
+                            <div class="podcast-circle-inner">
+
+                                <i
+                                    class="fa-solid fa-microphone"
+                                ></i>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="podcast-wave">
+
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                            <span></span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="podcast-content">
+
+                        <span class="mini-label">
+                            LATEST PODCAST
+                        </span>
+
+
+                        <h3>
+
+                            राजस्थान की आज की
+                            बड़ी खबरें — आवाज़ पॉडकास्ट
+
+                        </h3>
+
+
+                        <p>
+
+                            दिनभर की प्रमुख खबरें सुनिए,
+                            बिना पढ़े सीधे अपनी भाषा में।
+
+                        </p>
+
+
+                        <div class="podcast-meta">
+
+                            <span>
+
+                                <i
+                                    class="fa-regular fa-clock"
+                                ></i>
+
+                                08:45 मिनट
+
+                            </span>
+
+
+                            <span>
+
+                                <i
+                                    class="fa-solid fa-headphones"
+                                ></i>
+
+                                8.4K listens
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="podcast-player">
+
+                            <button
+                                type="button"
+                                class="podcast-play-button"
+                                id="podcastPlayButton"
+                                aria-label="पॉडकास्ट चलाएं"
+                            >
+
+                                <i
+                                    class="fa-solid fa-play"
+                                ></i>
+
+                            </button>
+
+
+                            <div class="podcast-player-info">
+
+                                <div class="podcast-progress">
+
+                                    <span
+                                        id="podcastProgress"
+                                    ></span>
+
+                                </div>
+
+
+                                <div class="podcast-time">
+
+                                    <span>
+                                        00:00
+                                    </span>
+
+                                    <span>
+                                        08:45
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+                                class="podcast-volume-button"
+                                id="podcastVolumeButton"
+                                aria-label="पॉडकास्ट आवाज़"
+                            >
+
+                                <i
+                                    class="fa-solid fa-volume-high"
+                                ></i>
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="podcast-platforms">
+
+                            <span>
+                                सुनें:
+                            </span>
+
+
+                            <button
+                                type="button"
+                                class="podcast-platform"
+                                data-platform="spotify"
+                            >
+
+                                <i
+                                    class="fa-brands fa-spotify"
+                                ></i>
+
+                                Spotify
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="podcast-platform"
+                                data-platform="youtube"
+                            >
+
+                                <i
+                                    class="fa-brands fa-youtube"
+                                ></i>
+
+                                YouTube
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="podcast-platform"
+                                data-platform="apple"
+                            >
+
+                                <i
+                                    class="fa-solid fa-podcast"
+                                ></i>
+
+                                Podcast
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================================
+             CITIZEN REPORT / SEND NEWS SECTION
+             ================================================ -->
+
+        <section
+            class="citizen-report-section"
+            id="citizen-report"
+        >
+
+            <div class="container">
+
+                <div class="citizen-report-card">
+
+                    <div class="citizen-report-icon">
+
+                        <i
+                            class="fa-solid fa-camera"
+                        ></i>
+
+                    </div>
+
+
+                    <div class="citizen-report-content">
+
+                        <span class="mini-label">
+                            CITIZEN JOURNALISM
+                        </span>
+
+
+                        <h2>
+                            आपके पास है कोई खबर?
+                        </h2>
+
+
+                        <p>
+
+                            फोटो, वीडियो या खबर हमें भेजें।
+                            आपकी खबर को आवाज़ राजस्थान की
+                            टीम तक पहुंचाएं।
+
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="citizen-report-button"
+                        id="openCitizenReport"
+                    >
+
+                        खबर भेजें
+
+                        <i
+                            class="fa-solid fa-arrow-left"
+                        ></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section> 
+index.html — PART 33/50
+<!-- ================================================
+             CITIZEN REPORT MODAL
+             ================================================ -->
+
+        <div
+            class="citizen-report-modal"
+            id="citizenReportModal"
+            aria-hidden="true"
+        >
+
+            <div
+                class="citizen-modal-backdrop"
+                data-citizen-close
+            ></div>
+
+
+            <div
+                class="citizen-modal-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="citizenReportTitle"
+            >
+
+                <button
+                    type="button"
+                    class="citizen-modal-close"
+                    id="citizenModalClose"
+                    aria-label="फॉर्म बंद करें"
+                >
+
+                    <i
+                        class="fa-solid fa-xmark"
+                    ></i>
+
+                </button>
+
+
+                <div class="citizen-modal-header">
+
+                    <div class="citizen-modal-icon">
+
+                        <i
+                            class="fa-solid fa-paper-plane"
+                        ></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <span class="mini-label">
+                            CITIZEN REPORT
+                        </span>
+
+                        <h2 id="citizenReportTitle">
+                            अपनी खबर हमें भेजें
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <p class="citizen-modal-intro">
+
+                    आपके पास कोई स्थानीय खबर, फोटो या वीडियो है?
+                    नीचे दी गई जानकारी भरकर हमारी टीम को भेजें।
+
+                </p>
+
+
+                <form
+                    class="citizen-report-form"
+                    id="citizenReportForm"
+                    novalidate
+                >
+
+
+                    <!-- NAME -->
+
+                    <div class="form-field">
+
+                        <label for="citizenName">
+                            आपका नाम
+                        </label>
+
+
+                        <div class="form-input-wrap">
+
+                            <i
+                                class="fa-regular fa-user"
+                            ></i>
+
+                            <input
+                                type="text"
+                                id="citizenName"
+                                name="name"
+                                placeholder="अपना नाम लिखें"
+                                autocomplete="name"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MOBILE -->
+
+                    <div class="form-field">
+
+                        <label for="citizenMobile">
+                            मोबाइल नंबर
+                        </label>
+
+
+                        <div class="form-input-wrap">
+
+                            <i
+                                class="fa-solid fa-phone"
+                            ></i>
+
+                            <input
+                                type="tel"
+                                id="citizenMobile"
+                                name="mobile"
+                                placeholder="10 अंकों का मोबाइल नंबर"
+                                inputmode="numeric"
+                                maxlength="10"
+                                autocomplete="tel"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DISTRICT -->
+
+                    <div class="form-field">
+
+                        <label for="citizenDistrict">
+                            जिला
+                        </label>
+
+
+                        <div class="form-input-wrap select-wrap">
+
+                            <i
+                                class="fa-solid fa-location-dot"
+                            ></i>
+
+
+                            <select
+                                id="citizenDistrict"
+                                name="district"
+                                required
+                            >
+
+                                <option
+                                    value=""
+                                    selected
+                                    disabled
+                                >
+                                    अपना जिला चुनें
+                                </option>
+
+                                <option value="ajmer">
+                                    अजमेर
+                                </option>
+
+                                <option value="alwar">
+                                    अलवर
+                                </option>
+
+                                <option value="banswara">
+                                    बांसवाड़ा
+                                </option>
+
+                                <option value="baran">
+                                    बारां
+                                </option>
+
+                                <option value="barmer">
+                                    बाड़मेर
+                                </option>
+
+                                <option value="bharatpur">
+                                    भरतपुर
+                                </option>
+
+                                <option value="bhilwara">
+                                    भीलवाड़ा
+                                </option>
+
+                                <option value="bikaner">
+                                    बीकानेर
+                                </option>
+
+                                <option value="bundi">
+                                    बूंदी
+                                </option>
+
+                                <option value="chittorgarh">
+                                    चित्तौड़गढ़
+                                </option>
+
+                                <option value="churu">
+                                    चूरू
+                                </option>
+
+                                <option value="dausa">
+                                    दौसा
+                                </option>
+
+                                <option value="dholpur">
+                                    धौलपुर
+                                </option>
+
+                                <option value="dungarpur">
+                                    डूंगरपुर
+                                </option>
+
+                                <option value="hanumangarh">
+                                    हनुमानगढ़
+                                </option>
+
+                                <option value="jaipur">
+                                    जयपुर
+                                </option>
+
+                                <option value="jaisalmer">
+                                    जैसलमेर
+                                </option>
+
+                                <option value="jalore">
+                                    जालोर
+                                </option>
+
+                                <option value="jhalawar">
+                                    झालावाड़
+                                </option>
+
+                                <option value="jhunjhunu">
+                                    झुंझुनूं
+                                </option>
+
+                                <option value="jodhpur">
+                                    जोधपुर
+                                </option>
+
+                                <option value="karauli">
+                                    करौली
+                                </option>
+
+                                <option value="kota">
+                                    कोटा
+                                </option>
+
+                                <option value="nagaur">
+                                    नागौर
+                                </option>
+
+                                <option value="pali">
+                                    पाली
+                                </option>
+
+                                <option value="pratapgarh">
+                                    प्रतापगढ़
+                                </option>
+
+                                <option value="rajsamand">
+                                    राजसमंद
+                                </option>
+
+                                <option value="sawai-madhopur">
+                                    सवाई माधोपुर
+                                </option>
+
+                                <option value="sikar">
+                                    सीकर
+                                </option>
+
+                                <option value="sirohi">
+                                    सिरोही
+                                </option>
+
+                                <option value="shri-ganganagar">
+                                    श्रीगंगानगर
+                                </option>
+
+                                <option value="tonk">
+                                    टोंक
+                                </option>
+
+                                <option value="udaipur">
+                                    उदयपुर
+                                </option>
+
+                            </select>
+
+
+                            <i
+                                class="fa-solid fa-chevron-down select-arrow"
+                            ></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- NEWS TITLE -->
+
+                    <div class="form-field">
+
+                        <label for="citizenTitle">
+                            खबर का शीर्षक
+                        </label>
+
+
+                        <div class="form-input-wrap">
+
+                            <i
+                                class="fa-regular fa-newspaper"
+                            ></i>
+
+                            <input
+                                type="text"
+                                id="citizenTitle"
+                                name="title"
+                                placeholder="खबर का छोटा सा शीर्षक"
+                                maxlength="150"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- NEWS DETAILS -->
+
+                    <div class="form-field">
+
+                        <label for="citizenDescription">
+                            खबर की जानकारी
+                        </label>
+
+
+                        <div class="form-input-wrap textarea-wrap">
+
+                            <i
+                                class="fa-solid fa-align-left"
+                            ></i>
+
+                            <textarea
+                                id="citizenDescription"
+                                name="description"
+                                rows="5"
+                                placeholder="घटना के बारे में पूरी जानकारी लिखें..."
+                                maxlength="3000"
+                                required
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="field-counter">
+
+                            <span>
+                                अधिकतम 3000 अक्षर
+                            </span>
+
+                            <span id="citizenDescriptionCount">
+                                0 / 3000
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MEDIA UPLOAD -->
+
+                    <div class="form-field">
+
+                        <label>
+                            फोटो / वीडियो
+                        </label>
+
+
+                        <label
+                            class="citizen-upload-area"
+                            for="citizenMedia"
+                        >
+
+                            <span class="citizen-upload-icon">
+
+                                <i
+                                    class="fa-solid fa-cloud-arrow-up"
+                                ></i>
+
+                            </span>
+
+
+                            <strong>
+                                फोटो या वीडियो अपलोड करें
+                            </strong>
+
+
+                            <small>
+                                JPG, PNG, WEBP या MP4
+                            </small>
+
+
+                            <input
+                                type="file"
+                                id="citizenMedia"
+                                name="media"
+                                accept="image/jpeg,image/png,image/webp,video/mp4"
+                                multiple
+                                hidden
+                            >
+
+                        </label>
+
+
+                        <div
+                            class="citizen-file-preview"
+                            id="citizenFilePreview"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- CONSENT -->
+
+                    <label class="form-checkbox">
+
+                        <input
+                            type="checkbox"
+                            id="citizenConsent"
+                            name="consent"
+                            required
+                        >
+
+
+                        <span class="custom-checkbox">
+
+                            <i
+                                class="fa-solid fa-check"
+                            ></i>
+
+                        </span>
+
+
+                        <span class="checkbox-text">
+
+                            मैं पुष्टि करता/करती हूं कि दी गई
+                            जानकारी मेरी जानकारी के अनुसार सही है।
+
+                        </span>
+
+                    </label>
+
+
+                    <!-- FORM MESSAGE -->
+
+                    <div
+                        class="citizen-form-message"
+                        id="citizenFormMessage"
+                        aria-live="polite"
+                    ></div>
+
+
+                    <!-- SUBMIT -->
+
+                    <button
+                        type="submit"
+                        class="citizen-submit-button"
+                    >
+
+                        <span>
+                            खबर भेजें
+                        </span>
+
+
+                        <i
+                            class="fa-solid fa-paper-plane"
+                        ></i>
+
+                    </button>
+
+
+                    <p class="citizen-form-note">
+
+                        <i
+                            class="fa-solid fa-shield-halved"
+                        ></i>
+
+                        आपकी भेजी गई जानकारी हमारी टीम द्वारा
+                        जांच के बाद प्रकाशित की जाएगी।
+
+                    </p>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================
+             SEARCH RESULT SECTION
+             ================================================ -->
+
+        <section
+            class="search-results-section"
+            id="search-results"
+            aria-hidden="true"
+        >
+
+            <div class="container">
+
+                <div class="search-results-header">
+
+                    <div>
+
+                        <span class="mini-label">
+                            SEARCH
+                        </span>
+
+                        <h2>
+                            खोज परिणाम
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="search-results-close"
+                        id="closeSearchResults"
+                        aria-label="सर्च बंद करें"
+                    >
+
+                        <i
+                            class="fa-solid fa-xmark"
+                        ></i>
+
+                    </button>
+
+                </div>
+
+
+                <div class="search-results-query">
+
+                    <i
+                        class="fa-solid fa-magnifying-glass"
+                    ></i>
+
+
+                    <span>
+                        आपने खोजा:
+                    </span>
+
+
+                    <strong id="searchQueryText">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div
+                    class="search-results-list"
+                    id="searchResultsList"
+                ></div>
+
+
+                <div
+                    class="search-empty-state"
+                    id="searchEmptyState"
+                    hidden
+                >
+
+                    <div class="search-empty-icon">
+
+                        <i
+                            class="fa-solid fa-magnifying-glass"
+                        ></i>
+
+                    </div>
+
+
+                    <h3>
+                        कोई खबर नहीं मिली
+                    </h3>
+
+
+                    <p>
+                        कृपया कोई दूसरा शब्द या विषय खोजें।
+                    </p>
+
+                </div>
+
+            </div>
+
+    </section>
