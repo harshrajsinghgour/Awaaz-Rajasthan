@@ -156,9 +156,9 @@ app.get("/api/health", (req, res) => {
    API ROUTES
 ========================================================= */
 
-// ========================================================
-// PUBLIC AUTHENTICATION
-// ========================================================
+/* ========================================================
+   PUBLIC AUTHENTICATION
+======================================================== */
 
 app.use(
     "/api/auth",
@@ -166,9 +166,10 @@ app.use(
 );
 
 
-// ========================================================
-// ADMIN / OWNER AUTHENTICATION & MANAGEMENT
-// ========================================================
+/* ========================================================
+   ADMIN / OWNER AUTHENTICATION & MANAGEMENT
+======================================================== */
+
 // अलग AdminUser system
 //
 // Login:
@@ -182,7 +183,6 @@ app.use(
 //
 // Owner और Admin permissions backend पर
 // adminMiddleware.js द्वारा verify होंगी.
-// ========================================================
 
 const adminRoutesPath = path.join(
     __dirname,
@@ -198,9 +198,44 @@ if (fs.existsSync(adminRoutesPath)) {
 }
 
 
-// ========================================================
-// NEWS
-// ========================================================
+/* ========================================================
+   OWNER AD SETTINGS
+======================================================== */
+
+// Owner-only Ad Settings
+//
+// GET:
+// /api/admin/ad-settings
+//
+// PUT:
+// /api/admin/ad-settings
+//
+// Security:
+// adminProtect + ownerOnly
+//
+// Normal Admin:
+// ❌ Access denied
+//
+// Public:
+// ❌ Access denied
+
+const adSettingsRoutesPath = path.join(
+    __dirname,
+    "routes",
+    "adSettingsRoutes.js"
+);
+
+if (fs.existsSync(adSettingsRoutesPath)) {
+    app.use(
+        "/api/admin/ad-settings",
+        require("./routes/adSettingsRoutes")
+    );
+}
+
+
+/* ========================================================
+   NEWS
+======================================================== */
 
 app.use(
     "/api/news",
@@ -208,9 +243,10 @@ app.use(
 );
 
 
-// ========================================================
-// CONTACT
-// ========================================================
+/* ========================================================
+   CONTACT
+======================================================== */
+
 // अगर contactRoutes.js मौजूद है तो इसे use किया जाएगा
 
 const contactRoutesPath = path.join(
@@ -227,9 +263,10 @@ if (fs.existsSync(contactRoutesPath)) {
 }
 
 
-// ========================================================
-// SITE FEATURES
-// ========================================================
+/* ========================================================
+   SITE FEATURES
+======================================================== */
+
 // Live TV, Live Blog और E-paper जैसी
 // frontend/site services के लिए route support
 
@@ -247,39 +284,50 @@ if (fs.existsSync(siteRoutesPath)) {
 }
 
 
-// ========================================================
-// ADVERTISEMENT SYSTEM
-// ========================================================
+/* ========================================================
+   PUBLIC ADVERTISEMENT SYSTEM
+======================================================== */
+
 // Public Advertisement API
 //
 // GET:
 // /api/ads
 //
 // Optional:
+//
 // /api/ads?position=home_top
 // /api/ads?position=sidebar
 // /api/ads?device=mobile
 // /api/ads?device=desktop
 //
 // Impression:
+//
 // POST /api/ads/:id/impression
 //
 // Click:
+//
 // POST /api/ads/:id/click
 //
 // IMPORTANT:
-// Public users can ONLY read active ads
-// and record impressions/clicks.
 //
-// Ad create/update/toggle/delete is NOT available
-// through this public route.
+// Public users can ONLY:
+// - View active ads
+// - Record impressions
+// - Record clicks
+//
+// Public users CANNOT:
+// - Create ads
+// - Update ads
+// - Toggle ads
+// - Delete ads
 //
 // Owner-only Ad Management:
+//
 // /api/admin/ads
 //
-// adminRoutes.js protects those routes with:
-// adminProtect + ownerOnly
-// ========================================================
+// Owner-only Ad Settings:
+//
+// /api/admin/ad-settings
 
 const adRoutesPath = path.join(
     __dirname,
@@ -306,6 +354,7 @@ app.use((req, res) => {
         path: req.originalUrl
     });
 });
+
 
 /* =========================================================
    GLOBAL ERROR HANDLER
@@ -349,6 +398,7 @@ app.use((err, req, res, next) => {
     });
 });
 
+
 /* =========================================================
    START SERVER
 ========================================================= */
@@ -358,7 +408,10 @@ const server = app.listen(PORT, () => {
     console.log("==========================================");
     console.log("       आवाज राजस्थान BACKEND");
     console.log("==========================================");
-    console.log(`🚀 Server: http://localhost:${PORT}`);
+
+    console.log(
+        `🚀 Server: http://localhost:${PORT}`
+    );
 
     console.log(
         `📰 News API: http://localhost:${PORT}/api/news`
@@ -381,12 +434,17 @@ const server = app.listen(PORT, () => {
     );
 
     console.log(
+        `⚙️ Owner Ad Settings: http://localhost:${PORT}/api/admin/ad-settings`
+    );
+
+    console.log(
         `❤️ Health: http://localhost:${PORT}/api/health`
     );
 
     console.log("==========================================");
     console.log("");
 });
+
 
 /* =========================================================
    SERVER ERROR HANDLING
@@ -406,6 +464,7 @@ server.on("error", (error) => {
 
     process.exit(1);
 });
+
 
 /* =========================================================
    GRACEFUL SHUTDOWN
@@ -427,5 +486,10 @@ process.on("SIGINT", () => {
 process.on("SIGTERM", () => {
     shutdown("SIGTERM");
 });
+
+
+/* =========================================================
+   EXPORT APP
+========================================================= */
 
 module.exports = app;
