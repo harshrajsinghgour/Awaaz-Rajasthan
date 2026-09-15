@@ -290,3 +290,1149 @@ input:focus-visible {
   outline: 2px solid #D71920;
   outline-offset: 2px;
 }
+/* =====================================================
+   PART 3
+   AAWAAZ RAJASTHAN — PREMIUM MOBILE UI
+===================================================== */
+
+
+/* =====================================================
+   PREMIUM APP HEADER
+===================================================== */
+
+.awaaz-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+
+  width: 100%;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.98),
+      rgba(255,255,255,0.94)
+    );
+
+  border-bottom: 1px solid rgba(229,231,235,0.9);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+
+.dark .awaaz-header {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7,26,54,0.98),
+      rgba(7,16,31,0.96)
+    );
+
+  border-bottom-color: rgba(35,52,77,0.9);
+}
+
+
+/* =====================================================
+   HEADER INNER
+===================================================== */
+
+.awaaz-header-inner {
+  width: 100%;
+  max-width: 1280px;
+
+  margin: 0 auto;
+
+  padding:
+    10px
+    12px
+    8px
+    12px;
+}
+
+
+/* =====================================================
+   BRAND AREA
+===================================================== */
+
+.awaaz-brand {
+  display: flex;
+
+  align-items: center;
+
+  min-width: 0;
+
+  text-decoration: none;
+}
+
+
+.awaaz-brand-logo {
+  width: 46px;
+  height: 46px;
+
+  flex: 0 0 46px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  border: 2px solid rgba(215,25,32,0.12);
+
+  box-shadow:
+    0 4px 14px rgba(7,26,54,0.12);
+}
+
+
+.awaaz-brand-title {
+  margin-left: 9px;
+
+  min-width: 0;
+}
+
+
+.awaaz-brand-name {
+  margin: 0;
+
+  font-size: 19px;
+
+  line-height: 1.15;
+
+  font-weight: 900;
+
+  letter-spacing: -0.35px;
+
+  white-space: nowrap;
+}
+
+
+.awaaz-brand-tagline {
+  margin-top: 2px;
+
+  font-size: 9px;
+
+  line-height: 1.3;
+
+  color: var(--text-muted);
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =====================================================
+   HEADER ACTION BUTTON
+===================================================== */
+
+.awaaz-header-action {
+  width: 40px;
+  height: 40px;
+
+  min-width: 40px;
+  min-height: 40px;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #f1f3f6;
+
+  color: var(--awaaz-navy);
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+
+.dark .awaaz-header-action {
+  background: #172943;
+
+  color: #ffffff;
+}
+
+
+.awaaz-header-action:active {
+  transform: scale(0.92);
+}
+
+
+/* =====================================================
+   LOCATION / CATEGORY PILLS
+===================================================== */
+
+.awaaz-location-strip {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  width: 100%;
+
+  overflow-x: auto;
+
+  padding:
+    0
+    12px
+    10px;
+
+  scrollbar-width: none;
+}
+
+
+.awaaz-location-strip::-webkit-scrollbar {
+  display: none;
+}
+
+
+.awaaz-pill {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 6px;
+
+  flex: 0 0 auto;
+
+  min-height: 30px;
+
+  padding:
+    5px
+    12px;
+
+  border-radius: 999px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+.awaaz-pill-primary {
+  color: var(--awaaz-red);
+
+  background: #fff0f1;
+
+  border: 1px solid rgba(215,25,32,0.08);
+}
+
+
+.dark .awaaz-pill-primary {
+  background: #35161a;
+
+  border-color: rgba(215,25,32,0.15);
+}
+
+
+.awaaz-pill-secondary {
+  color: var(--text-main);
+
+  background: #f3f5f7;
+
+  border: 1px solid var(--border-color);
+}
+
+
+.dark .awaaz-pill-secondary {
+  background: #172943;
+}
+
+
+/* =====================================================
+   BREAKING NEWS BAR
+===================================================== */
+
+.breaking-news-bar {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  width: 100%;
+
+  min-height: 38px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      #a80f15 0%,
+      #d71920 45%,
+      #b91018 100%
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 4px 14px rgba(215,25,32,0.16);
+}
+
+
+.breaking-news-label {
+  position: relative;
+
+  z-index: 3;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 5px;
+
+  flex: 0 0 auto;
+
+  min-height: 38px;
+
+  padding:
+    0
+    12px;
+
+  background: #071a36;
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.2px;
+}
+
+
+.breaking-news-content {
+  position: relative;
+
+  flex: 1;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+}
+
+
+.breaking-news-track {
+  display: inline-flex;
+
+  align-items: center;
+
+  white-space: nowrap;
+
+  padding-left: 100%;
+
+  animation:
+    ticker 22s linear infinite;
+}
+
+
+.breaking-news-item {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-right: 55px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+
+.breaking-news-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  flex: 0 0 auto;
+}
+
+
+/* =====================================================
+   SECTION TITLE
+===================================================== */
+
+.awaaz-section-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding:
+    18px
+    12px
+    10px;
+}
+
+
+.awaaz-section-title-wrap {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 0;
+}
+
+
+.awaaz-section-accent {
+  width: 4px;
+  height: 22px;
+
+  border-radius: 999px;
+
+  background: var(--awaaz-red);
+
+  box-shadow:
+    0 3px 8px rgba(215,25,32,0.25);
+}
+
+
+.awaaz-section-title {
+  margin: 0;
+
+  font-size: 18px;
+
+  line-height: 1.25;
+
+  font-weight: 900;
+
+  color: var(--text-main);
+}
+
+
+.awaaz-section-link {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 3px;
+
+  flex: 0 0 auto;
+
+  color: var(--awaaz-red);
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  text-decoration: none;
+}
+
+
+/* =====================================================
+   FEATURED NEWS CARD
+===================================================== */
+
+.awaaz-featured-news {
+  position: relative;
+
+  width: calc(100% - 24px);
+
+  margin:
+    0
+    12px;
+
+  min-height: 265px;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  background: #071a36;
+
+  box-shadow:
+    0 10px 28px rgba(7,26,54,0.16);
+}
+
+
+.awaaz-featured-news img {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform 0.5s ease;
+}
+
+
+.awaaz-featured-news:hover img {
+  transform: scale(1.035);
+}
+
+
+.awaaz-featured-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7,26,54,0.02) 20%,
+      rgba(7,26,54,0.30) 48%,
+      rgba(0,0,0,0.88) 100%
+    );
+}
+
+
+.awaaz-featured-content {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  padding:
+    16px
+    15px
+    17px;
+}
+
+
+.awaaz-featured-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  min-height: 25px;
+
+  padding:
+    4px
+    9px;
+
+  margin-bottom: 9px;
+
+  border-radius: 7px;
+
+  background: var(--awaaz-red);
+
+  color: #ffffff;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  box-shadow:
+    0 4px 10px rgba(215,25,32,0.28);
+}
+
+
+.awaaz-featured-meta {
+  display: flex;
+
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+  margin-bottom: 6px;
+
+  color: rgba(255,255,255,0.78);
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+
+.awaaz-featured-title {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 19px;
+
+  line-height: 1.4;
+
+  font-weight: 900;
+
+  letter-spacing: -0.2px;
+}
+
+
+/* =====================================================
+   NEWS LIST
+===================================================== */
+
+.awaaz-news-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+
+  padding:
+    0
+    12px;
+}
+
+
+.awaaz-news-item {
+  display: flex;
+
+  align-items: stretch;
+
+  gap: 11px;
+
+  width: 100%;
+
+  padding: 10px;
+
+  border-radius: 16px;
+
+  background: var(--card-bg);
+
+  border: 1px solid var(--border-color);
+
+  box-shadow:
+    0 3px 12px rgba(7,26,54,0.045);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+.awaaz-news-item:active {
+  transform: scale(0.985);
+}
+
+
+.awaaz-news-thumb {
+  width: 108px;
+  height: 82px;
+
+  flex: 0 0 108px;
+
+  overflow: hidden;
+
+  border-radius: 12px;
+
+  background: #e9ecef;
+}
+
+
+.awaaz-news-thumb img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+.awaaz-news-body {
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+}
+
+
+.awaaz-news-category {
+  display: inline-block;
+
+  width: fit-content;
+
+  margin-bottom: 3px;
+
+  color: var(--awaaz-red);
+
+  font-size: 9px;
+
+  line-height: 1.2;
+
+  font-weight: 900;
+}
+
+
+.awaaz-news-title {
+  margin: 0;
+
+  color: var(--text-main);
+
+  font-size: 13px;
+
+  line-height: 1.45;
+
+  font-weight: 800;
+}
+
+
+.awaaz-news-meta {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 6px;
+
+  color: var(--text-muted);
+
+  font-size: 9px;
+
+  line-height: 1.2;
+}
+
+
+.awaaz-news-meta span {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 3px;
+
+  min-width: 0;
+}
+
+
+/* =====================================================
+   QUICK FEATURES PREMIUM
+===================================================== */
+
+.quick-features-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 8px;
+
+  padding:
+    0
+    12px;
+}
+
+
+.quick-feature-card {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 6px;
+
+  min-height: 82px;
+
+  padding:
+    9px
+    3px;
+
+  border-radius: 15px;
+
+  background: var(--card-bg);
+
+  border: 1px solid var(--border-color);
+
+  box-shadow:
+    0 4px 14px rgba(7,26,54,0.045);
+
+  text-decoration: none;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+.quick-feature-card:active {
+  transform: scale(0.95);
+}
+
+
+.quick-feature-icon {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+
+  background: #fff0f1;
+
+  color: var(--awaaz-red);
+}
+
+
+.dark .quick-feature-icon {
+  background: #35161a;
+}
+
+
+.quick-feature-title {
+  max-width: 100%;
+
+  color: var(--text-main);
+
+  font-size: 9px;
+
+  line-height: 1.25;
+
+  font-weight: 800;
+
+  text-align: center;
+}
+
+
+/* =====================================================
+   ADVERTISEMENT PLACEHOLDER
+===================================================== */
+
+.awaaz-ad-slot {
+  position: relative;
+
+  width: calc(100% - 24px);
+
+  min-height: 72px;
+
+  margin:
+    13px
+    12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  border:
+    1px dashed rgba(107,114,128,0.35);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(245,246,248,0.95),
+      rgba(255,255,255,0.95)
+    );
+
+  color: #9ca3af;
+
+  font-size: 9px;
+
+  font-weight: 700;
+}
+
+
+.dark .awaaz-ad-slot {
+  background:
+    linear-gradient(
+      135deg,
+      #0d1c31,
+      #10233e
+    );
+
+  border-color: rgba(168,178,193,0.22);
+
+  color: #738197;
+}
+
+
+.awaaz-ad-label {
+  position: absolute;
+
+  top: 5px;
+  left: 8px;
+
+  font-size: 7px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  opacity: 0.75;
+}
+
+
+/* =====================================================
+   EMPTY / LOADING NEWS
+===================================================== */
+
+.awaaz-skeleton {
+  position: relative;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      #eef0f2 25%,
+      #f7f8f9 37%,
+      #eef0f2 63%
+    );
+
+  background-size: 400% 100%;
+
+  animation:
+    awaaz-skeleton 1.4s ease infinite;
+}
+
+
+.dark .awaaz-skeleton {
+  background:
+    linear-gradient(
+      90deg,
+      #172943 25%,
+      #223752 37%,
+      #172943 63%
+    );
+
+  background-size: 400% 100%;
+}
+
+
+@keyframes awaaz-skeleton {
+
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+
+}
+
+
+/* =====================================================
+   MOBILE RESPONSIVE
+===================================================== */
+
+@media (max-width: 380px) {
+
+  .awaaz-brand-logo {
+    width: 42px;
+    height: 42px;
+
+    flex-basis: 42px;
+  }
+
+
+  .awaaz-brand-name {
+    font-size: 17px;
+  }
+
+
+  .awaaz-header-action {
+    width: 38px;
+    height: 38px;
+
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+
+  .awaaz-news-thumb {
+    width: 96px;
+    height: 76px;
+
+    flex-basis: 96px;
+  }
+
+
+  .awaaz-featured-title {
+    font-size: 17px;
+  }
+
+
+  .quick-feature-card {
+    min-height: 76px;
+  }
+
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (min-width: 768px) {
+
+  .awaaz-header-inner {
+    padding:
+      14px
+      22px
+      10px;
+  }
+
+
+  .awaaz-news-list {
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    padding:
+      0
+      22px;
+  }
+
+
+  .quick-features-grid {
+    grid-template-columns:
+      repeat(8, minmax(0, 1fr));
+
+    gap: 10px;
+
+    padding:
+      0
+      22px;
+  }
+
+
+  .awaaz-featured-news {
+    width: calc(100% - 44px);
+
+    margin:
+      0
+      22px;
+
+    min-height: 360px;
+  }
+
+
+  .awaaz-ad-slot {
+    width: calc(100% - 44px);
+
+    margin:
+      18px
+      22px;
+  }
+
+
+  .awaaz-section-header {
+    padding:
+      22px
+      22px
+      12px;
+  }
+
+}
+
+
+/* =====================================================
+   LARGE DESKTOP
+===================================================== */
+
+@media (min-width: 1100px) {
+
+  .awaaz-news-list {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+
+
+  .awaaz-featured-news {
+    min-height: 410px;
+  }
+
+
+  .awaaz-featured-title {
+    font-size: 25px;
+  }
+
+}
+
+
+/* =====================================================
+   ACCESSIBILITY
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    scroll-behavior: auto !important;
+
+    transition-duration: 0.01ms !important;
+  }
+
+}
+
+
+/* =====================================================
+   SAFE AREA — MOBILE DEVICES
+===================================================== */
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+
+  .mobile-bottom-space {
+
+    height:
+      calc(
+        78px + env(safe-area-inset-bottom)
+      );
+  }
+
+
+  .awaaz-bottom-safe {
+
+    padding-bottom:
+      env(safe-area-inset-bottom);
+  }
+
+}
+
+
+/* =====================================================
+   END PART 3
+===================================================== */
