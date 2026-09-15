@@ -10,42 +10,76 @@
 
     <meta
       name="description"
-      content="आवाज़ राजस्थान - राजस्थान की हर खबर, हर जिले की आवाज़"
+      content="आवाज़ राजस्थान — राजस्थान की हर खबर, हर जिले की आवाज़। ताज़ा खबरें, राजस्थान समाचार, जिला समाचार, राजनीति, अपराध, शिक्षा, रोजगार, लाइव टीवी और ई-पेपर।"
     />
 
     <meta
       name="keywords"
-      content="Awaaz Rajasthan, Rajasthan News, Rajasthan Samachar, Jaipur News, Rajasthan Hindi News"
+      content="आवाज़ राजस्थान, Rajasthan News, Rajasthan Samachar, Jaipur News, Rajasthan Breaking News, District News, Hindi News"
     />
 
     <meta name="theme-color" content="#c90000" />
 
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <meta
+      name="apple-mobile-web-app-title"
+      content="आवाज़ राजस्थान"
+    />
+
     <title>आवाज़ राजस्थान — आपकी आवाज़, आपका राजस्थान</title>
 
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <!-- Google Font -->
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
 
-    <style>
-      * {
-        box-sizing: border-box;
-      }
+    <!-- App Icon -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="/logo.png"
+    />
 
+    <link
+      rel="apple-touch-icon"
+      href="/logo.png"
+    />
+
+    <!-- Prevent unwanted browser styling -->
+    <style>
       html {
-        scroll-behavior: smooth;
+        margin: 0;
+        padding: 0;
+        background: #f5f5f5;
       }
 
       body {
         margin: 0;
         padding: 0;
-        font-family: "Noto Sans Devanagari", sans-serif;
+        min-width: 320px;
         background: #f5f5f5;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       button,
@@ -55,23 +89,31 @@
         font-family: inherit;
       }
 
+      button {
+        -webkit-tap-highlight-color: transparent;
+      }
+
       img {
         max-width: 100%;
       }
 
-      button {
-        cursor: pointer;
+      ::selection {
+        background: #c90000;
+        color: #ffffff;
       }
     </style>
   </head>
 
   <body>
-    <noscript>
-      इस वेबसाइट को चलाने के लिए JavaScript आवश्यक है।
-    </noscript>
 
+    <!-- React Application -->
     <div id="root"></div>
 
-    <script type="module" src="/src/main.jsx"></script>
+    <!-- Vite / React Entry -->
+    <script
+      type="module"
+      src="/src/main.jsx"
+    ></script>
+
   </body>
 </html>
