@@ -10,42 +10,76 @@ const fs = require("fs");
 
 const connectDB = require("./config/db");
 
-// Load environment variables
+// ========================================================
+// LOAD ENVIRONMENT VARIABLES
+// ========================================================
+
 dotenv.config();
 
-// Connect MongoDB
+
+// ========================================================
+// CONNECT DATABASE
+// ========================================================
+
 connectDB();
+
+
+// ========================================================
+// EXPRESS APP
+// ========================================================
 
 const app = express();
 
-/* =========================================================
-   BASIC CONFIG
-========================================================= */
+
+// ========================================================
+// BASIC CONFIG
+// ========================================================
 
 const PORT = process.env.PORT || 5000;
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "*";
+const FRONTEND_URL =
+    process.env.FRONTEND_URL || "*";
 
-/* =========================================================
-   REQUIRED FOLDERS
-========================================================= */
 
-const uploadsPath = path.join(__dirname, "uploads");
-const epaperPath = path.join(__dirname, "epapers");
+// ========================================================
+// REQUIRED DIRECTORIES
+// ========================================================
+
+const uploadsPath =
+    path.join(__dirname, "uploads");
+
+const epaperPath =
+    path.join(__dirname, "epapers");
+
 
 if (!fs.existsSync(uploadsPath)) {
-    fs.mkdirSync(uploadsPath, { recursive: true });
+    fs.mkdirSync(
+        uploadsPath,
+        {
+            recursive: true
+        }
+    );
 }
+
 
 if (!fs.existsSync(epaperPath)) {
-    fs.mkdirSync(epaperPath, { recursive: true });
+    fs.mkdirSync(
+        epaperPath,
+        {
+            recursive: true
+        }
+    );
 }
 
-/* =========================================================
-   SECURITY
-========================================================= */
 
-app.disable("x-powered-by");
+// ========================================================
+// SECURITY
+// ========================================================
+
+app.disable(
+    "x-powered-by"
+);
+
 
 app.use(
     helmet({
@@ -55,14 +89,16 @@ app.use(
     })
 );
 
-/* =========================================================
-   CORS
-========================================================= */
+
+// ========================================================
+// CORS
+// ========================================================
 
 app.use(
     cors({
         origin: FRONTEND_URL,
         credentials: true,
+
         methods: [
             "GET",
             "POST",
@@ -71,6 +107,7 @@ app.use(
             "DELETE",
             "OPTIONS"
         ],
+
         allowedHeaders: [
             "Content-Type",
             "Authorization"
@@ -78,33 +115,47 @@ app.use(
     })
 );
 
-/* =========================================================
-   RATE LIMIT
-========================================================= */
 
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 300,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: {
-        success: false,
-        message:
-            "बहुत अधिक requests भेजी गई हैं। कृपया कुछ देर बाद प्रयास करें।"
-    }
-});
+// ========================================================
+// RATE LIMIT
+// ========================================================
 
-app.use("/api", apiLimiter);
+const apiLimiter =
+    rateLimit({
+        windowMs:
+            15 * 60 * 1000,
 
-/* =========================================================
-   BODY PARSER
-========================================================= */
+        max: 300,
+
+        standardHeaders: true,
+
+        legacyHeaders: false,
+
+        message: {
+            success: false,
+
+            message:
+                "बहुत अधिक requests भेजी गई हैं। कृपया कुछ देर बाद प्रयास करें।"
+        }
+    });
+
+
+app.use(
+    "/api",
+    apiLimiter
+);
+
+
+// ========================================================
+// BODY PARSER
+// ========================================================
 
 app.use(
     express.json({
         limit: "2mb"
     })
 );
+
 
 app.use(
     express.urlencoded({
@@ -113,52 +164,83 @@ app.use(
     })
 );
 
-/* =========================================================
-   STATIC FILES
-========================================================= */
+
+// ========================================================
+// STATIC FILES
+// ========================================================
 
 // News images
+
 app.use(
     "/uploads",
-    express.static(uploadsPath)
+    express.static(
+        uploadsPath
+    )
 );
+
 
 // E-paper files
+
 app.use(
     "/epapers",
-    express.static(epaperPath)
+    express.static(
+        epaperPath
+    )
 );
 
-/* =========================================================
-   HEALTH CHECK
-========================================================= */
 
-app.get("/", (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "आवाज राजस्थान Backend API चल रहा है",
-        name: "Awaaz Rajasthan",
-        version: "1.0.0",
-        status: "online"
-    });
-});
+// ========================================================
+// HEALTH CHECK
+// ========================================================
 
-app.get("/api/health", (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: "API is healthy",
-        service: "Awaaz Rajasthan Backend",
-        timestamp: new Date().toISOString()
-    });
-});
+app.get(
+    "/",
+    (req, res) => {
 
-/* =========================================================
-   API ROUTES
-========================================================= */
+        res.status(200).json({
 
-/* ========================================================
-   PUBLIC AUTHENTICATION
-======================================================== */
+            success: true,
+
+            message:
+                "आवाज राजस्थान Backend API चल रहा है",
+
+            name:
+                "Awaaz Rajasthan",
+
+            version:
+                "1.0.0",
+
+            status:
+                "online"
+        });
+    }
+);
+
+
+app.get(
+    "/api/health",
+    (req, res) => {
+
+        res.status(200).json({
+
+            success: true,
+
+            message:
+                "API is healthy",
+
+            service:
+                "Awaaz Rajasthan Backend",
+
+            timestamp:
+                new Date().toISOString()
+        });
+    }
+);
+
+
+// ========================================================
+// PUBLIC AUTHENTICATION
+// ========================================================
 
 app.use(
     "/api/auth",
@@ -166,433 +248,571 @@ app.use(
 );
 
 
-/* ========================================================
-   ADMIN / OWNER AUTHENTICATION & MANAGEMENT
-======================================================== */
+// ========================================================
+// ADMIN / OWNER AUTHENTICATION
+// ========================================================
 
-// अलग AdminUser system
-//
-// Login:
-// POST /api/admin/login
-//
-// Current admin:
-// GET /api/admin/me
-//
-// Admin management:
-// /api/admin/admins
-//
-// Owner और Admin permissions backend पर
-// adminMiddleware.js द्वारा verify होंगी.
+const adminRoutesPath =
+    path.join(
+        __dirname,
+        "routes",
+        "adminRoutes.js"
+    );
 
-const adminRoutesPath = path.join(
-    __dirname,
-    "routes",
-    "adminRoutes.js"
-);
 
-if (fs.existsSync(adminRoutesPath)) {
+if (
+    fs.existsSync(
+        adminRoutesPath
+    )
+) {
+
     app.use(
         "/api/admin",
-        require("./routes/adminRoutes")
+        require(
+            "./routes/adminRoutes"
+        )
     );
 }
 
 
-/* ========================================================
-   OWNER AD SETTINGS
-======================================================== */
+// ========================================================
+// OWNER AD SETTINGS
+// ========================================================
 
-// Owner-only Ad Settings
-//
-// GET:
-// /api/admin/ad-settings
-//
-// PUT:
-// /api/admin/ad-settings
-//
-// Security:
-// adminProtect + ownerOnly
-//
-// Normal Admin:
-// ❌ Access denied
-//
-// Public:
-// ❌ Access denied
+const adSettingsRoutesPath =
+    path.join(
+        __dirname,
+        "routes",
+        "adSettingsRoutes.js"
+    );
 
-const adSettingsRoutesPath = path.join(
-    __dirname,
-    "routes",
-    "adSettingsRoutes.js"
-);
 
-if (fs.existsSync(adSettingsRoutesPath)) {
+if (
+    fs.existsSync(
+        adSettingsRoutesPath
+    )
+) {
+
     app.use(
         "/api/admin/ad-settings",
-        require("./routes/adSettingsRoutes")
+        require(
+            "./routes/adSettingsRoutes"
+        )
     );
 }
 
 
-/* ========================================================
-   OWNER AD MANAGEMENT
-======================================================== */
+// ========================================================
+// OWNER AD MANAGEMENT
+// ========================================================
 
-// Owner-only Advertisement Management
-//
-// GET:
-// /api/admin/ads
-//
-// GET ONE:
-// /api/admin/ads/:id
-//
-// CREATE:
-// POST /api/admin/ads
-//
-// UPDATE:
-// PUT /api/admin/ads/:id
-//
-// TOGGLE:
-// PATCH /api/admin/ads/:id/toggle
-//
-// DELETE:
-// DELETE /api/admin/ads/:id
-//
-// Security:
-// adminProtect + ownerOnly
-//
-// Normal Admin:
-// ❌ Cannot create
-// ❌ Cannot update
-// ❌ Cannot toggle
-// ❌ Cannot delete
-//
-// Public:
-// ❌ No management access
+/*
+    Owner-only Advertisement Management
 
-const adminAdRoutesPath = path.join(
-    __dirname,
-    "routes",
-    "adminAdRoutes.js"
-);
+    GET:
+    /api/admin/ads
 
-if (fs.existsSync(adminAdRoutesPath)) {
+    GET ONE:
+    /api/admin/ads/:id
+
+    CREATE:
+    POST /api/admin/ads
+
+    UPDATE:
+    PUT /api/admin/ads/:id
+
+    TOGGLE:
+    PATCH /api/admin/ads/:id/toggle
+
+    DELETE:
+    DELETE /api/admin/ads/:id
+*/
+
+
+const adminAdRoutesPath =
+    path.join(
+        __dirname,
+        "routes",
+        "adminAdRoutes.js"
+    );
+
+
+if (
+    fs.existsSync(
+        adminAdRoutesPath
+    )
+) {
+
     app.use(
         "/api/admin/ads",
-        require("./routes/adminAdRoutes")
+        require(
+            "./routes/adminAdRoutes"
+        )
     );
 }
 
 
-/* ========================================================
-   OWNER AD ANALYTICS
-======================================================== */
+// ========================================================
+// OWNER AD ANALYTICS
+// ========================================================
 
-// Owner-only Advertisement Analytics
-//
-// GET:
-// /api/admin/ad-analytics
-//
-// GET SINGLE:
-// /api/admin/ad-analytics/:id
-//
-// Analytics में:
-// - Total Ads
-// - Active Ads
-// - Inactive Ads
-// - Total Impressions
-// - Total Clicks
-// - CTR
-// - Best Performing Ads
-// - Position-wise Analytics
-//
-// Security:
-// adminProtect + ownerOnly
-//
-// Normal Admin:
-// ❌ Access denied
-//
-// Public:
-// ❌ Access denied
+/*
+    Owner-only Advertisement Analytics
 
-const adminAdAnalyticsRoutesPath = path.join(
-    __dirname,
-    "routes",
-    "adminAdAnalyticsRoutes.js"
-);
+    Overall:
+    GET /api/admin/ad-analytics
 
-if (fs.existsSync(adminAdAnalyticsRoutesPath)) {
+    Top Ads:
+    GET /api/admin/ad-analytics/top
+
+    Position:
+    GET /api/admin/ad-analytics/positions
+
+    Device:
+    GET /api/admin/ad-analytics/devices
+
+    Single Ad:
+    GET /api/admin/ad-analytics/:id
+
+
+    IMPORTANT:
+
+    यह route केवल Owner access कर सकता है।
+
+    Normal Admin:
+    ❌
+
+    Public:
+    ❌
+
+    Owner:
+    ✅
+*/
+
+
+const adminAdAnalyticsRoutesPath =
+    path.join(
+        __dirname,
+        "routes",
+        "adminAdAnalyticsRoutes.js"
+    );
+
+
+if (
+    fs.existsSync(
+        adminAdAnalyticsRoutesPath
+    )
+) {
+
     app.use(
         "/api/admin/ad-analytics",
-        require("./routes/adminAdAnalyticsRoutes")
+        require(
+            "./routes/adminAdAnalyticsRoutes"
+        )
     );
 }
 
 
-/* ========================================================
-   NEWS
-======================================================== */
+// ========================================================
+// NEWS
+// ========================================================
 
 app.use(
     "/api/news",
-    require("./routes/newsRoutes")
+    require(
+        "./routes/newsRoutes"
+    )
 );
 
 
-/* ========================================================
-   CONTACT
-======================================================== */
+// ========================================================
+// CONTACT
+// ========================================================
 
-// अगर contactRoutes.js मौजूद है तो इसे use किया जाएगा
+const contactRoutesPath =
+    path.join(
+        __dirname,
+        "routes",
+        "contactRoutes.js"
+    );
 
-const contactRoutesPath = path.join(
-    __dirname,
-    "routes",
-    "contactRoutes.js"
-);
 
-if (fs.existsSync(contactRoutesPath)) {
+if (
+    fs.existsSync(
+        contactRoutesPath
+    )
+) {
+
     app.use(
         "/api/contact",
-        require("./routes/contactRoutes")
+        require(
+            "./routes/contactRoutes"
+        )
     );
 }
 
 
-/* ========================================================
-   SITE FEATURES
-======================================================== */
+// ========================================================
+// SITE FEATURES
+// ========================================================
 
-// Live TV, Live Blog और E-paper जैसी
-// frontend/site services के लिए route support
+const siteRoutesPath =
+    path.join(
+        __dirname,
+        "routes",
+        "siteRoutes.js"
+    );
 
-const siteRoutesPath = path.join(
-    __dirname,
-    "routes",
-    "siteRoutes.js"
-);
 
-if (fs.existsSync(siteRoutesPath)) {
+if (
+    fs.existsSync(
+        siteRoutesPath
+    )
+) {
+
     app.use(
         "/api/site",
-        require("./routes/siteRoutes")
+        require(
+            "./routes/siteRoutes"
+        )
     );
 }
 
 
-/* ========================================================
-   PUBLIC ADVERTISEMENT SYSTEM
-======================================================== */
+// ========================================================
+// PUBLIC ADVERTISEMENT SYSTEM
+// ========================================================
 
-// Public Advertisement API
-//
-// GET:
-// /api/ads
-//
-// Optional:
-//
-// /api/ads?position=home_top
-// /api/ads?position=sidebar
-// /api/ads?device=mobile
-// /api/ads?device=desktop
-//
-// Impression:
-//
-// POST /api/ads/:id/impression
-//
-// Click:
-//
-// POST /api/ads/:id/click
-//
-// IMPORTANT:
-//
-// Public users can ONLY:
-// - View active ads
-// - Record impressions
-// - Record clicks
-//
-// Public users CANNOT:
-// - Create ads
-// - Update ads
-// - Toggle ads
-// - Delete ads
-//
-// Owner-only Ad Management:
-//
-// /api/admin/ads
-//
-// Owner-only Ad Settings:
-//
-// /api/admin/ad-settings
-//
-// Owner-only Ad Analytics:
-//
-// /api/admin/ad-analytics
+/*
+    Public users can:
 
-const adRoutesPath = path.join(
-    __dirname,
-    "routes",
-    "adRoutes.js"
-);
+    ✅ View active advertisements
 
-if (fs.existsSync(adRoutesPath)) {
+    ✅ Record impressions
+
+    ✅ Record clicks
+
+
+    Public users CANNOT:
+
+    ❌ Create advertisements
+
+    ❌ Update advertisements
+
+    ❌ Delete advertisements
+
+    ❌ Toggle advertisements
+
+    ❌ Access analytics
+
+    ❌ Change ad settings
+*/
+
+
+const adRoutesPath =
+    path.join(
+        __dirname,
+        "routes",
+        "adRoutes.js"
+    );
+
+
+if (
+    fs.existsSync(
+        adRoutesPath
+    )
+) {
+
     app.use(
         "/api/ads",
-        require("./routes/adRoutes")
+        require(
+            "./routes/adRoutes"
+        )
     );
 }
 
 
-/* =========================================================
-   404 HANDLER
-========================================================= */
+// ========================================================
+// 404 HANDLER
+// ========================================================
 
-app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: "API route नहीं मिला",
-        path: req.originalUrl
-    });
-});
+app.use(
+    (req, res) => {
 
+        res.status(404).json({
 
-/* =========================================================
-   GLOBAL ERROR HANDLER
-========================================================= */
-
-app.use((err, req, res, next) => {
-    console.error("SERVER ERROR:", err);
-
-    // Multer file upload error
-    if (err.code === "LIMIT_FILE_SIZE") {
-        return res.status(400).json({
             success: false,
-            message: "File बहुत बड़ी है।"
+
+            message:
+                "API route नहीं मिला",
+
+            path:
+                req.originalUrl
         });
     }
+);
 
-    // Validation error
-    if (err.name === "ValidationError") {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid data",
-            errors: Object.values(err.errors).map(
-                (error) => error.message
+
+// ========================================================
+// GLOBAL ERROR HANDLER
+// ========================================================
+
+app.use(
+    (
+        err,
+        req,
+        res,
+        next
+    ) => {
+
+        console.error(
+            "SERVER ERROR:",
+            err
+        );
+
+
+        // ----------------------------------------------
+        // FILE SIZE ERROR
+        // ----------------------------------------------
+
+        if (
+            err.code ===
+            "LIMIT_FILE_SIZE"
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    success: false,
+
+                    message:
+                        "File बहुत बड़ी है।"
+                });
+        }
+
+
+        // ----------------------------------------------
+        // VALIDATION ERROR
+        // ----------------------------------------------
+
+        if (
+            err.name ===
+            "ValidationError"
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    success: false,
+
+                    message:
+                        "Invalid data",
+
+                    errors:
+                        Object.values(
+                            err.errors
+                        ).map(
+                            (error) =>
+                                error.message
+                        )
+                });
+        }
+
+
+        // ----------------------------------------------
+        // INVALID OBJECT ID
+        // ----------------------------------------------
+
+        if (
+            err.name ===
+            "CastError"
+        ) {
+
+            return res
+                .status(400)
+                .json({
+
+                    success: false,
+
+                    message:
+                        "Invalid ID"
+                });
+        }
+
+
+        // ----------------------------------------------
+        // DEFAULT ERROR
+        // ----------------------------------------------
+
+        return res
+            .status(
+                err.status || 500
             )
-        });
+            .json({
+
+                success: false,
+
+                message:
+                    err.message ||
+                    "Internal Server Error"
+            });
     }
+);
 
-    // MongoDB invalid ObjectId
-    if (err.name === "CastError") {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid ID"
-        });
+
+// ========================================================
+// START SERVER
+// ========================================================
+
+const server =
+    app.listen(
+        PORT,
+        () => {
+
+            console.log("");
+
+            console.log(
+                "=========================================="
+            );
+
+            console.log(
+                "       आवाज राजस्थान BACKEND"
+            );
+
+            console.log(
+                "=========================================="
+            );
+
+
+            console.log(
+                `🚀 Server: http://localhost:${PORT}`
+            );
+
+
+            console.log(
+                `📰 News API: http://localhost:${PORT}/api/news`
+            );
+
+
+            console.log(
+                `🔐 Auth API: http://localhost:${PORT}/api/auth`
+            );
+
+
+            console.log(
+                `👑 Admin API: http://localhost:${PORT}/api/admin`
+            );
+
+
+            console.log(
+                `📢 Public Ads API: http://localhost:${PORT}/api/ads`
+            );
+
+
+            console.log(
+                `👑 Owner Ads API: http://localhost:${PORT}/api/admin/ads`
+            );
+
+
+            console.log(
+                `⚙️ Ad Settings: http://localhost:${PORT}/api/admin/ad-settings`
+            );
+
+
+            console.log(
+                `📊 Ad Analytics: http://localhost:${PORT}/api/admin/ad-analytics`
+            );
+
+
+            console.log(
+                `❤️ Health: http://localhost:${PORT}/api/health`
+            );
+
+
+            console.log(
+                "=========================================="
+            );
+
+            console.log("");
+        }
+    );
+
+
+// ========================================================
+// SERVER ERROR HANDLING
+// ========================================================
+
+server.on(
+    "error",
+    (error) => {
+
+        if (
+            error.code ===
+            "EADDRINUSE"
+        ) {
+
+            console.error(
+                `❌ Port ${PORT} पहले से इस्तेमाल हो रहा है।`
+            );
+
+        } else {
+
+            console.error(
+                "❌ Server Error:",
+                error
+            );
+        }
+
+        process.exit(1);
     }
-
-    res.status(err.status || 500).json({
-        success: false,
-        message:
-            err.message ||
-            "Internal Server Error"
-    });
-});
+);
 
 
-/* =========================================================
-   START SERVER
-========================================================= */
+// ========================================================
+// GRACEFUL SHUTDOWN
+// ========================================================
 
-const server = app.listen(PORT, () => {
-    console.log("");
-    console.log("==========================================");
-    console.log("       आवाज राजस्थान BACKEND");
-    console.log("==========================================");
+const shutdown =
+    (signal) => {
 
-    console.log(
-        `🚀 Server: http://localhost:${PORT}`
-    );
-
-    console.log(
-        `📰 News API: http://localhost:${PORT}/api/news`
-    );
-
-    console.log(
-        `🔐 Auth API: http://localhost:${PORT}/api/auth`
-    );
-
-    console.log(
-        `👑 Admin API: http://localhost:${PORT}/api/admin`
-    );
-
-    console.log(
-        `📢 Public Ads API: http://localhost:${PORT}/api/ads`
-    );
-
-    console.log(
-        `👑 Owner Ads API: http://localhost:${PORT}/api/admin/ads`
-    );
-
-    console.log(
-        `⚙️ Owner Ad Settings: http://localhost:${PORT}/api/admin/ad-settings`
-    );
-
-    console.log(
-        `📊 Owner Ad Analytics: http://localhost:${PORT}/api/admin/ad-analytics`
-    );
-
-    console.log(
-        `❤️ Health: http://localhost:${PORT}/api/health`
-    );
-
-    console.log("==========================================");
-    console.log("");
-});
-
-
-/* =========================================================
-   SERVER ERROR HANDLING
-========================================================= */
-
-server.on("error", (error) => {
-    if (error.code === "EADDRINUSE") {
-        console.error(
-            `❌ Port ${PORT} पहले से इस्तेमाल हो रहा है।`
+        console.log(
+            `\n${signal} received.`
         );
-    } else {
-        console.error(
-            "❌ Server Error:",
-            error
+
+
+        server.close(
+            () => {
+
+                console.log(
+                    "HTTP server बंद हो गया।"
+                );
+
+                process.exit(0);
+            }
         );
+    };
+
+
+process.on(
+    "SIGINT",
+    () => {
+        shutdown("SIGINT");
     }
-
-    process.exit(1);
-});
+);
 
 
-/* =========================================================
-   GRACEFUL SHUTDOWN
-========================================================= */
-
-const shutdown = (signal) => {
-    console.log(`\n${signal} received.`);
-
-    server.close(() => {
-        console.log("HTTP server बंद हो गया।");
-        process.exit(0);
-    });
-};
-
-process.on("SIGINT", () => {
-    shutdown("SIGINT");
-});
-
-process.on("SIGTERM", () => {
-    shutdown("SIGTERM");
-});
+process.on(
+    "SIGTERM",
+    () => {
+        shutdown("SIGTERM");
+    }
+);
 
 
-/* =========================================================
-   EXPORT APP
-========================================================= */
+// ========================================================
+// EXPORT APP
+// ========================================================
 
 module.exports = app;
