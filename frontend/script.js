@@ -5,7 +5,7 @@
 
 "use strict";
 
-const API_BASE_URL = (window.AAWAZ_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
+const API_BASE_URL = "https://awaaz-rajasthan.onrender.com/api";
 const API_ROOT = API_BASE_URL.replace(/\/api$/, "");
 
 let currentNews = null;
