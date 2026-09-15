@@ -3111,7 +3111,7 @@ window.shareNews =
 async function checkBackendConnection() {
   try {
     await apiRequest(
-      "/../health"
+      "/health"
     );
 
     return true;
