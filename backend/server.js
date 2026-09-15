@@ -234,6 +234,56 @@ if (fs.existsSync(adSettingsRoutesPath)) {
 
 
 /* ========================================================
+   OWNER AD MANAGEMENT
+======================================================== */
+
+// Owner-only Advertisement Management
+//
+// GET:
+// /api/admin/ads
+//
+// GET ONE:
+// /api/admin/ads/:id
+//
+// CREATE:
+// POST /api/admin/ads
+//
+// UPDATE:
+// PUT /api/admin/ads/:id
+//
+// TOGGLE:
+// PATCH /api/admin/ads/:id/toggle
+//
+// DELETE:
+// DELETE /api/admin/ads/:id
+//
+// Security:
+// adminProtect + ownerOnly
+//
+// Normal Admin:
+// ❌ Cannot create
+// ❌ Cannot update
+// ❌ Cannot toggle
+// ❌ Cannot delete
+//
+// Public:
+// ❌ No management access
+
+const adminAdRoutesPath = path.join(
+    __dirname,
+    "routes",
+    "adminAdRoutes.js"
+);
+
+if (fs.existsSync(adminAdRoutesPath)) {
+    app.use(
+        "/api/admin/ads",
+        require("./routes/adminAdRoutes")
+    );
+}
+
+
+/* ========================================================
    NEWS
 ======================================================== */
 
