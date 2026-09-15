@@ -7591,7 +7591,7 @@ select:focus-visible {
    PAGE TRANSITION
    ========================================================= */
 
-.screen {
+.page-screen.active-screen {
   animation: screenFade 0.25s ease;
 }
 
