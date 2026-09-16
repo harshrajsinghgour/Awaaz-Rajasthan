@@ -14054,10 +14054,6 @@ window.addEventListener(
    SEARCH CONFIGURATION
 ============================================================ */
 
-Object.assign(SEARCH_CONFIG, {
-    ...
-});
-
     minCharacters:
         2,
 
