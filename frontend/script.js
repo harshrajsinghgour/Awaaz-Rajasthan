@@ -14054,7 +14054,9 @@ window.addEventListener(
    SEARCH CONFIGURATION
 ============================================================ */
 
-const SEARCH_CONFIG = {
+Object.assign(SEARCH_CONFIG, {
+    ...
+});
 
     minCharacters:
         2,
