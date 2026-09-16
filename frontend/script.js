@@ -29733,4 +29733,22270 @@ function renderRelatedNews(
 /* ============================================================
    ARTICLE SHARE DATA
 ============================================================ */
+function getArticleShareData(
+    article
+) {
 
+    const title =
+        article?.title ||
+        document.title ||
+        "आवाज़ राजस्थान";
+
+
+    const url =
+        article?.url ||
+        window.location.href;
+
+
+    return {
+
+        title:
+            title,
+
+        text:
+            `${title} — आवाज़ राजस्थान`,
+
+        url:
+            url
+
+    };
+
+}
+
+
+/* ============================================================
+   SHARE ARTICLE
+============================================================ */
+
+async function shareArticle(
+    article = null
+) {
+
+    const target =
+        article ||
+        ArticleState.article;
+
+
+    const data =
+        getArticleShareData(
+            target
+        );
+
+
+    if (
+        navigator.share
+    ) {
+
+        try {
+
+            await navigator.share(
+                data
+            );
+
+
+            return true;
+
+        } catch (
+            error
+        ) {
+
+            if (
+                error?.name ===
+                "AbortError"
+            ) {
+
+                return false;
+
+            }
+
+        }
+
+    }
+
+
+    return copyTextToClipboard(
+        `${data.title}\n${data.url}`
+    )
+        .then(
+            success => {
+
+                if (
+                    success
+                ) {
+
+                    showToast(
+                        "खबर का लिंक कॉपी हो गया।",
+                        "success"
+                    );
+
+                }
+
+
+                return success;
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   BOOKMARK ARTICLE
+============================================================ */
+
+function toggleArticleBookmark(
+    article = null
+) {
+
+    const target =
+        article ||
+        ArticleState.article;
+
+
+    if (
+        !target
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        typeof toggleBookmark ===
+        "function"
+    ) {
+
+        return toggleBookmark(
+            target
+        );
+
+    }
+
+
+    const id =
+        getArticleId(
+            target
+        );
+
+
+    if (
+        !id
+    ) {
+
+        return false;
+
+    }
+
+
+    const key =
+        "awaaz_bookmarks";
+
+
+    const bookmarks =
+        getStorage(
+            key,
+            []
+        );
+
+
+    const exists =
+        bookmarks.some(
+            item =>
+                String(
+                    getArticleId(
+                        item
+                    )
+                ) ===
+                String(
+                    id
+                )
+        );
+
+
+    let next;
+
+
+    if (
+        exists
+    ) {
+
+        next =
+            bookmarks.filter(
+                item =>
+                    String(
+                        getArticleId(
+                            item
+                        )
+                    ) !==
+                    String(
+                        id
+                    )
+            );
+
+    } else {
+
+        next =
+            [
+                target,
+                ...bookmarks
+            ];
+
+    }
+
+
+    setStorage(
+        key,
+        next
+    );
+
+
+    updateBookmarkButtons(
+        id,
+        !exists
+    );
+
+
+    showToast(
+        exists
+            ? "खबर सेव लिस्ट से हटा दी गई।"
+            : "खबर सेव कर ली गई।",
+        "success"
+    );
+
+
+    return !exists;
+
+}
+
+
+/* ============================================================
+   UPDATE BOOKMARK BUTTONS
+============================================================ */
+
+function updateBookmarkButtons(
+    articleId,
+    active
+) {
+
+    $$(
+        `[data-article-bookmark][data-article-id="${CSS.escape(
+            String(articleId)
+        )}"]`
+    )
+    .forEach(
+        button => {
+
+            button.classList.toggle(
+                "active",
+                active
+            );
+
+
+            button.setAttribute(
+                "aria-pressed",
+                String(
+                    active
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   PRINT ARTICLE
+============================================================ */
+
+function printArticle() {
+
+    window.print();
+
+}
+
+
+/* ============================================================
+   ARTICLE ACTIONS
+============================================================ */
+
+function initializeArticleActions(
+    article
+) {
+
+    const articleId =
+        getArticleId(
+            article
+        );
+
+
+    $$(
+        "[data-article-share]"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    shareArticle(
+                        article
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    $$(
+        "[data-article-bookmark]"
+    )
+    .forEach(
+        button => {
+
+            button.dataset.articleId =
+                articleId;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    toggleArticleBookmark(
+                        article
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    $$(
+        "[data-article-print]"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                printArticle
+            );
+
+        }
+    );
+
+
+    $$(
+        "[data-tag]"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const tag =
+                        button.dataset.tag;
+
+
+                    if (
+                        tag &&
+                        typeof performSearch ===
+                            "function"
+                    ) {
+
+                        performSearch(
+                            tag
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   READING PROGRESS
+============================================================ */
+
+function initializeReadingProgress() {
+
+    const article =
+        getArticleContainer();
+
+
+    if (
+        !article
+    ) {
+
+        return;
+
+    }
+
+
+    let progressBar =
+        document.querySelector(
+            "#readingProgress, " +
+            ".reading-progress, " +
+            "[data-reading-progress]"
+        );
+
+
+    if (
+        !progressBar
+    ) {
+
+        progressBar =
+            createElement(
+                "div",
+                {
+
+                    id:
+                        "readingProgress",
+
+                    className:
+                        "reading-progress"
+
+                }
+            );
+
+
+        document.body.prepend(
+            progressBar
+        );
+
+    }
+
+
+    const update =
+        () => {
+
+            const rect =
+                article.getBoundingClientRect();
+
+
+            const articleTop =
+                window.scrollY +
+                rect.top;
+
+
+            const articleHeight =
+                article.offsetHeight;
+
+
+            const viewport =
+                window.innerHeight;
+
+
+            const current =
+                window.scrollY -
+                articleTop +
+                viewport;
+
+
+            const denominator =
+                Math.max(
+                    1,
+                    articleHeight
+                );
+
+
+            const percentage =
+                Math.min(
+                    100,
+                    Math.max(
+                        0,
+                        (
+                            current /
+                            denominator
+                        ) *
+                        100
+                    )
+                );
+
+
+            ArticleState.progress =
+                percentage;
+
+
+            progressBar.style.width =
+                `${percentage}%`;
+
+        };
+
+
+    if (
+        !ArticleState._progressBound
+    ) {
+
+        window.addEventListener(
+            "scroll",
+            update,
+            {
+
+                passive:
+                    true
+
+            }
+        );
+
+
+        window.addEventListener(
+            "resize",
+            update
+        );
+
+
+        ArticleState._progressBound =
+            true;
+
+    }
+
+
+    update();
+
+}
+
+
+/* ============================================================
+   ARTICLE PAGE DETECTION
+============================================================ */
+
+function isArticlePage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path.startsWith(
+            "/news/"
+        ) ||
+        path.startsWith(
+            "/article/"
+        ) ||
+        path.startsWith(
+            "/story/"
+        ) ||
+        !!document.querySelector(
+            "#articlePage, #articleDetails, [data-article-page]"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   ARTICLE PAGE INITIALIZATION
+============================================================ */
+
+async function initializeArticlePage() {
+
+    if (
+        !isArticlePage()
+    ) {
+
+        return;
+
+    }
+
+
+    const id =
+        getArticleIdFromURL();
+
+
+    if (
+        !id
+    ) {
+
+        return;
+
+    }
+
+
+    ArticleState.id =
+        id;
+
+
+    await loadArticle(
+        id
+    );
+
+
+    ArticleState.initialized =
+        true;
+
+}
+
+
+/* ============================================================
+   ARTICLE GLOBAL EXPORT
+============================================================ */
+
+window.AwaazRajasthan.article = {
+
+    state:
+        ArticleState,
+
+    getId:
+        getArticleIdFromURL,
+
+    fetch:
+        fetchArticleById,
+
+    load:
+        loadArticle,
+
+    related:
+        loadRelatedNews,
+
+    share:
+        shareArticle,
+
+    bookmark:
+        toggleArticleBookmark,
+
+    print:
+        printArticle,
+
+    progress:
+        () =>
+            ArticleState.progress,
+
+    initialize:
+        initializeArticlePage
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeArticlePage();
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 19/30
+============================================================ */
+
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 20/30
+
+   BOOKMARK SYSTEM
+   SAVED NEWS
+   LOCAL STORAGE
+   SAVED NEWS PAGE
+   REMOVE BOOKMARK
+   CLEAR BOOKMARKS
+============================================================ */
+
+
+/* ============================================================
+   BOOKMARK CONFIGURATION
+============================================================ */
+
+const BOOKMARK_CONFIG = {
+
+    storageKey:
+        "awaaz_bookmarks",
+
+    containerSelectors: [
+
+        "#bookmarkedNews",
+
+        "#savedNews",
+
+        "#savedNewsGrid",
+
+        ".bookmarked-news",
+
+        ".saved-news-grid",
+
+        "[data-bookmarked-news]"
+
+    ],
+
+    countSelectors: [
+
+        "#bookmarkCount",
+
+        ".bookmark-count",
+
+        "[data-bookmark-count]"
+
+    ]
+
+};
+
+
+/* ============================================================
+   BOOKMARK STATE
+============================================================ */
+
+const BookmarkState = {
+
+    items:
+        [],
+
+    initialized:
+        false,
+
+    loading:
+        false
+
+};
+
+
+/* ============================================================
+   GET BOOKMARKS
+============================================================ */
+
+function getBookmarks() {
+
+    const bookmarks =
+        getStorage(
+            BOOKMARK_CONFIG.storageKey,
+            []
+        );
+
+
+    if (
+        !Array.isArray(
+            bookmarks
+        )
+    ) {
+
+        return [];
+
+    }
+
+
+    return bookmarks.filter(
+        item =>
+            item &&
+            typeof item ===
+                "object"
+    );
+
+}
+
+
+/* ============================================================
+   SAVE BOOKMARKS
+============================================================ */
+
+function saveBookmarks(
+    bookmarks
+) {
+
+    const items =
+        Array.isArray(
+            bookmarks
+        )
+            ? bookmarks
+            : [];
+
+
+    setStorage(
+        BOOKMARK_CONFIG.storageKey,
+        items
+    );
+
+
+    BookmarkState.items =
+        items;
+
+
+    updateBookmarkCount();
+
+}
+
+
+/* ============================================================
+   GET BOOKMARK ID
+============================================================ */
+
+function getBookmarkId(
+    article
+) {
+
+    if (
+        !article
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(
+        article._id ||
+        article.id ||
+        article.newsId ||
+        article.slug ||
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   CHECK BOOKMARK
+============================================================ */
+
+function isBookmarked(
+    articleOrId
+) {
+
+    const id =
+        typeof articleOrId ===
+            "object"
+            ? getBookmarkId(
+                articleOrId
+            )
+            : String(
+                articleOrId ||
+                ""
+            );
+
+
+    if (
+        !id
+    ) {
+
+        return false;
+
+    }
+
+
+    return BookmarkState.items.some(
+        item =>
+            getBookmarkId(
+                item
+            ) ===
+            id
+    );
+
+}
+
+
+/* ============================================================
+   ADD BOOKMARK
+============================================================ */
+
+function addBookmark(
+    article
+) {
+
+    if (
+        !article
+    ) {
+
+        return false;
+
+    }
+
+
+    const id =
+        getBookmarkId(
+            article
+        );
+
+
+    if (
+        !id
+    ) {
+
+        return false;
+
+    }
+
+
+    const current =
+        getBookmarks();
+
+
+    const exists =
+        current.some(
+            item =>
+                getBookmarkId(
+                    item
+                ) ===
+                id
+        );
+
+
+    if (
+        exists
+    ) {
+
+        BookmarkState.items =
+            current;
+
+
+        updateBookmarkButtonsGlobal(
+            id,
+            true
+        );
+
+
+        return true;
+
+    }
+
+
+    const updated = [
+
+        article,
+
+        ...current
+
+    ];
+
+
+    saveBookmarks(
+        updated
+    );
+
+
+    updateBookmarkButtonsGlobal(
+        id,
+        true
+    );
+
+
+    showToast(
+        "खबर सेव कर ली गई।",
+        "success"
+    );
+
+
+    return true;
+
+}
+
+
+/* ============================================================
+   REMOVE BOOKMARK
+============================================================ */
+
+function removeBookmark(
+    articleOrId,
+    options = {}
+) {
+
+    const id =
+        typeof articleOrId ===
+            "object"
+            ? getBookmarkId(
+                articleOrId
+            )
+            : String(
+                articleOrId ||
+                ""
+            );
+
+
+    if (
+        !id
+    ) {
+
+        return false;
+
+    }
+
+
+    const current =
+        getBookmarks();
+
+
+    const updated =
+        current.filter(
+            item =>
+                getBookmarkId(
+                    item
+                ) !==
+                id
+        );
+
+
+    saveBookmarks(
+        updated
+    );
+
+
+    updateBookmarkButtonsGlobal(
+        id,
+        false
+    );
+
+
+    if (
+        options.toast !==
+        false
+    ) {
+
+        showToast(
+            "खबर सेव लिस्ट से हटा दी गई।",
+            "success"
+        );
+
+    }
+
+
+    if (
+        options.rerender !==
+        false
+    ) {
+
+        renderBookmarksPage();
+
+    }
+
+
+    return true;
+
+}
+
+
+/* ============================================================
+   TOGGLE BOOKMARK
+============================================================ */
+
+function toggleBookmark(
+    article
+) {
+
+    if (
+        isBookmarked(
+            article
+        )
+    ) {
+
+        removeBookmark(
+            article
+        );
+
+
+        return false;
+
+    }
+
+
+    return addBookmark(
+        article
+    );
+
+}
+
+
+/* ============================================================
+   CLEAR ALL BOOKMARKS
+============================================================ */
+
+function clearAllBookmarks(
+    options = {}
+) {
+
+    const current =
+        getBookmarks();
+
+
+    if (
+        !current.length
+    ) {
+
+        showToast(
+            "सेव लिस्ट पहले से खाली है।",
+            "info"
+        );
+
+
+        return;
+
+    }
+
+
+    if (
+        options.confirm !==
+        false
+    ) {
+
+        const confirmed =
+            window.confirm(
+                "क्या आप सभी सेव खबरें हटाना चाहते हैं?"
+            );
+
+
+        if (
+            !confirmed
+        ) {
+
+            return;
+
+        }
+
+    }
+
+
+    saveBookmarks(
+        []
+    );
+
+
+    updateAllBookmarkButtons(
+        false
+    );
+
+
+    renderBookmarksPage();
+
+
+    showToast(
+        "सभी सेव खबरें हटा दी गई हैं।",
+        "success"
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE BOOKMARK BUTTONS
+============================================================ */
+
+function updateBookmarkButtonsGlobal(
+    articleId,
+    active
+) {
+
+    const id =
+        String(
+            articleId ||
+            ""
+        );
+
+
+    if (
+        !id
+    ) {
+
+        return;
+
+    }
+
+
+    $$(
+        "[data-bookmark], " +
+        "[data-article-bookmark]"
+    )
+    .forEach(
+        button => {
+
+            const buttonId =
+                String(
+                    button.dataset.articleId ||
+                    button.dataset.bookmarkId ||
+                    ""
+                );
+
+
+            if (
+                buttonId !==
+                id
+            ) {
+
+                return;
+
+            }
+
+
+            button.classList.toggle(
+                "active",
+                active
+            );
+
+
+            button.classList.toggle(
+                "bookmarked",
+                active
+            );
+
+
+            button.setAttribute(
+                "aria-pressed",
+                String(
+                    active
+                )
+            );
+
+
+            const label =
+                button.querySelector(
+                    "[data-bookmark-label]"
+                );
+
+
+            if (
+                label
+            ) {
+
+                label.textContent =
+                    active
+                        ? "सेव्ड"
+                        : "सेव";
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE ALL BOOKMARK BUTTONS
+============================================================ */
+
+function updateAllBookmarkButtons(
+    forceState = null
+) {
+
+    $$(
+        "[data-bookmark], " +
+        "[data-article-bookmark]"
+    )
+    .forEach(
+        button => {
+
+            const id =
+                button.dataset.articleId ||
+                button.dataset.bookmarkId ||
+                "";
+
+
+            if (
+                !id
+            ) {
+
+                return;
+
+            }
+
+
+            const active =
+                forceState ===
+                    null
+                    ? isBookmarked(
+                        id
+                    )
+                    : forceState;
+
+
+            button.classList.toggle(
+                "active",
+                active
+            );
+
+
+            button.classList.toggle(
+                "bookmarked",
+                active
+            );
+
+
+            button.setAttribute(
+                "aria-pressed",
+                String(
+                    active
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE BOOKMARK COUNT
+============================================================ */
+
+function updateBookmarkCount() {
+
+    const count =
+        getBookmarks().length;
+
+
+    BOOKMARK_CONFIG.countSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            element.textContent =
+                                String(
+                                    count
+                                );
+
+
+                            element.classList.toggle(
+                                "has-items",
+                                count > 0
+                            );
+
+                        }
+                    );
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   CREATE BOOKMARK CARD
+============================================================ */
+
+function createBookmarkCard(
+    article
+) {
+
+    let card = null;
+
+
+    if (
+        typeof createNewsCard ===
+        "function"
+    ) {
+
+        card =
+            createNewsCard(
+                article,
+                {
+
+                    showExcerpt:
+                        true,
+
+                    showSave:
+                        true
+
+                }
+            );
+
+    } else if (
+        typeof createSearchResultCard ===
+        "function"
+    ) {
+
+        card =
+            createSearchResultCard(
+                article
+            );
+
+    }
+
+
+    if (
+        !card
+    ) {
+
+        card =
+            createElement(
+                "article",
+                {
+
+                    className:
+                        "news-card saved-news-card"
+
+                }
+            );
+
+
+        const image =
+            getArticleImage(
+                article
+            );
+
+
+        const title =
+            article.title ||
+            "समाचार";
+
+
+        card.innerHTML =
+            `
+
+            ${
+                image
+                    ? `
+                        <div class="news-card-image">
+
+                            <img
+                                src="${escapeHTML(image)}"
+                                alt="${escapeHTML(title)}"
+                                loading="lazy"
+                            >
+
+                        </div>
+                      `
+                    : ""
+            }
+
+            <div class="news-card-content">
+
+                <span class="news-category">
+
+                    ${escapeHTML(
+                        getArticleCategoryName(
+                            article
+                        ) ||
+                        "राजस्थान"
+                    )}
+
+                </span>
+
+                <h3 class="news-title">
+
+                    ${escapeHTML(
+                        title
+                    )}
+
+                </h3>
+
+            </div>
+
+            `;
+
+    }
+
+
+    if (
+        !card
+    ) {
+
+        return null;
+
+    }
+
+
+    card.classList.add(
+        "saved-news-card"
+    );
+
+
+    card.dataset.articleId =
+        getBookmarkId(
+            article
+        );
+
+
+    /*
+     * Remove button
+     */
+
+    const removeButton =
+        createElement(
+            "button",
+            {
+
+                className:
+                    "saved-news-remove",
+
+                text:
+                    "✕",
+
+                attributes: {
+
+                    type:
+                        "button",
+
+                    title:
+                        "सेव लिस्ट से हटाएं",
+
+                    "aria-label":
+                        "सेव लिस्ट से हटाएं"
+
+                }
+
+            }
+        );
+
+
+    removeButton.addEventListener(
+        "click",
+        event => {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+
+            removeBookmark(
+                article
+            );
+
+        }
+    );
+
+
+    card.appendChild(
+        removeButton
+    );
+
+
+    return card;
+
+}
+
+
+/* ============================================================
+   GET BOOKMARK CONTAINERS
+============================================================ */
+
+function getBookmarkContainers() {
+
+    const containers = [];
+
+
+    BOOKMARK_CONFIG
+        .containerSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !containers.includes(
+                                    element
+                                )
+                            ) {
+
+                                containers.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return containers;
+
+}
+
+
+/* ============================================================
+   CREATE BOOKMARK EMPTY STATE
+============================================================ */
+
+function createBookmarkEmptyState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "bookmark-empty-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div class="bookmark-empty-icon"
+             aria-hidden="true">
+            🔖
+        </div>
+
+        <h2>
+            अभी कोई खबर सेव नहीं है
+        </h2>
+
+        <p>
+            पसंद आने वाली खबरों को सेव करें।
+            वे यहां बाद में पढ़ने के लिए मिल जाएंगी।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-go-home
+        >
+            खबरें देखें
+        </button>
+
+        `;
+
+
+    const button =
+        wrapper.querySelector(
+            "[data-go-home]"
+        );
+
+
+    if (
+        button
+    ) {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                navigateTo(
+                    "/"
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   RENDER BOOKMARKS
+============================================================ */
+
+function renderBookmarksPage() {
+
+    const containers =
+        getBookmarkContainers();
+
+
+    const bookmarks =
+        getBookmarks();
+
+
+    BookmarkState.items =
+        bookmarks;
+
+
+    updateBookmarkCount();
+
+
+    if (
+        !containers.length
+    ) {
+
+        return;
+
+    }
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !bookmarks.length
+            ) {
+
+                container.appendChild(
+                    createBookmarkEmptyState()
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            bookmarks.forEach(
+                article => {
+
+                    const card =
+                        createBookmarkCard(
+                            article
+                        );
+
+
+                    if (
+                        card
+                    ) {
+
+                        fragment.appendChild(
+                            card
+                        );
+
+                    }
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+        }
+    );
+
+
+    updateAllBookmarkButtons();
+
+
+    initializeLazyImages();
+
+}
+
+
+/* ============================================================
+   INITIALIZE BOOKMARK BUTTONS
+============================================================ */
+
+function initializeBookmarkButtons() {
+
+    $$(
+        "[data-bookmark], " +
+        "[data-article-bookmark]"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.bookmarkInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.bookmarkInitialized =
+                "true";
+
+
+            const articleId =
+                button.dataset.articleId ||
+                button.dataset.bookmarkId;
+
+
+            if (
+                articleId
+            ) {
+
+                button.dataset.articleId =
+                    articleId;
+
+            }
+
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+                    event.stopPropagation();
+
+
+                    const id =
+                        button.dataset.articleId ||
+                        button.dataset.bookmarkId;
+
+
+                    if (
+                        !id
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const article =
+                        findArticleInCurrentData(
+                            id
+                        );
+
+
+                    if (
+                        article
+                    ) {
+
+                        toggleBookmark(
+                            article
+                        );
+
+
+                        updateAllBookmarkButtons();
+
+                        return;
+
+                    }
+
+
+                    if (
+                        isBookmarked(
+                            id
+                        )
+                    ) {
+
+                        removeBookmark(
+                            id
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    updateAllBookmarkButtons();
+
+}
+
+
+/* ============================================================
+   FIND ARTICLE IN CURRENT DATA
+============================================================ */
+
+function findArticleInCurrentData(
+    id
+) {
+
+    const targetId =
+        String(
+            id ||
+            ""
+        );
+
+
+    if (
+        !targetId
+    ) {
+
+        return null;
+
+    }
+
+
+    const sources = [
+
+        BookmarkState.items,
+
+        CategoryState.results,
+
+        ArticleState.related,
+
+        ArticleState.article
+            ? [
+                ArticleState.article
+            ]
+            : []
+
+    ];
+
+
+    for (
+        const source of
+        sources
+    ) {
+
+        if (
+            !Array.isArray(
+                source
+            )
+        ) {
+
+            continue;
+
+        }
+
+
+        const article =
+            source.find(
+                item =>
+                    getBookmarkId(
+                        item
+                    ) ===
+                    targetId
+            );
+
+
+        if (
+            article
+        ) {
+
+            return article;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* ============================================================
+   BOOKMARK PAGE DETECTION
+============================================================ */
+
+function isBookmarkPage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path ===
+            "/saved" ||
+        path ===
+            "/bookmarks" ||
+        path ===
+            "/saved-news" ||
+        !!document.querySelector(
+            "#bookmarkedNews, #savedNews, [data-bookmarked-news]"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   INITIALIZE BOOKMARK SYSTEM
+============================================================ */
+
+function initializeBookmarkSystem() {
+
+    if (
+        BookmarkState.initialized
+    ) {
+
+        updateBookmarkCount();
+
+        updateAllBookmarkButtons();
+
+        return;
+
+    }
+
+
+    BookmarkState.items =
+        getBookmarks();
+
+
+    initializeBookmarkButtons();
+
+    renderBookmarksPage();
+
+    updateBookmarkCount();
+
+
+    BookmarkState.initialized =
+        true;
+
+}
+
+
+/* ============================================================
+   STORAGE CHANGE SYNC
+============================================================ */
+
+window.addEventListener(
+    "storage",
+    event => {
+
+        if (
+            event.key !==
+            BOOKMARK_CONFIG.storageKey
+        ) {
+
+            return;
+
+        }
+
+
+        BookmarkState.items =
+            getBookmarks();
+
+
+        updateBookmarkCount();
+
+        updateAllBookmarkButtons();
+
+        renderBookmarksPage();
+
+    }
+);
+
+
+/* ============================================================
+   GLOBAL BOOKMARK EXPORT
+============================================================ */
+
+window.AwaazRajasthan.bookmarks = {
+
+    state:
+        BookmarkState,
+
+    get:
+        getBookmarks,
+
+    save:
+        saveBookmarks,
+
+    add:
+        addBookmark,
+
+    remove:
+        removeBookmark,
+
+    toggle:
+        toggleBookmark,
+
+    has:
+        isBookmarked,
+
+    clear:
+        clearAllBookmarks,
+
+    render:
+        renderBookmarksPage,
+
+    initialize:
+        initializeBookmarkSystem
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeBookmarkSystem();
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 20/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 21/30
+
+   SEARCH SYSTEM
+   GLOBAL SEARCH
+   SEARCH INPUT
+   SEARCH RESULTS
+   SEARCH SUGGESTIONS
+   SEARCH PAGINATION
+   SEARCH URL STATE
+============================================================ */
+
+
+/* ============================================================
+   SEARCH CONFIGURATION
+============================================================ */
+
+const SEARCH_CONFIG = {
+
+    minQueryLength:
+        2,
+
+    defaultLimit:
+        12,
+
+    maxLimit:
+        48,
+
+    debounce:
+        350,
+
+    inputSelectors: [
+
+        "#searchInput",
+
+        "#globalSearch",
+
+        ".search-input",
+
+        "[data-search-input]"
+
+    ],
+
+    resultSelectors: [
+
+        "#searchResults",
+
+        "#searchNews",
+
+        "#searchNewsGrid",
+
+        ".search-results",
+
+        ".search-results-grid",
+
+        "[data-search-results]"
+
+    ],
+
+    suggestionSelectors: [
+
+        "#searchSuggestions",
+
+        ".search-suggestions",
+
+        "[data-search-suggestions]"
+
+    ]
+
+};
+
+
+/* ============================================================
+   SEARCH STATE
+============================================================ */
+
+const SearchState = {
+
+    query:
+        "",
+
+    results:
+        [],
+
+    suggestions:
+        [],
+
+    page:
+        1,
+
+    limit:
+        SEARCH_CONFIG.defaultLimit,
+
+    total:
+        0,
+
+    totalPages:
+        1,
+
+    loading:
+        false,
+
+    suggestionsLoading:
+        false,
+
+    initialized:
+        false,
+
+    controller:
+        null
+
+};
+
+
+/* ============================================================
+   GET SEARCH INPUTS
+============================================================ */
+
+function getSearchInputs() {
+
+    const elements = [];
+
+
+    SEARCH_CONFIG.inputSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !elements.includes(
+                                    element
+                                )
+                            ) {
+
+                                elements.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return elements;
+
+}
+
+
+/* ============================================================
+   GET SEARCH RESULT CONTAINERS
+============================================================ */
+
+function getSearchResultContainers() {
+
+    const elements = [];
+
+
+    SEARCH_CONFIG.resultSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !elements.includes(
+                                    element
+                                )
+                            ) {
+
+                                elements.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return elements;
+
+}
+
+
+/* ============================================================
+   GET SEARCH SUGGESTION CONTAINERS
+============================================================ */
+
+function getSearchSuggestionContainers() {
+
+    const elements = [];
+
+
+    SEARCH_CONFIG.suggestionSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !elements.includes(
+                                    element
+                                )
+                            ) {
+
+                                elements.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return elements;
+
+}
+
+
+/* ============================================================
+   NORMALIZE SEARCH QUERY
+============================================================ */
+
+function normalizeSearchQuery(
+    value
+) {
+
+    return normalizeText(
+        value ||
+        ""
+    )
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .trim();
+
+}
+
+
+/* ============================================================
+   GET SEARCH QUERY FROM URL
+============================================================ */
+
+function getSearchQueryFromURL() {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    return normalizeSearchQuery(
+        url.searchParams.get(
+            "q"
+        ) ||
+        url.searchParams.get(
+            "search"
+        ) ||
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   GET SEARCH PAGE FROM URL
+============================================================ */
+
+function getSearchPageFromURL() {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    return Math.max(
+        1,
+        Number(
+            url.searchParams.get(
+                "page"
+            )
+        ) || 1
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE SEARCH URL
+============================================================ */
+
+function updateSearchURL(
+    options = {}
+) {
+
+    if (
+        !window.history ||
+        !window.history.pushState
+    ) {
+
+        return;
+
+    }
+
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    if (
+        SearchState.query
+    ) {
+
+        url.searchParams.set(
+            "q",
+            SearchState.query
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "q"
+        );
+
+    }
+
+
+    if (
+        SearchState.page > 1
+    ) {
+
+        url.searchParams.set(
+            "page",
+            String(
+                SearchState.page
+            )
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "page"
+        );
+
+    }
+
+
+    if (
+        options.replace
+    ) {
+
+        window.history.replaceState(
+            {
+
+                q:
+                    SearchState.query,
+
+                page:
+                    SearchState.page
+
+            },
+            "",
+            url
+        );
+
+    } else {
+
+        window.history.pushState(
+            {
+
+                q:
+                    SearchState.query,
+
+                page:
+                    SearchState.page
+
+            },
+            "",
+            url
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   BUILD SEARCH QUERY
+============================================================ */
+
+function buildSearchQuery(
+    query,
+    options = {}
+) {
+
+    const params =
+        new URLSearchParams();
+
+
+    const search =
+        normalizeSearchQuery(
+            query
+        );
+
+
+    const page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                SearchState.page
+            ) || 1
+        );
+
+
+    const limit =
+        Math.min(
+            SEARCH_CONFIG.maxLimit,
+            Math.max(
+                1,
+                Number(
+                    options.limit ??
+                    SearchState.limit
+                ) ||
+                SEARCH_CONFIG.defaultLimit
+            )
+        );
+
+
+    if (
+        search
+    ) {
+
+        params.set(
+            "search",
+            search
+        );
+
+    }
+
+
+    params.set(
+        "page",
+        String(
+            page
+        )
+    );
+
+
+    params.set(
+        "limit",
+        String(
+            limit
+        )
+    );
+
+
+    if (
+        options.category
+    ) {
+
+        params.set(
+            "category",
+            normalizeText(
+                options.category
+            )
+        );
+
+    }
+
+
+    if (
+        options.district
+    ) {
+
+        params.set(
+            "district",
+            normalizeText(
+                options.district
+            )
+        );
+
+    }
+
+
+    if (
+        options.sort
+    ) {
+
+        params.set(
+            "sort",
+            normalizeText(
+                options.sort
+            )
+        );
+
+    }
+
+
+    return params;
+
+}
+
+
+/* ============================================================
+   FETCH SEARCH RESULTS
+============================================================ */
+
+async function fetchSearchResults(
+    query,
+    options = {}
+) {
+
+    const search =
+        normalizeSearchQuery(
+            query
+        );
+
+
+    if (
+        search.length <
+        SEARCH_CONFIG.minQueryLength
+    ) {
+
+        return {
+
+            news:
+                [],
+
+            total:
+                0,
+
+            page:
+                1,
+
+            totalPages:
+                1,
+
+            limit:
+                SearchState.limit
+
+        };
+
+    }
+
+
+    if (
+        typeof apiGet !==
+        "function"
+    ) {
+
+        throw new Error(
+            "API GET function unavailable"
+        );
+
+    }
+
+
+    if (
+        SearchState.controller
+    ) {
+
+        SearchState.controller.abort();
+
+    }
+
+
+    SearchState.controller =
+        new AbortController();
+
+
+    const params =
+        buildSearchQuery(
+            search,
+            options
+        );
+
+
+    const endpoint =
+        API_ENDPOINTS.news;
+
+
+    const response =
+        await apiGet(
+            `${endpoint}?${params.toString()}`,
+            {
+
+                signal:
+                    SearchState.controller.signal
+
+            }
+        );
+
+
+    const data =
+        response?.data ||
+        response;
+
+
+    const news =
+        data?.news ||
+        data?.articles ||
+        data?.results ||
+        [];
+
+
+    const pagination =
+        normalizePageData(
+            data?.pagination ||
+            data?.meta ||
+            data
+        );
+
+
+    return {
+
+        news:
+            Array.isArray(
+                news
+            )
+                ? news
+                : [],
+
+        total:
+            pagination.totalItems,
+
+        page:
+            pagination.page,
+
+        totalPages:
+            pagination.totalPages,
+
+        limit:
+            pagination.limit
+
+    };
+
+}
+
+
+/* ============================================================
+   SEARCH LOADING UI
+============================================================ */
+
+function renderSearchLoading(
+    containers
+) {
+
+    const targets =
+        Array.isArray(
+            containers
+        )
+            ? containers
+            : getSearchResultContainers();
+
+
+    targets.forEach(
+        container => {
+
+            if (
+                !container
+            ) {
+
+                return;
+
+            }
+
+
+            container.innerHTML =
+                "";
+
+
+            container.appendChild(
+                createCategorySkeleton(
+                    6
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH EMPTY STATE
+============================================================ */
+
+function createSearchEmptyState(
+    query = ""
+) {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "search-empty-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="search-empty-icon"
+            aria-hidden="true"
+        >
+            🔎
+        </div>
+
+        <h2>
+            कोई खबर नहीं मिली
+        </h2>
+
+        <p>
+            ${
+                query
+                    ? `“${escapeHTML(
+                        query
+                    )}” के लिए कोई परिणाम नहीं मिला।`
+                    : "कृपया कोई शब्द खोजें।"
+            }
+        </p>
+
+        <div class="search-empty-help">
+
+            <span>
+                दूसरे शब्दों से खोजकर देखें।
+            </span>
+
+        </div>
+
+        `;
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   SEARCH ERROR STATE
+============================================================ */
+
+function createSearchErrorState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "search-error-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="search-error-icon"
+            aria-hidden="true"
+        >
+            ⚠️
+        </div>
+
+        <h2>
+            सर्च में समस्या आई
+        </h2>
+
+        <p>
+            खबरें लोड नहीं हो सकीं।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-search-retry
+        >
+            दोबारा प्रयास करें
+        </button>
+
+        `;
+
+
+    const retry =
+        wrapper.querySelector(
+            "[data-search-retry]"
+        );
+
+
+    if (
+        retry
+    ) {
+
+        retry.addEventListener(
+            "click",
+            () => {
+
+                performSearch(
+                    SearchState.query,
+                    {
+
+                        updateURL:
+                            false
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   CREATE SEARCH RESULT CARD
+============================================================ */
+
+function createSearchResultCard(
+    article
+) {
+
+    if (
+        typeof createNewsCard ===
+        "function"
+    ) {
+
+        const card =
+            createNewsCard(
+                article,
+                {
+
+                    showExcerpt:
+                        true,
+
+                    showAuthor:
+                        true,
+
+                    showSave:
+                        true
+
+                }
+            );
+
+
+        if (
+            card
+        ) {
+
+            card.classList.add(
+                "search-result-card"
+            );
+
+
+            card.dataset.articleId =
+                getArticleId(
+                    article
+                );
+
+        }
+
+
+        return card;
+
+    }
+
+
+    const card =
+        createElement(
+            "article",
+            {
+
+                className:
+                    "news-card search-result-card",
+
+                attributes: {
+
+                    "data-article-id":
+                        getArticleId(
+                            article
+                        )
+
+                }
+
+            }
+        );
+
+
+    const image =
+        getArticleImage(
+            article
+        );
+
+
+    const title =
+        article.title ||
+        "समाचार";
+
+
+    if (
+        image
+    ) {
+
+        const imageWrap =
+            createElement(
+                "div",
+                {
+
+                    className:
+                        "news-card-image"
+
+                }
+            );
+
+
+        const imageElement =
+            createElement(
+                "img",
+                {
+
+                    attributes: {
+
+                        src:
+                            image,
+
+                        alt:
+                            title,
+
+                        loading:
+                            "lazy"
+
+                    }
+
+                }
+            );
+
+
+        imageWrap.appendChild(
+            imageElement
+        );
+
+
+        card.appendChild(
+            imageWrap
+        );
+
+    }
+
+
+    const content =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "news-card-content"
+
+            }
+        );
+
+
+    content.innerHTML =
+        `
+
+        <span class="news-category">
+            ${escapeHTML(
+                getArticleCategoryName(
+                    article
+                ) ||
+                "राजस्थान"
+            )}
+        </span>
+
+        <h3 class="news-title">
+            ${escapeHTML(
+                title
+            )}
+        </h3>
+
+        ${
+            article.excerpt
+                ? `
+                    <p class="news-excerpt">
+                        ${escapeHTML(
+                            article.excerpt
+                        )}
+                    </p>
+                  `
+                : ""
+        }
+
+        `;
+
+
+    card.appendChild(
+        content
+    );
+
+
+    card.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target.closest(
+                    "button, a"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            openArticle(
+                article
+            );
+
+        }
+    );
+
+
+    return card;
+
+}
+
+
+/* ============================================================
+   RENDER SEARCH RESULTS
+============================================================ */
+
+function renderSearchResults(
+    result
+) {
+
+    const containers =
+        getSearchResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !result ||
+                !result.news ||
+                !result.news.length
+            ) {
+
+                container.appendChild(
+                    createSearchEmptyState(
+                        SearchState.query
+                    )
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            result.news.forEach(
+                article => {
+
+                    const card =
+                        createSearchResultCard(
+                            article
+                        );
+
+
+                    if (
+                        card
+                    ) {
+
+                        fragment.appendChild(
+                            card
+                        );
+
+                    }
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+        }
+    );
+
+
+    initializeArticleCards();
+
+    initializeBookmarkButtons();
+
+    initializeLazyImages();
+
+
+    renderSearchPagination(
+        result
+    );
+
+
+    updateSearchResultHeading();
+
+}
+
+
+/* ============================================================
+   SEARCH RESULT HEADING
+============================================================ */
+
+function updateSearchResultHeading() {
+
+    const headings =
+        $$(
+            "[data-search-heading], " +
+            ".search-heading"
+        );
+
+
+    headings.forEach(
+        heading => {
+
+            if (
+                SearchState.query
+            ) {
+
+                heading.textContent =
+                    `“${SearchState.query}” के खोज परिणाम`;
+
+            } else {
+
+                heading.textContent =
+                    "समाचार खोजें";
+
+            }
+
+        }
+    );
+
+
+    $$(
+        "[data-search-total], " +
+        ".search-total"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                SearchState.total
+                    ? `${SearchState.total} खबरें मिलीं`
+                    : "";
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH PAGINATION
+============================================================ */
+
+function renderSearchPagination(
+    result
+) {
+
+    const containers =
+        $$(
+            "#searchPagination, " +
+            ".search-pagination, " +
+            "[data-search-pagination]"
+        );
+
+
+    containers.forEach(
+        container => {
+
+            renderPagination(
+                {
+
+                    page:
+                        result?.page ||
+                        1,
+
+                    totalPages:
+                        result?.totalPages ||
+                        1,
+
+                    totalItems:
+                        result?.total ||
+                        0,
+
+                    limit:
+                        result?.limit ||
+                        SearchState.limit
+
+                },
+                container,
+                {
+
+                    type:
+                        "search",
+
+                    onPageChange:
+                        page => {
+
+                            SearchState.page =
+                                page;
+
+
+                            performSearch(
+                                SearchState.query,
+                                {
+
+                                    page:
+                                        page,
+
+                                    updateURL:
+                                        true
+
+                                }
+                            );
+
+                        }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   PERFORM SEARCH
+============================================================ */
+
+async function performSearch(
+    query,
+    options = {}
+) {
+
+    const search =
+        normalizeSearchQuery(
+            query
+        );
+
+
+    SearchState.query =
+        search;
+
+
+    SearchState.page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                SearchState.page
+            ) || 1
+        );
+
+
+    if (
+        options.resetPage
+    ) {
+
+        SearchState.page =
+            1;
+
+    }
+
+
+    getSearchInputs()
+        .forEach(
+            input => {
+
+                if (
+                    input.value !==
+                    search
+                ) {
+
+                    input.value =
+                        search;
+
+                }
+
+            }
+        );
+
+
+    if (
+        search.length <
+        SEARCH_CONFIG.minQueryLength
+    ) {
+
+        SearchState.results =
+            [];
+
+
+        SearchState.total =
+            0;
+
+
+        SearchState.totalPages =
+            1;
+
+
+        getSearchResultContainers()
+            .forEach(
+                container => {
+
+                    container.innerHTML =
+                        "";
+
+
+                    container.appendChild(
+                        createSearchEmptyState()
+                    );
+
+                }
+            );
+
+
+        updateSearchResultHeading();
+
+
+        hideSearchSuggestions();
+
+
+        if (
+            options.updateURL !==
+            false
+        ) {
+
+            updateSearchURL();
+
+        }
+
+
+        return {
+
+            news:
+                [],
+
+            total:
+                0,
+
+            page:
+                1,
+
+            totalPages:
+                1,
+
+            limit:
+                SearchState.limit
+
+        };
+
+    }
+
+
+    SearchState.loading =
+        true;
+
+
+    hideSearchSuggestions();
+
+
+    renderSearchLoading();
+
+
+    try {
+
+        const result =
+            await fetchSearchResults(
+                search,
+                {
+
+                    page:
+                        SearchState.page,
+
+                    limit:
+                        SearchState.limit
+
+                }
+            );
+
+
+        SearchState.results =
+            result.news;
+
+
+        SearchState.total =
+            result.total;
+
+
+        SearchState.page =
+            result.page;
+
+
+        SearchState.totalPages =
+            result.totalPages;
+
+
+        SearchState.limit =
+            result.limit;
+
+
+        renderSearchResults(
+            result
+        );
+
+
+        if (
+            options.updateURL !==
+            false
+        ) {
+
+            updateSearchURL();
+
+        }
+
+
+        return result;
+
+    } catch (
+        error
+    ) {
+
+        if (
+            error?.name ===
+            "AbortError"
+        ) {
+
+            return null;
+
+        }
+
+
+        SearchState.results =
+            [];
+
+
+        getSearchResultContainers()
+            .forEach(
+                container => {
+
+                    container.innerHTML =
+                        "";
+
+
+                    container.appendChild(
+                        createSearchErrorState()
+                    );
+
+                }
+            );
+
+
+        handleGlobalError(
+            error,
+            "Search"
+        );
+
+
+        return null;
+
+    } finally {
+
+        SearchState.loading =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   DEBOUNCED SEARCH
+============================================================ */
+
+let searchDebounceTimer =
+    null;
+
+
+function debouncedSearch(
+    query
+) {
+
+    if (
+        searchDebounceTimer
+    ) {
+
+        clearTimeout(
+            searchDebounceTimer
+        );
+
+    }
+
+
+    searchDebounceTimer =
+        setTimeout(
+            () => {
+
+                performSearch(
+                    query,
+                    {
+
+                        page:
+                            1,
+
+                        resetPage:
+                            true,
+
+                        updateURL:
+                            false
+
+                    }
+                );
+
+            },
+            SEARCH_CONFIG.debounce
+        );
+
+}
+
+
+/* ============================================================
+   SEARCH INPUT EVENTS
+============================================================ */
+
+function initializeSearchInputs() {
+
+    const inputs =
+        getSearchInputs();
+
+
+    inputs.forEach(
+        input => {
+
+            if (
+                input.dataset.searchInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            input.dataset.searchInitialized =
+                "true";
+
+
+            input.addEventListener(
+                "input",
+                event => {
+
+                    const value =
+                        normalizeSearchQuery(
+                            event.target.value
+                        );
+
+
+                    getSearchInputs()
+                        .forEach(
+                            other => {
+
+                                if (
+                                    other !==
+                                    input
+                                ) {
+
+                                    other.value =
+                                        value;
+
+                                }
+
+                            }
+                        );
+
+
+                    if (
+                        value.length >=
+                        SEARCH_CONFIG.minQueryLength
+                    ) {
+
+                        showSearchSuggestions(
+                            value
+                        );
+
+                    } else {
+
+                        hideSearchSuggestions();
+
+                    }
+
+
+                    debouncedSearch(
+                        value
+                    );
+
+                }
+            );
+
+
+            input.addEventListener(
+                "keydown",
+                event => {
+
+                    if (
+                        event.key ===
+                        "Enter"
+                    ) {
+
+                        event.preventDefault();
+
+
+                        if (
+                            searchDebounceTimer
+                        ) {
+
+                            clearTimeout(
+                                searchDebounceTimer
+                            );
+
+                        }
+
+
+                        performSearch(
+                            input.value,
+                            {
+
+                                page:
+                                    1,
+
+                                resetPage:
+                                    true,
+
+                                updateURL:
+                                    true
+
+                            }
+                        );
+
+                    }
+
+
+                    if (
+                        event.key ===
+                        "Escape"
+                    ) {
+
+                        hideSearchSuggestions();
+
+                    }
+
+                }
+            );
+
+
+            input.addEventListener(
+                "focus",
+                () => {
+
+                    const value =
+                        normalizeSearchQuery(
+                            input.value
+                        );
+
+
+                    if (
+                        value.length >=
+                        SEARCH_CONFIG.minQueryLength
+                    ) {
+
+                        showSearchSuggestions(
+                            value
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH BUTTONS
+============================================================ */
+
+function initializeSearchButtons() {
+
+    $$(
+        "[data-search-submit], " +
+        "#searchSubmit, " +
+        ".search-submit"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.searchButtonInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.searchButtonInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const input =
+                        getSearchInputs()[0];
+
+
+                    if (
+                        !input
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    performSearch(
+                        input.value,
+                        {
+
+                            page:
+                                1,
+
+                            resetPage:
+                                true,
+
+                            updateURL:
+                                true
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH SUGGESTIONS
+============================================================ */
+
+async function fetchSearchSuggestions(
+    query
+) {
+
+    const search =
+        normalizeSearchQuery(
+            query
+        );
+
+
+    if (
+        search.length <
+        SEARCH_CONFIG.minQueryLength
+    ) {
+
+        return [];
+
+    }
+
+
+    /*
+     * पहले हाल की खोजों से suggestions।
+     */
+
+    const recent =
+        getStorage(
+            "awaaz_recent_searches",
+            []
+        );
+
+
+    const localMatches =
+        Array.isArray(
+            recent
+        )
+            ? recent.filter(
+                item =>
+                    normalizeSearchQuery(
+                        item
+                    )
+                        .toLowerCase()
+                        .includes(
+                            search.toLowerCase()
+                        )
+            )
+            : [];
+
+
+    /*
+     * Backend suggestion endpoint उपलब्ध हो
+     * तो उसका उपयोग करें।
+     */
+
+    if (
+        typeof apiGet ===
+        "function" &&
+        API_ENDPOINTS.searchSuggestions
+    ) {
+
+        try {
+
+            const response =
+                await apiGet(
+                    `${API_ENDPOINTS.searchSuggestions}?q=${encodeURIComponent(
+                        search
+                    )}`
+                );
+
+
+            const data =
+                response?.data ||
+                response;
+
+
+            const suggestions =
+                data?.suggestions ||
+                data?.results ||
+                [];
+
+
+            if (
+                Array.isArray(
+                    suggestions
+                )
+            ) {
+
+                return [
+                    ...new Set(
+                        [
+                            ...suggestions,
+                            ...localMatches
+                        ]
+                        .map(
+                            item =>
+                                typeof item ===
+                                    "string"
+                                    ? item
+                                    : item?.text ||
+                                      item?.query ||
+                                      ""
+                        )
+                        .filter(Boolean)
+                    )
+                ].slice(
+                    0,
+                    8
+                );
+
+            }
+
+        } catch (
+            error
+        ) {
+
+            /*
+             * Backend suggestions fail होने पर
+             * local suggestions इस्तेमाल होंगे।
+             */
+
+        }
+
+    }
+
+
+    return [
+        ...new Set(
+            localMatches
+        )
+    ].slice(
+        0,
+        8
+    );
+
+}
+
+
+/* ============================================================
+   RENDER SEARCH SUGGESTIONS
+============================================================ */
+
+function renderSearchSuggestions(
+    suggestions
+) {
+
+    const containers =
+        getSearchSuggestionContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !suggestions.length
+            ) {
+
+                container.classList.remove(
+                    "visible"
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            suggestions.forEach(
+                suggestion => {
+
+                    const button =
+                        createElement(
+                            "button",
+                            {
+
+                                className:
+                                    "search-suggestion-item",
+
+                                text:
+                                    suggestion,
+
+                                attributes: {
+
+                                    type:
+                                        "button"
+
+                                }
+
+                            }
+                        );
+
+
+                    button.addEventListener(
+                        "click",
+                        () => {
+
+                            getSearchInputs()
+                                .forEach(
+                                    input => {
+
+                                        input.value =
+                                            suggestion;
+
+                                    }
+                                );
+
+
+                            saveRecentSearch(
+                                suggestion
+                            );
+
+
+                            hideSearchSuggestions();
+
+
+                            performSearch(
+                                suggestion,
+                                {
+
+                                    page:
+                                        1,
+
+                                    resetPage:
+                                        true,
+
+                                    updateURL:
+                                        true
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    fragment.appendChild(
+                        button
+                    );
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+
+            container.classList.add(
+                "visible"
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SHOW SEARCH SUGGESTIONS
+============================================================ */
+
+async function showSearchSuggestions(
+    query
+) {
+
+    SearchState.suggestionsLoading =
+        true;
+
+
+    try {
+
+        const suggestions =
+            await fetchSearchSuggestions(
+                query
+            );
+
+
+        SearchState.suggestions =
+            suggestions;
+
+
+        renderSearchSuggestions(
+            suggestions
+        );
+
+    } finally {
+
+        SearchState.suggestionsLoading =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   HIDE SEARCH SUGGESTIONS
+============================================================ */
+
+function hideSearchSuggestions() {
+
+    getSearchSuggestionContainers()
+        .forEach(
+            container => {
+
+                container.classList.remove(
+                    "visible"
+                );
+
+
+                container.innerHTML =
+                    "";
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   SAVE RECENT SEARCH
+============================================================ */
+
+function saveRecentSearch(
+    query
+) {
+
+    const search =
+        normalizeSearchQuery(
+            query
+        );
+
+
+    if (
+        search.length <
+        SEARCH_CONFIG.minQueryLength
+    ) {
+
+        return;
+
+    }
+
+
+    const current =
+        getStorage(
+            "awaaz_recent_searches",
+            []
+        );
+
+
+    const list =
+        Array.isArray(
+            current
+        )
+            ? current
+            : [];
+
+
+    const updated = [
+
+        search,
+
+        ...list.filter(
+            item =>
+                normalizeSearchQuery(
+                    item
+                ).toLowerCase() !==
+                search.toLowerCase()
+        )
+
+    ].slice(
+        0,
+        8
+    );
+
+
+    setStorage(
+        "awaaz_recent_searches",
+        updated
+    );
+
+}
+
+
+/* ============================================================
+   CLEAR RECENT SEARCHES
+============================================================ */
+
+function clearRecentSearches() {
+
+    setStorage(
+        "awaaz_recent_searches",
+        []
+    );
+
+
+    SearchState.suggestions =
+        [];
+
+
+    hideSearchSuggestions();
+
+}
+
+
+/* ============================================================
+   SEARCH PAGE DETECTION
+============================================================ */
+
+  function isSearchPage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path ===
+            "/search" ||
+        path.startsWith(
+            "/search/"
+        ) ||
+        !!document.querySelector(
+            "#searchResults, #searchNews, [data-search-results]"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH PAGE INITIALIZATION
+============================================================ */
+
+async function initializeSearchPage() {
+
+    if (
+        SearchState.initialized
+    ) {
+
+        return;
+
+    }
+
+
+    initializeSearchInputs();
+
+    initializeSearchButtons();
+
+
+    const query =
+        getSearchQueryFromURL();
+
+
+    SearchState.query =
+        query;
+
+
+    SearchState.page =
+        getSearchPageFromURL();
+
+
+    if (
+        query
+    ) {
+
+        getSearchInputs()
+            .forEach(
+                input => {
+
+                    input.value =
+                        query;
+
+                }
+            );
+
+
+        if (
+            isSearchPage()
+        ) {
+
+            await performSearch(
+                query,
+                {
+
+                    page:
+                        SearchState.page,
+
+                    updateURL:
+                        false
+
+                }
+            );
+
+        }
+
+    }
+
+
+    SearchState.initialized =
+        true;
+
+}
+
+
+/* ============================================================
+   SEARCH POPSTATE
+============================================================ */
+
+window.addEventListener(
+    "popstate",
+    () => {
+
+        if (
+            !isSearchPage()
+        ) {
+
+            return;
+
+        }
+
+
+        const query =
+            getSearchQueryFromURL();
+
+
+        const page =
+            getSearchPageFromURL();
+
+
+        SearchState.query =
+            query;
+
+
+        SearchState.page =
+            page;
+
+
+        getSearchInputs()
+            .forEach(
+                input => {
+
+                    input.value =
+                        query;
+
+                }
+            );
+
+
+        if (
+            query
+        ) {
+
+            performSearch(
+                query,
+                {
+
+                    page:
+                        page,
+
+                    updateURL:
+                        false
+
+                }
+            );
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   CLOSE SUGGESTIONS ON OUTSIDE CLICK
+============================================================ */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target.closest(
+                ".search-box, " +
+                ".global-search, " +
+                "[data-search-wrapper]"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        hideSearchSuggestions();
+
+    }
+);
+
+
+/* ============================================================
+   GLOBAL SEARCH EXPORT
+============================================================ */
+
+window.AwaazRajasthan.search = {
+
+    state:
+        SearchState,
+
+    query:
+        normalizeSearchQuery,
+
+    fetch:
+        fetchSearchResults,
+
+    perform:
+        performSearch,
+
+    suggest:
+        fetchSearchSuggestions,
+
+    saveRecent:
+        saveRecentSearch,
+
+    clearRecent:
+        clearRecentSearches,
+
+    initialize:
+        initializeSearchPage
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeSearchPage();
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 21/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 22/30
+
+   CATEGORY SYSTEM
+   CATEGORY NEWS
+   DISTRICT FILTER
+   CATEGORY NAVIGATION
+   CATEGORY PAGE
+   FILTER STATE
+============================================================ */
+
+
+/* ============================================================
+   CATEGORY CONFIGURATION
+============================================================ */
+
+const CATEGORY_CONFIG = {
+
+    defaultLimit:
+        12,
+
+    maxLimit:
+        48,
+
+    categorySelectors: [
+
+        "[data-category]",
+
+        ".category-link",
+
+        ".category-item",
+
+        ".nav-category"
+
+    ],
+
+    resultSelectors: [
+
+        "#categoryNews",
+
+        "#categoryNewsGrid",
+
+        "#categoryResults",
+
+        ".category-news-grid",
+
+        ".category-results",
+
+        "[data-category-results]"
+
+    ]
+
+};
+
+
+/* ============================================================
+   CATEGORY STATE
+============================================================ */
+
+const CategoryState = {
+
+    slug:
+        "",
+
+    name:
+        "",
+
+    district:
+        "",
+
+    results:
+        [],
+
+    page:
+        1,
+
+    limit:
+        CATEGORY_CONFIG.defaultLimit,
+
+    total:
+        0,
+
+    totalPages:
+        1,
+
+    loading:
+        false,
+
+    initialized:
+        false
+
+};
+
+
+/* ============================================================
+   CATEGORY DEFINITIONS
+============================================================ */
+
+const RAJASTHAN_CATEGORIES = [
+
+    {
+        slug:
+            "rajasthan",
+
+        name:
+            "राजस्थान",
+
+        aliases: [
+            "राजस्थान",
+            "rajasthan"
+        ]
+    },
+
+    {
+        slug:
+            "jaipur",
+
+        name:
+            "जयपुर",
+
+        aliases: [
+            "जयपुर",
+            "jaipur"
+        ]
+    },
+
+    {
+        slug:
+            "jodhpur",
+
+        name:
+            "जोधपुर",
+
+        aliases: [
+            "जोधपुर",
+            "jodhpur"
+        ]
+    },
+
+    {
+        slug:
+            "udaipur",
+
+        name:
+            "उदयपुर",
+
+        aliases: [
+            "उदयपुर",
+            "udaipur"
+        ]
+    },
+
+    {
+        slug:
+            "kota",
+
+        name:
+            "कोटा",
+
+        aliases: [
+            "कोटा",
+            "kota"
+        ]
+    },
+
+    {
+        slug:
+            "ajmer",
+
+        name:
+            "अजमेर",
+
+        aliases: [
+            "अजमेर",
+            "ajmer"
+        ]
+    },
+
+    {
+        slug:
+            "bikaner",
+
+        name:
+            "बीकानेर",
+
+        aliases: [
+            "बीकानेर",
+            "bikaner"
+        ]
+    },
+
+    {
+        slug:
+            "alwar",
+
+        name:
+            "अलवर",
+
+        aliases: [
+            "अलवर",
+            "alwar"
+        ]
+    },
+
+    {
+        slug:
+            "bharatpur",
+
+        name:
+            "भरतपुर",
+
+        aliases: [
+            "भरतपुर",
+            "bharatpur"
+        ]
+    },
+
+    {
+        slug:
+            "crime",
+
+        name:
+            "अपराध",
+
+        aliases: [
+            "अपराध",
+            "crime"
+        ]
+    },
+
+    {
+        slug:
+            "politics",
+
+        name:
+            "राजनीति",
+
+        aliases: [
+            "राजनीति",
+            "politics"
+        ]
+    },
+
+    {
+        slug:
+            "business",
+
+        name:
+            "बिजनेस",
+
+        aliases: [
+            "बिजनेस",
+            "व्यापार",
+            "business"
+        ]
+    },
+
+    {
+        slug:
+            "education",
+
+        name:
+            "शिक्षा",
+
+        aliases: [
+            "शिक्षा",
+            "education"
+        ]
+    },
+
+    {
+        slug:
+            "jobs",
+
+        name:
+            "नौकरी",
+
+        aliases: [
+            "नौकरी",
+            "रोजगार",
+            "jobs"
+        ]
+    },
+
+    {
+        slug:
+            "sports",
+
+        name:
+            "खेल",
+
+        aliases: [
+            "खेल",
+            "sports"
+        ]
+    },
+
+    {
+        slug:
+            "entertainment",
+
+        name:
+            "मनोरंजन",
+
+        aliases: [
+            "मनोरंजन",
+            "entertainment"
+        ]
+    },
+
+    {
+        slug:
+            "technology",
+
+        name:
+            "टेक्नोलॉजी",
+
+        aliases: [
+            "टेक्नोलॉजी",
+            "तकनीक",
+            "technology"
+        ]
+    },
+
+    {
+        slug:
+            "weather",
+
+        name:
+            "मौसम",
+
+        aliases: [
+            "मौसम",
+            "weather"
+        ]
+    }
+
+];
+
+
+/* ============================================================
+   GET CATEGORY BY SLUG
+============================================================ */
+
+function getCategoryBySlug(
+    slug
+) {
+
+    const value =
+        normalizeText(
+            slug
+        )
+        .toLowerCase();
+
+
+    if (
+        !value
+    ) {
+
+        return null;
+
+    }
+
+
+    return RAJASTHAN_CATEGORIES.find(
+        category =>
+            category.slug
+                .toLowerCase() ===
+                value ||
+            category.aliases.some(
+                alias =>
+                    String(
+                        alias
+                    )
+                        .toLowerCase() ===
+                    value
+            )
+    ) || null;
+
+}
+
+
+/* ============================================================
+   GET CATEGORY NAME
+============================================================ */
+
+function getCategoryName(
+    slug
+) {
+
+    const category =
+        getCategoryBySlug(
+            slug
+        );
+
+
+    return category?.name ||
+        normalizeText(
+            slug
+        ) ||
+        "समाचार";
+
+}
+
+
+/* ============================================================
+   GET CATEGORY SLUG FROM ARTICLE
+============================================================ */
+
+function getArticleCategorySlug(
+    article
+) {
+
+    if (
+        !article
+    ) {
+
+        return "";
+
+    }
+
+
+    const category =
+        article.category;
+
+
+    if (
+        typeof category ===
+        "object"
+    ) {
+
+        return (
+            category.slug ||
+            category._id ||
+            category.id ||
+            category.name ||
+            ""
+        );
+
+    }
+
+
+    return (
+        article.categorySlug ||
+        category ||
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   GET ARTICLE CATEGORY NAME
+============================================================ */
+
+function getArticleCategoryName(
+    article
+) {
+
+    if (
+        !article
+    ) {
+
+        return "";
+
+    }
+
+
+    const category =
+        article.category;
+
+
+    if (
+        typeof category ===
+        "object"
+    ) {
+
+        return (
+            category.name ||
+            category.title ||
+            getCategoryName(
+                category.slug
+            )
+        );
+
+    }
+
+
+    return (
+        article.categoryName ||
+        getCategoryName(
+            category
+        )
+    );
+
+}
+
+
+/* ============================================================
+   GET CATEGORY FROM URL
+============================================================ */
+
+function getCategoryFromURL() {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    const params =
+        url.searchParams;
+
+
+    const queryCategory =
+        params.get(
+            "category"
+        ) ||
+        params.get(
+            "cat"
+        );
+
+
+    if (
+        queryCategory
+    ) {
+
+        return normalizeText(
+            queryCategory
+        );
+
+    }
+
+
+    const path =
+        window.location.pathname
+            .split("/")
+            .filter(Boolean);
+
+
+    const categoryIndex =
+        path.findIndex(
+            item =>
+                [
+                    "category",
+                    "categories",
+                    "section"
+                ].includes(
+                    item.toLowerCase()
+                )
+        );
+
+
+    if (
+        categoryIndex >= 0 &&
+        path[categoryIndex + 1]
+    ) {
+
+        return decodeURIComponent(
+            path[
+                categoryIndex + 1
+            ]
+        );
+
+    }
+
+
+    return "";
+
+}
+
+
+/* ============================================================
+   GET DISTRICT FROM URL
+============================================================ */
+
+function getDistrictFromURL() {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    return normalizeText(
+        url.searchParams.get(
+            "district"
+        ) ||
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE CATEGORY URL
+============================================================ */
+
+function updateCategoryURL(
+    options = {}
+) {
+
+    if (
+        !window.history
+    ) {
+
+        return;
+
+    }
+
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    if (
+        CategoryState.slug
+    ) {
+
+        url.searchParams.set(
+            "category",
+            CategoryState.slug
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "category"
+        );
+
+    }
+
+
+    if (
+        CategoryState.district
+    ) {
+
+        url.searchParams.set(
+            "district",
+            CategoryState.district
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "district"
+        );
+
+    }
+
+
+    if (
+        CategoryState.page > 1
+    ) {
+
+        url.searchParams.set(
+            "page",
+            String(
+                CategoryState.page
+            )
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "page"
+        );
+
+    }
+
+
+    const state = {
+
+        category:
+            CategoryState.slug,
+
+        district:
+            CategoryState.district,
+
+        page:
+            CategoryState.page
+
+    };
+
+
+    if (
+        options.replace
+    ) {
+
+        window.history.replaceState(
+            state,
+            "",
+            url
+        );
+
+    } else {
+
+        window.history.pushState(
+            state,
+            "",
+            url
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   CATEGORY RESULT CONTAINERS
+============================================================ */
+
+function getCategoryResultContainers() {
+
+    const containers = [];
+
+
+    CATEGORY_CONFIG
+        .resultSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !containers.includes(
+                                    element
+                                )
+                            ) {
+
+                                containers.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return containers;
+
+}
+
+
+/* ============================================================
+   BUILD CATEGORY QUERY
+============================================================ */
+
+function buildCategoryQuery(
+    options = {}
+) {
+
+    const params =
+        new URLSearchParams();
+
+
+    const category =
+        normalizeText(
+            options.category ??
+            CategoryState.slug
+        );
+
+
+    const district =
+        normalizeText(
+            options.district ??
+            CategoryState.district
+        );
+
+
+    const page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                CategoryState.page
+            ) || 1
+        );
+
+
+    const limit =
+        Math.min(
+            CATEGORY_CONFIG.maxLimit,
+            Math.max(
+                1,
+                Number(
+                    options.limit ??
+                    CategoryState.limit
+                ) ||
+                CATEGORY_CONFIG.defaultLimit
+            )
+        );
+
+
+    if (
+        category
+    ) {
+
+        params.set(
+            "category",
+            category
+        );
+
+    }
+
+
+    if (
+        district
+    ) {
+
+        params.set(
+            "district",
+            district
+        );
+
+    }
+
+
+    params.set(
+        "page",
+        String(
+            page
+        )
+    );
+
+
+    params.set(
+        "limit",
+        String(
+            limit
+        )
+    );
+
+
+    params.set(
+        "sort",
+        options.sort ||
+        "latest"
+    );
+
+
+    return params;
+
+}
+
+
+/* ============================================================
+   FETCH CATEGORY NEWS
+============================================================ */
+
+async function fetchCategoryNews(
+    options = {}
+) {
+
+    if (
+        typeof apiGet !==
+        "function"
+    ) {
+
+        throw new Error(
+            "API GET function unavailable"
+        );
+
+    }
+
+
+    const params =
+        buildCategoryQuery(
+            options
+        );
+
+
+    const response =
+        await apiGet(
+            `${API_ENDPOINTS.news}?${params.toString()}`
+        );
+
+
+    const data =
+        response?.data ||
+        response;
+
+
+    const news =
+        data?.news ||
+        data?.articles ||
+        data?.results ||
+        [];
+
+
+    const pagination =
+        normalizePageData(
+            data?.pagination ||
+            data?.meta ||
+            data
+        );
+
+
+    return {
+
+        news:
+            Array.isArray(
+                news
+            )
+                ? news
+                : [],
+
+        total:
+            pagination.totalItems,
+
+        page:
+            pagination.page,
+
+        totalPages:
+            pagination.totalPages,
+
+        limit:
+            pagination.limit
+
+    };
+
+}
+
+
+/* ============================================================
+   CATEGORY LOADING
+============================================================ */
+
+function renderCategoryLoading() {
+
+    const containers =
+        getCategoryResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            container.appendChild(
+                createCategorySkeleton(
+                    8
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CATEGORY EMPTY STATE
+============================================================ */
+
+function createCategoryEmptyState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "category-empty-state"
+
+            }
+        );
+
+
+    const categoryName =
+        CategoryState.name ||
+        "इस श्रेणी";
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="category-empty-icon"
+            aria-hidden="true"
+        >
+            📰
+        </div>
+
+        <h2>
+            ${escapeHTML(
+                categoryName
+            )} में अभी कोई खबर नहीं है
+        </h2>
+
+        <p>
+            इस श्रेणी में नई खबरें प्रकाशित होने पर
+            यहां दिखाई देंगी।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-category-home
+        >
+            सभी खबरें देखें
+        </button>
+
+        `;
+
+
+    const button =
+        wrapper.querySelector(
+            "[data-category-home]"
+        );
+
+
+    if (
+        button
+    ) {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                navigateTo(
+                    "/"
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   CATEGORY ERROR STATE
+============================================================ */
+
+function createCategoryErrorState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "category-error-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="category-error-icon"
+            aria-hidden="true"
+        >
+            ⚠️
+        </div>
+
+        <h2>
+            खबरें लोड नहीं हो सकीं
+        </h2>
+
+        <p>
+            कृपया कुछ समय बाद दोबारा प्रयास करें।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-category-retry
+        >
+            दोबारा प्रयास करें
+        </button>
+
+        `;
+
+
+    const button =
+        wrapper.querySelector(
+            "[data-category-retry]"
+        );
+
+
+    if (
+        button
+    ) {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                loadCategoryNews(
+                    CategoryState.slug,
+                    {
+
+                        district:
+                            CategoryState.district,
+
+                        page:
+                            CategoryState.page,
+
+                        updateURL:
+                            false
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   RENDER CATEGORY NEWS
+============================================================ */
+
+function renderCategoryNews(
+    result
+) {
+
+    const containers =
+        getCategoryResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !result?.news?.length
+            ) {
+
+                container.appendChild(
+                    createCategoryEmptyState()
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            result.news.forEach(
+                article => {
+
+                    const card =
+                        createSearchResultCard(
+                            article
+                        );
+
+
+                    if (
+                        card
+                    ) {
+
+                        card.classList.add(
+                            "category-news-card"
+                        );
+
+
+                        fragment.appendChild(
+                            card
+                        );
+
+                    }
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+        }
+    );
+
+
+    initializeArticleCards();
+
+    initializeBookmarkButtons();
+
+    initializeLazyImages();
+
+
+    renderCategoryPagination(
+        result
+    );
+
+
+    updateCategoryHeading();
+
+}
+
+
+/* ============================================================
+   CATEGORY PAGINATION
+============================================================ */
+
+function renderCategoryPagination(
+    result
+) {
+
+    $$(
+        "#categoryPagination, " +
+        ".category-pagination, " +
+        "[data-category-pagination]"
+    )
+    .forEach(
+        container => {
+
+            renderPagination(
+                {
+
+                    page:
+                        result?.page ||
+                        1,
+
+                    totalPages:
+                        result?.totalPages ||
+                        1,
+
+                    totalItems:
+                        result?.total ||
+                        0,
+
+                    limit:
+                        result?.limit ||
+                        CategoryState.limit
+
+                },
+                container,
+                {
+
+                    type:
+                        "category",
+
+                    onPageChange:
+                        page => {
+
+                            CategoryState.page =
+                                page;
+
+
+                            loadCategoryNews(
+                                CategoryState.slug,
+                                {
+
+                                    district:
+                                        CategoryState.district,
+
+                                    page:
+                                        page,
+
+                                    updateURL:
+                                        true
+
+                                }
+                            );
+
+                        }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE CATEGORY HEADING
+============================================================ */
+
+function updateCategoryHeading() {
+
+    const title =
+        CategoryState.name ||
+        getCategoryName(
+            CategoryState.slug
+        );
+
+
+    $$(
+        "[data-category-heading], " +
+        ".category-heading"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                title;
+
+        }
+    );
+
+
+    $$(
+        "[data-category-total], " +
+        ".category-total"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                CategoryState.total
+                    ? `${CategoryState.total} खबरें`
+                    : "";
+
+        }
+    );
+
+
+    $$(
+        "[data-category-description]"
+    )
+    .forEach(
+        element => {
+
+            if (
+                CategoryState.district
+            ) {
+
+                element.textContent =
+                    `${title} — ${CategoryState.district}`;
+
+            } else {
+
+                element.textContent =
+                    `${title} की ताजा खबरें`;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   LOAD CATEGORY NEWS
+============================================================ */
+
+async function loadCategoryNews(
+    slug,
+    options = {}
+) {
+
+    const category =
+        normalizeText(
+            slug ||
+            CategoryState.slug ||
+            getCategoryFromURL()
+        );
+
+
+    const categoryData =
+        getCategoryBySlug(
+            category
+        );
+
+
+    CategoryState.slug =
+        categoryData?.slug ||
+        category;
+
+
+    CategoryState.name =
+        categoryData?.name ||
+        getCategoryName(
+            category
+        );
+
+
+    CategoryState.district =
+        normalizeText(
+            options.district ??
+            CategoryState.district ??
+            getDistrictFromURL()
+        );
+
+
+    CategoryState.page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                CategoryState.page
+            ) || 1
+        );
+
+
+    CategoryState.loading =
+        true;
+
+
+    renderCategoryLoading();
+
+
+    try {
+
+        const result =
+            await fetchCategoryNews(
+                {
+
+                    category:
+                        CategoryState.slug,
+
+                    district:
+                        CategoryState.district,
+
+                    page:
+                        CategoryState.page,
+
+                    limit:
+                        CategoryState.limit
+
+                }
+            );
+
+
+        CategoryState.results =
+            result.news;
+
+
+        CategoryState.total =
+            result.total;
+
+
+        CategoryState.page =
+            result.page;
+
+
+        CategoryState.totalPages =
+            result.totalPages;
+
+
+        CategoryState.limit =
+            result.limit;
+
+
+        renderCategoryNews(
+            result
+        );
+
+
+        if (
+            options.updateURL !==
+            false
+        ) {
+
+            updateCategoryURL();
+
+        }
+
+
+        updateDocumentTitle(
+            `${CategoryState.name} | आवाज़ राजस्थान`
+        );
+
+
+        return result;
+
+    } catch (
+        error
+    ) {
+
+        getCategoryResultContainers()
+            .forEach(
+                container => {
+
+                    container.innerHTML =
+                        "";
+
+
+                    container.appendChild(
+                        createCategoryErrorState()
+                    );
+
+                }
+            );
+
+
+        handleGlobalError(
+            error,
+            "Category"
+        );
+
+
+        return null;
+
+    } finally {
+
+        CategoryState.loading =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   CATEGORY NAVIGATION
+============================================================ */
+
+function navigateToCategory(
+    slug,
+    options = {}
+) {
+
+    const category =
+        getCategoryBySlug(
+            slug
+        );
+
+
+    const value =
+        category?.slug ||
+        normalizeText(
+            slug
+        );
+
+
+    if (
+        !value
+    ) {
+
+        return;
+
+    }
+
+
+    CategoryState.slug =
+        value;
+
+
+    CategoryState.name =
+        category?.name ||
+        getCategoryName(
+            value
+        );
+
+
+    CategoryState.page =
+        1;
+
+
+    if (
+        options.district !==
+        undefined
+    ) {
+
+        CategoryState.district =
+            normalizeText(
+                options.district
+            );
+
+    }
+
+
+    if (
+        options.navigate !==
+        false
+    ) {
+
+        const path =
+            `/category/${encodeURIComponent(
+                value
+            )}`;
+
+
+        if (
+            typeof navigateTo ===
+            "function"
+        ) {
+
+            navigateTo(
+                path
+            );
+
+        } else {
+
+            window.location.href =
+                path;
+
+        }
+
+    }
+
+
+    return loadCategoryNews(
+        value,
+        {
+
+            district:
+                CategoryState.district,
+
+            page:
+                1,
+
+            updateURL:
+                false
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CATEGORY LINK INITIALIZATION
+============================================================ */
+
+function initializeCategoryLinks() {
+
+    CATEGORY_CONFIG
+        .categorySelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                element.dataset.categoryInitialized ===
+                                "true"
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const rawCategory =
+                                element.dataset.category ||
+                                element.dataset.slug ||
+                                element.getAttribute(
+                                    "data-category-name"
+                                );
+
+
+                            if (
+                                !rawCategory
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const category =
+                                getCategoryBySlug(
+                                    rawCategory
+                                );
+
+
+                            if (
+                                !category
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            element.dataset.categoryInitialized =
+                                "true";
+
+
+                            element.dataset.category =
+                                category.slug;
+
+
+                            element.addEventListener(
+                                "click",
+                                event => {
+
+                                    event.preventDefault();
+
+
+                                    navigateToCategory(
+                                        category.slug
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+            }
+        );
+
+
+    updateActiveCategory();
+
+}
+
+
+/* ============================================================
+   ACTIVE CATEGORY
+============================================================ */
+
+function updateActiveCategory() {
+
+    const activeSlug =
+        CategoryState.slug;
+
+
+    $$(
+        "[data-category]"
+    )
+    .forEach(
+        element => {
+
+            const slug =
+                normalizeText(
+                    element.dataset.category
+                );
+
+
+            const active =
+                slug ===
+                activeSlug;
+
+
+            element.classList.toggle(
+                "active",
+                active
+            );
+
+
+            if (
+                active
+            ) {
+
+                element.setAttribute(
+                    "aria-current",
+                    "page"
+                );
+
+            } else {
+
+                element.removeAttribute(
+                    "aria-current"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   DISTRICT FILTER
+============================================================ */
+
+function initializeDistrictFilters() {
+
+    $$(
+        "[data-district-filter], " +
+        "#districtFilter, " +
+        ".district-filter"
+    )
+    .forEach(
+        select => {
+
+            if (
+                select.dataset.districtInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            select.dataset.districtInitialized =
+                "true";
+
+
+            const current =
+                CategoryState.district ||
+                getDistrictFromURL();
+
+
+            if (
+                current
+            ) {
+
+                select.value =
+                    current;
+
+            }
+
+
+            select.addEventListener(
+                "change",
+                () => {
+
+                    CategoryState.district =
+                        normalizeText(
+                            select.value
+                        );
+
+
+                    CategoryState.page =
+                        1;
+
+
+                    loadCategoryNews(
+                        CategoryState.slug,
+                        {
+
+                            district:
+                                CategoryState.district,
+
+                            page:
+                                1,
+
+                            updateURL:
+                                true
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CATEGORY PAGE DETECTION
+============================================================ */
+
+function isCategoryPage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path.startsWith(
+            "/category/"
+        ) ||
+        path.startsWith(
+            "/categories/"
+        ) ||
+        path.startsWith(
+            "/section/"
+        ) ||
+        !!document.querySelector(
+            "#categoryNews, #categoryResults, [data-category-results]"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   CATEGORY PAGE INITIALIZATION
+============================================================ */
+
+async function initializeCategoryPage() {
+
+    initializeCategoryLinks();
+
+    initializeDistrictFilters();
+
+
+    if (
+        !isCategoryPage()
+    ) {
+
+        return;
+
+    }
+
+
+    const slug =
+        getCategoryFromURL();
+
+
+    if (
+        !slug
+    ) {
+
+        return;
+
+    }
+
+
+    CategoryState.slug =
+        slug;
+
+
+    CategoryState.district =
+        getDistrictFromURL();
+
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    CategoryState.page =
+        Math.max(
+            1,
+            Number(
+                url.searchParams.get(
+                    "page"
+                )
+            ) || 1
+        );
+
+
+    await loadCategoryNews(
+        slug,
+        {
+
+            district:
+                CategoryState.district,
+
+            page:
+                CategoryState.page,
+
+            updateURL:
+                false
+
+        }
+    );
+
+
+    updateActiveCategory();
+
+
+    CategoryState.initialized =
+        true;
+
+}
+
+
+/* ============================================================
+   CATEGORY POPSTATE
+============================================================ */
+
+window.addEventListener(
+    "popstate",
+    () => {
+
+        if (
+            !isCategoryPage()
+        ) {
+
+            return;
+
+        }
+
+
+        const slug =
+            getCategoryFromURL();
+
+
+        if (
+            !slug
+        ) {
+
+            return;
+
+        }
+
+
+        CategoryState.slug =
+            slug;
+
+
+        CategoryState.district =
+            getDistrictFromURL();
+
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+
+        CategoryState.page =
+            Math.max(
+                1,
+                Number(
+                    url.searchParams.get(
+                        "page"
+                    )
+                ) || 1
+            );
+
+
+        loadCategoryNews(
+            slug,
+            {
+
+                district:
+                    CategoryState.district,
+
+                page:
+                    CategoryState.page,
+
+                updateURL:
+                    false
+
+            }
+        );
+
+    }
+);
+
+
+/* ============================================================
+   CATEGORY GLOBAL EXPORT
+============================================================ */
+
+window.AwaazRajasthan.category = {
+
+    state:
+        CategoryState,
+
+    list:
+        RAJASTHAN_CATEGORIES,
+
+    get:
+        getCategoryBySlug,
+
+    name:
+        getCategoryName,
+
+    load:
+        loadCategoryNews,
+
+    navigate:
+        navigateToCategory,
+
+    initialize:
+        initializeCategoryPage
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeCategoryPage();
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 22/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 23/30
+
+   DISTRICT SYSTEM
+   RAJASTHAN DISTRICTS
+   DISTRICT NAVIGATION
+   DISTRICT NEWS
+   DISTRICT FILTERS
+============================================================ */
+
+
+/* ============================================================
+   DISTRICT CONFIGURATION
+============================================================ */
+
+const DISTRICT_CONFIG = {
+
+    defaultLimit:
+        12,
+
+    maxLimit:
+        48,
+
+    resultSelectors: [
+
+        "#districtNews",
+
+        "#districtNewsGrid",
+
+        "#districtResults",
+
+        ".district-news-grid",
+
+        ".district-results",
+
+        "[data-district-results]"
+
+    ],
+
+    districtSelectors: [
+
+        "[data-district]",
+
+        ".district-link",
+
+        ".district-item"
+
+    ]
+
+};
+
+
+/* ============================================================
+   DISTRICT STATE
+============================================================ */
+
+const DistrictState = {
+
+    slug:
+        "",
+
+    name:
+        "",
+
+    results:
+        [],
+
+    page:
+        1,
+
+    limit:
+        DISTRICT_CONFIG.defaultLimit,
+
+    total:
+        0,
+
+    totalPages:
+        1,
+
+    loading:
+        false,
+
+    initialized:
+        false
+
+};
+
+
+/* ============================================================
+   RAJASTHAN DISTRICTS
+============================================================ */
+
+const RAJASTHAN_DISTRICTS = [
+
+    {
+        slug:
+            "ajmer",
+
+        name:
+            "अजमेर"
+    },
+
+    {
+        slug:
+            "alwar",
+
+        name:
+            "अलवर"
+    },
+
+    {
+        slug:
+            "balotra",
+
+        name:
+            "बालोतरा"
+    },
+
+    {
+        slug:
+            "banswara",
+
+        name:
+            "बांसवाड़ा"
+    },
+
+    {
+        slug:
+            "baran",
+
+        name:
+            "बारां"
+    },
+
+    {
+        slug:
+            "barmer",
+
+        name:
+            "बाड़मेर"
+    },
+
+    {
+        slug:
+            "beawar",
+
+        name:
+            "ब्यावर"
+    },
+
+    {
+        slug:
+            "bharatpur",
+
+        name:
+            "भरतपुर"
+    },
+
+    {
+        slug:
+            "bhilwara",
+
+        name:
+            "भीलवाड़ा"
+    },
+
+    {
+        slug:
+            "bikaner",
+
+        name:
+            "बीकानेर"
+    },
+
+    {
+        slug:
+            "bundi",
+
+        name:
+            "बूंदी"
+    },
+
+    {
+        slug:
+            "chittorgarh",
+
+        name:
+            "चित्तौड़गढ़"
+    },
+
+    {
+        slug:
+            "churu",
+
+        name:
+            "चूरू"
+    },
+
+    {
+        slug:
+            "dausa",
+
+        name:
+            "दौसा"
+    },
+
+    {
+        slug:
+            "deeg",
+
+        name:
+            "डीग"
+    },
+
+    {
+        slug:
+            "dholpur",
+
+        name:
+            "धौलपुर"
+    },
+
+    {
+        slug:
+            "didwana-kuchamana",
+
+        name:
+            "डीडवाना-कुचामन"
+    },
+
+    {
+        slug:
+            "dudu",
+
+        name:
+            "दूदू"
+    },
+
+    {
+        slug:
+            "dungarpur",
+
+        name:
+            "डूंगरपुर"
+    },
+
+    {
+        slug:
+            "hanumangarh",
+
+        name:
+            "हनुमानगढ़"
+    },
+
+    {
+        slug:
+            "jaipur",
+
+        name:
+            "जयपुर"
+    },
+
+    {
+        slug:
+            "jaisalmer",
+
+        name:
+            "जैसलमेर"
+    },
+
+    {
+        slug:
+            "jalore",
+
+        name:
+            "जालौर"
+    },
+
+    {
+        slug:
+            "jhalawar",
+
+        name:
+            "झालावाड़"
+    },
+
+    {
+        slug:
+            "jhunjhunu",
+
+        name:
+            "झुंझुनूं"
+    },
+
+    {
+        slug:
+            "jodhpur",
+
+        name:
+            "जोधपुर"
+    },
+
+    {
+        slug:
+            "karauli",
+
+        name:
+            "करौली"
+    },
+
+    {
+        slug:
+            "kekri",
+
+        name:
+            "केकड़ी"
+    },
+
+    {
+        slug:
+            "khairthal-tijara",
+
+        name:
+            "खैरथल-तिजारा"
+    },
+
+    {
+        slug:
+            "kota",
+
+        name:
+            "कोटा"
+    },
+
+    {
+        slug:
+            "kotputli-behror",
+
+        name:
+            "कोटपूतली-बहरोड़"
+    },
+
+    {
+        slug:
+            "nagaur",
+
+        name:
+            "नागौर"
+    },
+
+    {
+        slug:
+            "pali",
+
+        name:
+            "पाली"
+    },
+
+    {
+        slug:
+            "phalaudi",
+
+        name:
+            "फलोदी"
+    },
+
+    {
+        slug:
+            "pratapgarh",
+
+        name:
+            "प्रतापगढ़"
+    },
+
+    {
+        slug:
+            "rajsamand",
+
+        name:
+            "राजसमंद"
+    },
+
+    {
+        slug:
+            "salumber",
+
+        name:
+            "सलूंबर"
+    },
+
+    {
+        slug:
+            "sawai-madhopur",
+
+        name:
+            "सवाई माधोपुर"
+    },
+
+    {
+        slug:
+            "shahpura",
+
+        name:
+            "शाहपुरा"
+    },
+
+    {
+        slug:
+            "sikar",
+
+        name:
+            "सीकर"
+    },
+
+    {
+        slug:
+            "sirohi",
+
+        name:
+            "सिरोही"
+    },
+
+    {
+        slug:
+            "sri-ganganagar",
+
+        name:
+            "श्रीगंगानगर"
+    },
+
+    {
+        slug:
+            "tonk",
+
+        name:
+            "टोंक"
+    },
+
+    {
+        slug:
+            "udaipur",
+
+        name:
+            "उदयपुर"
+    }
+
+];
+
+
+/* ============================================================
+   GET DISTRICT BY SLUG
+============================================================ */
+
+function getDistrictBySlug(
+    slug
+) {
+
+    const value =
+        normalizeText(
+            slug
+        )
+        .toLowerCase();
+
+
+    if (
+        !value
+    ) {
+
+        return null;
+
+    }
+
+
+    return RAJASTHAN_DISTRICTS.find(
+        district =>
+            district.slug
+                .toLowerCase() ===
+            value
+    ) || null;
+
+}
+
+
+/* ============================================================
+   GET DISTRICT NAME
+============================================================ */
+
+function getDistrictName(
+    slug
+) {
+
+    const district =
+        getDistrictBySlug(
+            slug
+        );
+
+
+    return (
+        district?.name ||
+        normalizeText(
+            slug
+        ) ||
+        "राजस्थान"
+    );
+
+}
+
+
+/* ============================================================
+   GET DISTRICT FROM URL
+============================================================ */
+
+function getDistrictSlugFromURL() {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    const params =
+        url.searchParams;
+
+
+    const queryValue =
+        params.get(
+            "district"
+        ) ||
+        params.get(
+            "city"
+        );
+
+
+    if (
+        queryValue
+    ) {
+
+        return normalizeText(
+            queryValue
+        );
+
+    }
+
+
+    const path =
+        window.location.pathname
+            .split("/")
+            .filter(Boolean);
+
+
+    const index =
+        path.findIndex(
+            item =>
+                [
+                    "district",
+                    "districts",
+                    "city"
+                ].includes(
+                    item.toLowerCase()
+                )
+        );
+
+
+    if (
+        index >= 0 &&
+        path[index + 1]
+    ) {
+
+        return decodeURIComponent(
+            path[
+                index + 1
+            ]
+        );
+
+    }
+
+
+    return "";
+
+}
+
+
+/* ============================================================
+   DISTRICT RESULT CONTAINERS
+============================================================ */
+
+function getDistrictResultContainers() {
+
+    const containers = [];
+
+
+    DISTRICT_CONFIG
+        .resultSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !containers.includes(
+                                    element
+                                )
+                            ) {
+
+                                containers.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return containers;
+
+}
+
+
+/* ============================================================
+   BUILD DISTRICT QUERY
+============================================================ */
+
+function buildDistrictQuery(
+    options = {}
+) {
+
+    const params =
+        new URLSearchParams();
+
+
+    const district =
+        normalizeText(
+            options.district ??
+            DistrictState.slug
+        );
+
+
+    const page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                DistrictState.page
+            ) || 1
+        );
+
+
+    const limit =
+        Math.min(
+            DISTRICT_CONFIG.maxLimit,
+            Math.max(
+                1,
+                Number(
+                    options.limit ??
+                    DistrictState.limit
+                ) ||
+                DISTRICT_CONFIG.defaultLimit
+            )
+        );
+
+
+    if (
+        district
+    ) {
+
+        params.set(
+            "district",
+            district
+        );
+
+    }
+
+
+    params.set(
+        "page",
+        String(
+            page
+        )
+    );
+
+
+    params.set(
+        "limit",
+        String(
+            limit
+        )
+    );
+
+
+    params.set(
+        "sort",
+        options.sort ||
+        "latest"
+    );
+
+
+    return params;
+
+}
+
+
+/* ============================================================
+   FETCH DISTRICT NEWS
+============================================================ */
+
+async function fetchDistrictNews(
+    options = {}
+) {
+
+    if (
+        typeof apiGet !==
+        "function"
+    ) {
+
+        throw new Error(
+            "API GET function unavailable"
+        );
+
+    }
+
+
+    const params =
+        buildDistrictQuery(
+            options
+        );
+
+
+    const response =
+        await apiGet(
+            `${API_ENDPOINTS.news}?${params.toString()}`
+        );
+
+
+    const data =
+        response?.data ||
+        response;
+
+
+    const news =
+        data?.news ||
+        data?.articles ||
+        data?.results ||
+        [];
+
+
+    const pagination =
+        normalizePageData(
+            data?.pagination ||
+            data?.meta ||
+            data
+        );
+
+
+    return {
+
+        news:
+            Array.isArray(
+                news
+            )
+                ? news
+                : [],
+
+        total:
+            pagination.totalItems,
+
+        page:
+            pagination.page,
+
+        totalPages:
+            pagination.totalPages,
+
+        limit:
+            pagination.limit
+
+    };
+
+}
+
+
+/* ============================================================
+   DISTRICT LOADING
+============================================================ */
+
+function renderDistrictLoading() {
+
+    const containers =
+        getDistrictResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            container.appendChild(
+                createCategorySkeleton(
+                    8
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   DISTRICT EMPTY STATE
+============================================================ */
+
+function createDistrictEmptyState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "district-empty-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="district-empty-icon"
+            aria-hidden="true"
+        >
+            📍
+        </div>
+
+        <h2>
+            ${escapeHTML(
+                DistrictState.name
+            )} में अभी कोई खबर नहीं है
+        </h2>
+
+        <p>
+            इस जिले की नई खबरें प्रकाशित होने पर
+            यहां दिखाई देंगी।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-district-home
+        >
+            सभी राजस्थान खबरें
+        </button>
+
+        `;
+
+
+    const button =
+        wrapper.querySelector(
+            "[data-district-home]"
+        );
+
+
+    if (
+        button
+    ) {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                navigateTo(
+                    "/"
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   DISTRICT ERROR STATE
+============================================================ */
+
+function createDistrictErrorState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "district-error-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="district-error-icon"
+            aria-hidden="true"
+        >
+            ⚠️
+        </div>
+
+        <h2>
+            जिले की खबरें लोड नहीं हो सकीं
+        </h2>
+
+        <p>
+            कृपया दोबारा प्रयास करें।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-district-retry
+        >
+            दोबारा प्रयास करें
+        </button>
+
+        `;
+
+
+    const retry =
+        wrapper.querySelector(
+            "[data-district-retry]"
+        );
+
+
+    if (
+        retry
+    ) {
+
+        retry.addEventListener(
+            "click",
+            () => {
+
+                loadDistrictNews(
+                    DistrictState.slug,
+                    {
+
+                        page:
+                            DistrictState.page,
+
+                        updateURL:
+                            false
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   RENDER DISTRICT NEWS
+============================================================ */
+
+function renderDistrictNews(
+    result
+) {
+
+    const containers =
+        getDistrictResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !result?.news?.length
+            ) {
+
+                container.appendChild(
+                    createDistrictEmptyState()
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            result.news.forEach(
+                article => {
+
+                    const card =
+                        createSearchResultCard(
+                            article
+                        );
+
+
+                    if (
+                        card
+                    ) {
+
+                        card.classList.add(
+                            "district-news-card"
+                        );
+
+
+                        fragment.appendChild(
+                            card
+                        );
+
+                    }
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+        }
+    );
+
+
+    initializeArticleCards();
+
+    initializeBookmarkButtons();
+
+    initializeLazyImages();
+
+
+    renderDistrictPagination(
+        result
+    );
+
+
+    updateDistrictHeading();
+
+}
+
+
+/* ============================================================
+   DISTRICT PAGINATION
+============================================================ */
+
+function renderDistrictPagination(
+    result
+) {
+
+    $$(
+        "#districtPagination, " +
+        ".district-pagination, " +
+        "[data-district-pagination]"
+    )
+    .forEach(
+        container => {
+
+            renderPagination(
+                {
+
+                    page:
+                        result?.page ||
+                        1,
+
+                    totalPages:
+                        result?.totalPages ||
+                        1,
+
+                    totalItems:
+                        result?.total ||
+                        0,
+
+                    limit:
+                        result?.limit ||
+                        DistrictState.limit
+
+                },
+                container,
+                {
+
+                    type:
+                        "district",
+
+                    onPageChange:
+                        page => {
+
+                            DistrictState.page =
+                                page;
+
+
+                            loadDistrictNews(
+                                DistrictState.slug,
+                                {
+
+                                    page:
+                                        page,
+
+                                    updateURL:
+                                        true
+
+                                }
+                            );
+
+                        }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE DISTRICT HEADING
+============================================================ */
+
+function updateDistrictHeading() {
+
+    const name =
+        DistrictState.name ||
+        getDistrictName(
+            DistrictState.slug
+        );
+
+
+    $$(
+        "[data-district-heading], " +
+        ".district-heading"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                name;
+
+        }
+    );
+
+
+    $$(
+        "[data-district-total], " +
+        ".district-total"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                DistrictState.total
+                    ? `${DistrictState.total} खबरें`
+                    : "";
+
+        }
+    );
+
+
+    $$(
+        "[data-district-description]"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                `${name} जिले की ताजा खबरें`;
+
+        }
+    );
+
+
+    updateActiveDistrict();
+
+}
+
+
+/* ============================================================
+   UPDATE DISTRICT URL
+============================================================ */
+
+function updateDistrictURL(
+    options = {}
+) {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    if (
+        DistrictState.slug
+    ) {
+
+        url.searchParams.set(
+            "district",
+            DistrictState.slug
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "district"
+        );
+
+    }
+
+
+    if (
+        DistrictState.page > 1
+    ) {
+
+        url.searchParams.set(
+            "page",
+            String(
+                DistrictState.page
+            )
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "page"
+        );
+
+    }
+
+
+    const state = {
+
+        district:
+            DistrictState.slug,
+
+        page:
+            DistrictState.page
+
+    };
+
+
+    if (
+        options.replace
+    ) {
+
+        window.history.replaceState(
+            state,
+            "",
+            url
+        );
+
+    } else {
+
+        window.history.pushState(
+            state,
+            "",
+            url
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   LOAD DISTRICT NEWS
+============================================================ */
+
+async function loadDistrictNews(
+    slug,
+    options = {}
+) {
+
+    const value =
+        normalizeText(
+            slug ||
+            DistrictState.slug ||
+            getDistrictSlugFromURL()
+        );
+
+
+    const district =
+        getDistrictBySlug(
+            value
+        );
+
+
+    DistrictState.slug =
+        district?.slug ||
+        value;
+
+
+    DistrictState.name =
+        district?.name ||
+        getDistrictName(
+            value
+        );
+
+
+    DistrictState.page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                DistrictState.page
+            ) || 1
+        );
+
+
+    DistrictState.loading =
+        true;
+
+
+    renderDistrictLoading();
+
+
+    try {
+
+        const result =
+            await fetchDistrictNews(
+                {
+
+                    district:
+                        DistrictState.slug,
+
+                    page:
+                        DistrictState.page,
+
+                    limit:
+                        DistrictState.limit
+
+                }
+            );
+
+
+        DistrictState.results =
+            result.news;
+
+
+        DistrictState.total =
+            result.total;
+
+
+        DistrictState.page =
+            result.page;
+
+
+        DistrictState.totalPages =
+            result.totalPages;
+
+
+        DistrictState.limit =
+            result.limit;
+
+
+        renderDistrictNews(
+            result
+        );
+
+
+        updateDocumentTitle(
+            `${DistrictState.name} की खबरें | आवाज़ राजस्थान`
+        );
+
+
+        if (
+            options.updateURL !==
+            false
+        ) {
+
+            updateDistrictURL();
+
+        }
+
+
+        return result;
+
+    } catch (
+        error
+    ) {
+
+        getDistrictResultContainers()
+            .forEach(
+                container => {
+
+                    container.innerHTML =
+                        "";
+
+
+                    container.appendChild(
+                        createDistrictErrorState()
+                    );
+
+                }
+            );
+
+
+        handleGlobalError(
+            error,
+            "District"
+        );
+
+
+        return null;
+
+    } finally {
+
+        DistrictState.loading =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   NAVIGATE TO DISTRICT
+============================================================ */
+
+function navigateToDistrict(
+    slug,
+    options = {}
+) {
+
+    const district =
+        getDistrictBySlug(
+            slug
+        );
+
+
+    const value =
+        district?.slug ||
+        normalizeText(
+            slug
+        );
+
+
+    if (
+        !value
+    ) {
+
+        return;
+
+    }
+
+
+    DistrictState.slug =
+        value;
+
+
+    DistrictState.name =
+        district?.name ||
+        getDistrictName(
+            value
+        );
+
+
+    DistrictState.page =
+        1;
+
+
+    if (
+        options.navigate !==
+        false
+    ) {
+
+        const path =
+            `/district/${encodeURIComponent(
+                value
+            )}`;
+
+
+        if (
+            typeof navigateTo ===
+            "function"
+        ) {
+
+            navigateTo(
+                path
+            );
+
+        } else {
+
+            window.location.href =
+                path;
+
+        }
+
+    }
+
+
+    return loadDistrictNews(
+        value,
+        {
+
+            page:
+                1,
+
+            updateURL:
+                false
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   INITIALIZE DISTRICT LINKS
+============================================================ */
+
+function initializeDistrictLinks() {
+
+    DISTRICT_CONFIG
+        .districtSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                element.dataset.districtInitialized ===
+                                "true"
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const raw =
+                                element.dataset.district ||
+                                element.dataset.slug;
+
+
+                            if (
+                                !raw
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const district =
+                                getDistrictBySlug(
+                                    raw
+                                );
+
+
+                            if (
+                                !district
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            element.dataset.districtInitialized =
+                                "true";
+
+
+                            element.dataset.district =
+                                district.slug;
+
+
+                            element.addEventListener(
+                                "click",
+                                event => {
+
+                                    event.preventDefault();
+
+
+                                    navigateToDistrict(
+                                        district.slug
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+            }
+        );
+
+
+    updateActiveDistrict();
+
+}
+
+
+/* ============================================================
+   UPDATE ACTIVE DISTRICT
+============================================================ */
+
+function updateActiveDistrict() {
+
+    const active =
+        DistrictState.slug;
+
+
+    $$(
+        "[data-district]"
+    )
+    .forEach(
+        element => {
+
+            const slug =
+                normalizeText(
+                    element.dataset.district
+                );
+
+
+            const isActive =
+                slug ===
+                active;
+
+
+            element.classList.toggle(
+                "active",
+                isActive
+            );
+
+
+            if (
+                isActive
+            ) {
+
+                element.setAttribute(
+                    "aria-current",
+                    "page"
+                );
+
+            } else {
+
+                element.removeAttribute(
+                    "aria-current"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   DISTRICT SELECT
+============================================================ */
+
+function initializeDistrictSelects() {
+
+    $$(
+        "[data-district-select], " +
+        "#districtSelect"
+    )
+    .forEach(
+        select => {
+
+            if (
+                select.dataset.initialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            select.dataset.initialized =
+                "true";
+
+
+            select.addEventListener(
+                "change",
+                () => {
+
+                    const value =
+                        normalizeText(
+                            select.value
+                        );
+
+
+                    if (
+                        value
+                    ) {
+
+                        navigateToDistrict(
+                            value
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   DISTRICT PAGE DETECTION
+============================================================ */
+
+function isDistrictPage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path.startsWith(
+            "/district/"
+        ) ||
+        path.startsWith(
+            "/districts/"
+        ) ||
+        !!document.querySelector(
+            "#districtNews, #districtResults, [data-district-results]"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   DISTRICT PAGE INITIALIZATION
+============================================================ */
+
+async function initializeDistrictPage() {
+
+    initializeDistrictLinks();
+
+    initializeDistrictSelects();
+
+
+    if (
+        !isDistrictPage()
+    ) {
+
+        return;
+
+    }
+
+
+    const slug =
+        getDistrictSlugFromURL();
+
+
+    if (
+        !slug
+    ) {
+
+        return;
+
+    }
+
+
+    DistrictState.slug =
+        slug;
+
+
+    const district =
+        getDistrictBySlug(
+            slug
+        );
+
+
+    DistrictState.name =
+        district?.name ||
+        getDistrictName(
+            slug
+        );
+
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    DistrictState.page =
+        Math.max(
+            1,
+            Number(
+                url.searchParams.get(
+                    "page"
+                )
+            ) || 1
+        );
+
+
+    await loadDistrictNews(
+        slug,
+        {
+
+            page:
+                DistrictState.page,
+
+            updateURL:
+                false
+
+        }
+    );
+
+
+    DistrictState.initialized =
+        true;
+
+}
+
+
+/* ============================================================
+   DISTRICT POPSTATE
+============================================================ */
+
+window.addEventListener(
+    "popstate",
+    () => {
+
+        if (
+            !isDistrictPage()
+        ) {
+
+            return;
+
+        }
+
+
+        const slug =
+            getDistrictSlugFromURL();
+
+
+        if (
+            !slug
+        ) {
+
+            return;
+
+        }
+
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+
+        DistrictState.page =
+            Math.max(
+                1,
+                Number(
+                    url.searchParams.get(
+                        "page"
+                    )
+                ) || 1
+            );
+
+
+        loadDistrictNews(
+            slug,
+            {
+
+                page:
+                    DistrictState.page,
+
+                updateURL:
+                    false
+
+            }
+        );
+
+    }
+);
+
+
+/* ============================================================
+   DISTRICT GLOBAL EXPORT
+============================================================ */
+
+window.AwaazRajasthan.district = {
+
+    state:
+        DistrictState,
+
+    list:
+        RAJASTHAN_DISTRICTS,
+
+    get:
+        getDistrictBySlug,
+
+    name:
+        getDistrictName,
+
+    load:
+        loadDistrictNews,
+
+    navigate:
+        navigateToDistrict,
+
+    initialize:
+        initializeDistrictPage
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeDistrictPage();
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 23/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 24/30
+
+   SEARCH SYSTEM
+   SEARCH INPUT
+   SEARCH RESULTS
+   SEARCH SUGGESTIONS
+   SEARCH HISTORY
+   SEARCH PAGINATION
+============================================================ */
+
+
+/* ============================================================
+   SEARCH CONFIGURATION
+============================================================ */
+
+const SEARCH_CONFIG = {
+
+    minLength:
+        2,
+
+    debounce:
+        450,
+
+    defaultLimit:
+        12,
+
+    maxLimit:
+        48,
+
+    historyLimit:
+        8,
+
+    resultSelectors: [
+
+        "#searchResults",
+
+        "#searchNews",
+
+        "#searchNewsGrid",
+
+        ".search-results",
+
+        ".search-news-grid",
+
+        "[data-search-results]"
+
+    ],
+
+    inputSelectors: [
+
+        "#searchInput",
+
+        "#headerSearchInput",
+
+        "#mobileSearchInput",
+
+        ".search-input",
+
+        "[data-search-input]"
+
+    ]
+
+};
+
+
+/* ============================================================
+   SEARCH STATE
+============================================================ */
+
+const SearchState = {
+
+    query:
+        "",
+
+    results:
+        [],
+
+    suggestions:
+        [],
+
+    history:
+        [],
+
+    page:
+        1,
+
+    limit:
+        SEARCH_CONFIG.defaultLimit,
+
+    total:
+        0,
+
+    totalPages:
+        1,
+
+    loading:
+        false,
+
+    searching:
+        false,
+
+    initialized:
+        false
+
+};
+
+
+/* ============================================================
+   SEARCH DEBOUNCE TIMER
+============================================================ */
+
+let searchDebounceTimer =
+    null;
+
+
+/* ============================================================
+   SEARCH HISTORY STORAGE KEY
+============================================================ */
+
+const SEARCH_HISTORY_KEY =
+    "awaaz_rajasthan_search_history";
+
+
+/* ============================================================
+   LOAD SEARCH HISTORY
+============================================================ */
+
+function loadSearchHistory() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                SEARCH_HISTORY_KEY
+            );
+
+
+        if (
+            !raw
+        ) {
+
+            SearchState.history =
+                [];
+
+            return [];
+
+        }
+
+
+        const parsed =
+            JSON.parse(
+                raw
+            );
+
+
+        if (
+            !Array.isArray(
+                parsed
+            )
+        ) {
+
+            SearchState.history =
+                [];
+
+            return [];
+
+        }
+
+
+        SearchState.history =
+            parsed
+                .filter(
+                    item =>
+                        typeof item ===
+                        "string"
+                )
+                .map(
+                    item =>
+                        item.trim()
+                )
+                .filter(
+                    Boolean
+                )
+                .slice(
+                    0,
+                    SEARCH_CONFIG.historyLimit
+                );
+
+
+        return SearchState.history;
+
+    } catch (
+        error
+    ) {
+
+        SearchState.history =
+            [];
+
+        return [];
+
+    }
+
+}
+
+
+/* ============================================================
+   SAVE SEARCH HISTORY
+============================================================ */
+
+function saveSearchHistory() {
+
+    try {
+
+        localStorage.setItem(
+            SEARCH_HISTORY_KEY,
+            JSON.stringify(
+                SearchState.history
+                    .slice(
+                        0,
+                        SEARCH_CONFIG.historyLimit
+                    )
+            )
+        );
+
+    } catch (
+        error
+    ) {
+
+        /* Storage unavailable */
+
+    }
+
+}
+
+
+/* ============================================================
+   ADD SEARCH HISTORY
+============================================================ */
+
+function addSearchHistory(
+    query
+) {
+
+    const value =
+        normalizeText(
+            query
+        );
+
+
+    if (
+        value.length <
+        SEARCH_CONFIG.minLength
+    ) {
+
+        return;
+
+    }
+
+
+    SearchState.history =
+        SearchState.history.filter(
+            item =>
+                item.toLowerCase() !==
+                value.toLowerCase()
+        );
+
+
+    SearchState.history.unshift(
+        value
+    );
+
+
+    SearchState.history =
+        SearchState.history.slice(
+            0,
+            SEARCH_CONFIG.historyLimit
+        );
+
+
+    saveSearchHistory();
+
+    renderSearchHistory();
+
+}
+
+
+/* ============================================================
+   REMOVE SEARCH HISTORY ITEM
+============================================================ */
+
+function removeSearchHistory(
+    query
+) {
+
+    const value =
+        normalizeText(
+            query
+        );
+
+
+    SearchState.history =
+        SearchState.history.filter(
+            item =>
+                item.toLowerCase() !==
+                value.toLowerCase()
+        );
+
+
+    saveSearchHistory();
+
+    renderSearchHistory();
+
+}
+
+
+/* ============================================================
+   CLEAR SEARCH HISTORY
+============================================================ */
+
+function clearSearchHistory() {
+
+    SearchState.history =
+        [];
+
+
+    try {
+
+        localStorage.removeItem(
+            SEARCH_HISTORY_KEY
+        );
+
+    } catch (
+        error
+    ) {
+
+        /* Storage unavailable */
+
+    }
+
+
+    renderSearchHistory();
+
+}
+
+
+/* ============================================================
+   GET SEARCH RESULT CONTAINERS
+============================================================ */
+
+function getSearchResultContainers() {
+
+    const containers = [];
+
+
+    SEARCH_CONFIG
+        .resultSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !containers.includes(
+                                    element
+                                )
+                            ) {
+
+                                containers.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return containers;
+
+}
+
+
+/* ============================================================
+   GET SEARCH INPUTS
+============================================================ */
+
+function getSearchInputs() {
+
+    const inputs = [];
+
+
+    SEARCH_CONFIG
+        .inputSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !inputs.includes(
+                                    element
+                                )
+                            ) {
+
+                                inputs.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return inputs;
+
+}
+
+
+/* ============================================================
+   BUILD SEARCH QUERY
+============================================================ */
+
+function buildSearchQuery(
+    options = {}
+) {
+
+    const params =
+        new URLSearchParams();
+
+
+    const query =
+        normalizeText(
+            options.query ??
+            SearchState.query
+        );
+
+
+    const page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                SearchState.page
+            ) || 1
+        );
+
+
+    const limit =
+        Math.min(
+            SEARCH_CONFIG.maxLimit,
+            Math.max(
+                1,
+                Number(
+                    options.limit ??
+                    SearchState.limit
+                ) ||
+                SEARCH_CONFIG.defaultLimit
+            )
+        );
+
+
+    if (
+        query
+    ) {
+
+        params.set(
+            "search",
+            query
+        );
+
+    }
+
+
+    params.set(
+        "page",
+        String(
+            page
+        )
+    );
+
+
+    params.set(
+        "limit",
+        String(
+            limit
+        )
+    );
+
+
+    params.set(
+        "sort",
+        options.sort ||
+        "latest"
+    );
+
+
+    if (
+        options.category
+    ) {
+
+        params.set(
+            "category",
+            normalizeText(
+                options.category
+            )
+        );
+
+    }
+
+
+    if (
+        options.district
+    ) {
+
+        params.set(
+            "district",
+            normalizeText(
+                options.district
+            )
+        );
+
+    }
+
+
+    return params;
+
+}
+
+
+/* ============================================================
+   FETCH SEARCH RESULTS
+============================================================ */
+
+async function fetchSearchResults(
+    options = {}
+) {
+
+    if (
+        typeof apiGet !==
+        "function"
+    ) {
+
+        throw new Error(
+            "API GET function unavailable"
+        );
+
+    }
+
+
+    const params =
+        buildSearchQuery(
+            options
+        );
+
+
+    const response =
+        await apiGet(
+            `${API_ENDPOINTS.news}?${params.toString()}`
+        );
+
+
+    const data =
+        response?.data ||
+        response;
+
+
+    const results =
+        data?.news ||
+        data?.articles ||
+        data?.results ||
+        [];
+
+
+    const pagination =
+        normalizePageData(
+            data?.pagination ||
+            data?.meta ||
+            data
+        );
+
+
+    return {
+
+        results:
+            Array.isArray(
+                results
+            )
+                ? results
+                : [],
+
+        total:
+            pagination.totalItems,
+
+        page:
+            pagination.page,
+
+        totalPages:
+            pagination.totalPages,
+
+        limit:
+            pagination.limit
+
+    };
+
+}
+
+
+/* ============================================================
+   SEARCH LOADING
+============================================================ */
+
+function renderSearchLoading() {
+
+    const containers =
+        getSearchResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            container.appendChild(
+                createCategorySkeleton(
+                    8
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH EMPTY STATE
+============================================================ */
+
+function createSearchEmptyState(
+    query
+) {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "search-empty-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="search-empty-icon"
+            aria-hidden="true"
+        >
+            🔎
+        </div>
+
+        <h2>
+            कोई खबर नहीं मिली
+        </h2>
+
+        <p>
+            “${escapeHTML(
+                query
+            )}” के लिए कोई परिणाम नहीं मिला।
+        </p>
+
+        <div
+            class="search-empty-help"
+        >
+            <span>
+                सुझाव:
+            </span>
+
+            <span>
+                शब्द की स्पेलिंग जांचें
+            </span>
+
+            <span>
+                कम शब्दों से खोजें
+            </span>
+
+            <span>
+                किसी अन्य कीवर्ड से प्रयास करें
+            </span>
+        </div>
+
+        `;
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   SEARCH ERROR STATE
+============================================================ */
+
+function createSearchErrorState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "search-error-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="search-error-icon"
+            aria-hidden="true"
+        >
+            ⚠️
+        </div>
+
+        <h2>
+            खोज पूरी नहीं हो सकी
+        </h2>
+
+        <p>
+            सर्वर से समाचार प्राप्त करने में समस्या हुई।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-search-retry
+        >
+            दोबारा खोजें
+        </button>
+
+        `;
+
+
+    const button =
+        wrapper.querySelector(
+            "[data-search-retry]"
+        );
+
+
+    if (
+        button
+    ) {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                performSearch(
+                    SearchState.query,
+                    {
+
+                        page:
+                            SearchState.page,
+
+                        updateURL:
+                            false
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   RENDER SEARCH RESULTS
+============================================================ */
+
+function renderSearchResults(
+    result
+) {
+
+    const containers =
+        getSearchResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !result?.results?.length
+            ) {
+
+                container.appendChild(
+                    createSearchEmptyState(
+                        SearchState.query
+                    )
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            result.results.forEach(
+                article => {
+
+                    const card =
+                        createSearchResultCard(
+                            article
+                        );
+
+
+                    if (
+                        card
+                    ) {
+
+                        card.classList.add(
+                            "search-result-card"
+                        );
+
+
+                        fragment.appendChild(
+                            card
+                        );
+
+                    }
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+        }
+    );
+
+
+    initializeArticleCards();
+
+    initializeBookmarkButtons();
+
+    initializeLazyImages();
+
+
+    renderSearchPagination(
+        result
+    );
+
+
+    updateSearchHeading();
+
+}
+
+
+/* ============================================================
+   SEARCH HEADING
+============================================================ */
+
+function updateSearchHeading() {
+
+    $$(
+        "[data-search-heading], " +
+        ".search-heading"
+    )
+    .forEach(
+        element => {
+
+            if (
+                SearchState.query
+            ) {
+
+                element.textContent =
+                    `खोज परिणाम: ${SearchState.query}`;
+
+            } else {
+
+                element.textContent =
+                    "खबर खोजें";
+
+            }
+
+        }
+    );
+
+
+    $$(
+        "[data-search-total], " +
+        ".search-total"
+    )
+    .forEach(
+        element => {
+
+            if (
+                SearchState.total
+            ) {
+
+                element.textContent =
+                    `${SearchState.total} परिणाम`;
+
+            } else {
+
+                element.textContent =
+                    "";
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH PAGINATION
+============================================================ */
+
+function renderSearchPagination(
+    result
+) {
+
+    $$(
+        "#searchPagination, " +
+        ".search-pagination, " +
+        "[data-search-pagination]"
+    )
+    .forEach(
+        container => {
+
+            renderPagination(
+                {
+
+                    page:
+                        result?.page ||
+                        1,
+
+                    totalPages:
+                        result?.totalPages ||
+                        1,
+
+                    totalItems:
+                        result?.total ||
+                        0,
+
+                    limit:
+                        result?.limit ||
+                        SearchState.limit
+
+                },
+                container,
+                {
+
+                    type:
+                        "search",
+
+                    onPageChange:
+                        page => {
+
+                            SearchState.page =
+                                page;
+
+
+                            performSearch(
+                                SearchState.query,
+                                {
+
+                                    page:
+                                        page,
+
+                                    updateURL:
+                                        true
+
+                                }
+                            );
+
+                        }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE SEARCH URL
+============================================================ */
+
+function updateSearchURL(
+    options = {}
+) {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    if (
+        SearchState.query
+    ) {
+
+        url.searchParams.set(
+            "q",
+            SearchState.query
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "q"
+        );
+
+    }
+
+
+    if (
+        SearchState.page > 1
+    ) {
+
+        url.searchParams.set(
+            "page",
+            String(
+                SearchState.page
+            )
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "page"
+        );
+
+    }
+
+
+    const state = {
+
+        search:
+            SearchState.query,
+
+        page:
+            SearchState.page
+
+    };
+
+
+    if (
+        options.replace
+    ) {
+
+        window.history.replaceState(
+            state,
+            "",
+            url
+        );
+
+    } else {
+
+        window.history.pushState(
+            state,
+            "",
+            url
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   PERFORM SEARCH
+============================================================ */
+
+async function performSearch(
+    query,
+    options = {}
+) {
+
+    const value =
+        normalizeText(
+            query
+        );
+
+
+    if (
+        value.length <
+        SEARCH_CONFIG.minLength
+    ) {
+
+        if (
+            options.clear !==
+            false
+        ) {
+
+            clearSearchResults();
+
+        }
+
+
+        return null;
+
+    }
+
+
+    SearchState.query =
+        value;
+
+
+    SearchState.page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                1
+            ) || 1
+        );
+
+
+    SearchState.loading =
+        true;
+
+
+    SearchState.searching =
+        true;
+
+
+    syncSearchInputs(
+        value
+    );
+
+
+    renderSearchLoading();
+
+
+    try {
+
+        const result =
+            await fetchSearchResults(
+                {
+
+                    query:
+                        value,
+
+                    page:
+                        SearchState.page,
+
+                    limit:
+                        SearchState.limit
+
+                }
+            );
+
+
+        SearchState.results =
+            result.results;
+
+
+        SearchState.total =
+            result.total;
+
+
+        SearchState.page =
+            result.page;
+
+
+        SearchState.totalPages =
+            result.totalPages;
+
+
+        SearchState.limit =
+            result.limit;
+
+
+        addSearchHistory(
+            value
+        );
+
+
+        renderSearchResults(
+            result
+        );
+
+
+        updateDocumentTitle(
+            `खोज: ${value} | आवाज़ राजस्थान`
+        );
+
+
+        if (
+            options.updateURL !==
+            false
+        ) {
+
+            updateSearchURL();
+
+        }
+
+
+        return result;
+
+    } catch (
+        error
+    ) {
+
+        getSearchResultContainers()
+            .forEach(
+                container => {
+
+                    container.innerHTML =
+                        "";
+
+
+                    container.appendChild(
+                        createSearchErrorState()
+                    );
+
+                }
+            );
+
+
+        handleGlobalError(
+            error,
+            "Search"
+        );
+
+
+        return null;
+
+    } finally {
+
+        SearchState.loading =
+            false;
+
+        SearchState.searching =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   CLEAR SEARCH RESULTS
+============================================================ */
+
+function clearSearchResults() {
+
+    SearchState.query =
+        "";
+
+    SearchState.results =
+        [];
+
+    SearchState.total =
+        0;
+
+    SearchState.page =
+        1;
+
+    SearchState.totalPages =
+        1;
+
+
+    getSearchResultContainers()
+        .forEach(
+            container => {
+
+                container.innerHTML =
+                    `
+
+                    <div class="search-placeholder">
+
+                        <div
+                            class="search-placeholder-icon"
+                            aria-hidden="true"
+                        >
+                            🔎
+                        </div>
+
+                        <h2>
+                            खबर खोजें
+                        </h2>
+
+                        <p>
+                            ऊपर दिए गए सर्च बॉक्स में
+                            खबर का नाम या कीवर्ड लिखें।
+                        </p>
+
+                    </div>
+
+                    `;
+
+            }
+        );
+
+
+    updateSearchHeading();
+
+}
+
+
+/* ============================================================
+   SYNC SEARCH INPUTS
+============================================================ */
+
+function syncSearchInputs(
+    value
+) {
+
+    getSearchInputs()
+        .forEach(
+            input => {
+
+                if (
+                    input.value !==
+                    value
+                ) {
+
+                    input.value =
+                        value;
+
+                }
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   SEARCH SUBMIT
+============================================================ */
+
+function submitSearchFromInput(
+    input
+) {
+
+    if (
+        !input
+    ) {
+
+        return;
+
+    }
+
+
+    const query =
+        normalizeText(
+            input.value
+        );
+
+
+    if (
+        query.length <
+        SEARCH_CONFIG.minLength
+    ) {
+
+        showToast(
+            `कम से कम ${SEARCH_CONFIG.minLength} अक्षर लिखें`,
+            "warning"
+        );
+
+
+        input.focus();
+
+        return;
+
+    }
+
+
+    addSearchHistory(
+        query
+    );
+
+
+    const path =
+        `/search?q=${encodeURIComponent(
+            query
+        )}`;
+
+
+    if (
+        typeof navigateTo ===
+        "function"
+    ) {
+
+        navigateTo(
+            path
+        );
+
+    } else {
+
+        window.location.href =
+            path;
+
+    }
+
+
+    performSearch(
+        query,
+        {
+
+            page:
+                1,
+
+            updateURL:
+                false
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH FORM INITIALIZATION
+============================================================ */
+
+function initializeSearchForms() {
+
+    $$(
+        "form[data-search-form], " +
+        ".search-form, " +
+        "#searchForm"
+    )
+    .forEach(
+        form => {
+
+            if (
+                form.dataset.searchInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            form.dataset.searchInitialized =
+                "true";
+
+
+            const input =
+                form.querySelector(
+                    "input[type='search'], " +
+                    "input[data-search-input], " +
+                    ".search-input"
+                );
+
+
+            if (
+                !input
+            ) {
+
+                return;
+
+            }
+
+
+            form.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+                    submitSearchFromInput(
+                        input
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH INPUT EVENTS
+============================================================ */
+
+function initializeSearchInputs() {
+
+    getSearchInputs()
+        .forEach(
+            input => {
+
+                if (
+                    input.dataset.searchInitialized ===
+                    "true"
+                ) {
+
+                    return;
+
+                }
+
+
+                input.dataset.searchInitialized =
+                    "true";
+
+
+                input.setAttribute(
+                    "autocomplete",
+                    "off"
+                );
+
+
+                input.addEventListener(
+                    "input",
+                    () => {
+
+                        const value =
+                            normalizeText(
+                                input.value
+                            );
+
+
+                        syncSearchInputs(
+                            value
+                        );
+
+
+                        clearTimeout(
+                            searchDebounceTimer
+                        );
+
+
+                        if (
+                            value.length <
+                            SEARCH_CONFIG.minLength
+                        ) {
+
+                            hideSearchSuggestions();
+
+                            return;
+
+                        }
+
+
+                        searchDebounceTimer =
+                            setTimeout(
+                                () => {
+
+                                    loadSearchSuggestions(
+                                        value
+                                    );
+
+                                },
+                                SEARCH_CONFIG.debounce
+                            );
+
+                    }
+                );
+
+
+                input.addEventListener(
+                    "keydown",
+                    event => {
+
+                        if (
+                            event.key ===
+                            "Enter"
+                        ) {
+
+                            event.preventDefault();
+
+
+                            clearTimeout(
+                                searchDebounceTimer
+                            );
+
+
+                            submitSearchFromInput(
+                                input
+                            );
+
+                        }
+
+
+                        if (
+                            event.key ===
+                            "Escape"
+                        ) {
+
+                            hideSearchSuggestions();
+
+                        }
+
+                    }
+                );
+
+
+                input.addEventListener(
+                    "focus",
+                    () => {
+
+                        renderSearchHistory();
+
+                    }
+                );
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   SEARCH SUGGESTION CONTAINER
+============================================================ */
+
+function getSearchSuggestionContainers() {
+
+    return $$(
+        "#searchSuggestions, " +
+        ".search-suggestions, " +
+        "[data-search-suggestions]"
+    );
+
+}
+
+
+/* ============================================================
+   LOAD SEARCH SUGGESTIONS
+============================================================ */
+
+async function loadSearchSuggestions(
+    query
+) {
+
+    const value =
+        normalizeText(
+            query
+        );
+
+
+    if (
+        value.length <
+        SEARCH_CONFIG.minLength
+    ) {
+
+        hideSearchSuggestions();
+
+        return [];
+
+    }
+
+
+    try {
+
+        let suggestions = [];
+
+
+        if (
+            typeof apiGet ===
+            "function"
+        ) {
+
+            const params =
+                new URLSearchParams();
+
+
+            params.set(
+                "q",
+                value
+            );
+
+
+            params.set(
+                "limit",
+                "6"
+            );
+
+
+            const response =
+                await apiGet(
+                    `${API_ENDPOINTS.searchSuggestions || API_ENDPOINTS.news}?${params.toString()}`
+                );
+
+
+            const data =
+                response?.data ||
+                response;
+
+
+            suggestions =
+                data?.suggestions ||
+                data?.results ||
+                [];
+
+        }
+
+
+        if (
+            !Array.isArray(
+                suggestions
+            )
+        ) {
+
+            suggestions =
+                [];
+
+        }
+
+
+        SearchState.suggestions =
+            suggestions
+                .map(
+                    item => {
+
+                        if (
+                            typeof item ===
+                            "string"
+                        ) {
+
+                            return item;
+
+                        }
+
+
+                        return (
+                            item.title ||
+                            item.name ||
+                            item.query ||
+                            ""
+                        );
+
+                    }
+                )
+                .filter(
+                    Boolean
+                )
+                .slice(
+                    0,
+                    6
+                );
+
+
+        renderSearchSuggestions(
+            value
+        );
+
+
+        return SearchState.suggestions;
+
+    } catch (
+        error
+    ) {
+
+        renderSearchSuggestions(
+            value
+        );
+
+
+        return [];
+
+    }
+
+}
+
+
+/* ============================================================
+   RENDER SEARCH SUGGESTIONS
+============================================================ */
+
+function renderSearchSuggestions(
+    query
+) {
+
+    const containers =
+        getSearchSuggestionContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            const suggestions = [
+                ...SearchState.suggestions
+            ];
+
+
+            if (
+                !suggestions.length
+            ) {
+
+                if (
+                    SearchState.history.length
+                ) {
+
+                    renderSearchHistory();
+
+                } else {
+
+                    hideSearchSuggestions();
+
+                }
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            suggestions.forEach(
+                suggestion => {
+
+                    const item =
+                        createElement(
+                            "button",
+                            {
+
+                                className:
+                                    "search-suggestion",
+
+                                type:
+                                    "button"
+
+                            }
+                        );
+
+
+                    item.innerHTML =
+                        `
+
+                        <span
+                            class="search-suggestion-icon"
+                            aria-hidden="true"
+                        >
+                            🔎
+                        </span>
+
+                        <span
+                            class="search-suggestion-text"
+                        >
+                            ${escapeHTML(
+                                suggestion
+                            )}
+                        </span>
+
+                        `;
+
+
+                    item.addEventListener(
+                        "click",
+                        () => {
+
+                            syncSearchInputs(
+                                suggestion
+                            );
+
+
+                            hideSearchSuggestions();
+
+
+                            submitSearchFromInput(
+                                getSearchInputs()[0]
+                            );
+
+                        }
+                    );
+
+
+                    fragment.appendChild(
+                        item
+                    );
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+
+            container.classList.add(
+                "is-visible"
+            );
+
+
+            container.removeAttribute(
+                "hidden"
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   RENDER SEARCH HISTORY
+============================================================ */
+
+function renderSearchHistory() {
+
+    const containers =
+        getSearchSuggestionContainers();
+
+
+    if (
+        !SearchState.history.length
+    ) {
+
+        return;
+
+    }
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                `
+
+                <div
+                    class="search-history-header"
+                >
+
+                    <span>
+                        हाल की खोज
+                    </span>
+
+                    <button
+                        type="button"
+                        data-clear-search-history
+                    >
+                        साफ करें
+                    </button>
+
+                </div>
+
+                `;
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            SearchState.history.forEach(
+                query => {
+
+                    const row =
+                        createElement(
+                            "div",
+                            {
+
+                                className:
+                                    "search-history-item"
+
+                            }
+                        );
+
+
+                    row.innerHTML =
+                        `
+
+                        <button
+                            type="button"
+                            class="search-history-query"
+                        >
+
+                            <span
+                                aria-hidden="true"
+                            >
+                                🕘
+                            </span>
+
+                            <span>
+                                ${escapeHTML(
+                                    query
+                                )}
+                            </span>
+
+                        </button>
+
+                        <button
+                            type="button"
+                            class="search-history-remove"
+                            aria-label="खोज हटाएं"
+                        >
+                            ×
+                        </button>
+
+                        `;
+
+
+                    const queryButton =
+                        row.querySelector(
+                            ".search-history-query"
+                        );
+
+
+                    const removeButton =
+                        row.querySelector(
+                            ".search-history-remove"
+                        );
+
+
+                    queryButton.addEventListener(
+                        "click",
+                        () => {
+
+                            syncSearchInputs(
+                                query
+                            );
+
+
+                            hideSearchSuggestions();
+
+
+                            submitSearchFromInput(
+                                getSearchInputs()[0]
+                            );
+
+                        }
+                    );
+
+
+                    removeButton.addEventListener(
+                        "click",
+                        event => {
+
+                            event.stopPropagation();
+
+                            removeSearchHistory(
+                                query
+                            );
+
+                        }
+                    );
+
+
+                    fragment.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+
+            const clearButton =
+                container.querySelector(
+                    "[data-clear-search-history]"
+                );
+
+
+            if (
+                clearButton
+            ) {
+
+                clearButton.addEventListener(
+                    "click",
+                    clearSearchHistory
+                );
+
+            }
+
+
+            container.classList.add(
+                "is-visible"
+            );
+
+
+            container.removeAttribute(
+                "hidden"
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   HIDE SEARCH SUGGESTIONS
+============================================================ */
+
+function hideSearchSuggestions() {
+
+    getSearchSuggestionContainers()
+        .forEach(
+            container => {
+
+                container.classList.remove(
+                    "is-visible"
+                );
+
+
+                container.setAttribute(
+                    "hidden",
+                    ""
+                );
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   SEARCH OUTSIDE CLICK
+============================================================ */
+
+function initializeSearchOutsideClick() {
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            const target =
+                event.target;
+
+
+            if (
+                target.closest(
+                    ".search-form, " +
+                    ".search-box, " +
+                    ".search-wrapper, " +
+                    "[data-search-container]"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            hideSearchSuggestions();
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH PAGE DETECTION
+============================================================ */
+
+function isSearchPage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path === "/search" ||
+        path.startsWith(
+            "/search/"
+        ) ||
+        !!document.querySelector(
+            "#searchResults, #searchNews, [data-search-results]"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   GET SEARCH QUERY FROM URL
+============================================================ */
+
+function getSearchQueryFromURL() {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    return normalizeText(
+        url.searchParams.get(
+            "q"
+        ) ||
+        url.searchParams.get(
+            "search"
+        ) ||
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   INITIALIZE SEARCH PAGE
+============================================================ */
+
+async function initializeSearchPage() {
+
+    loadSearchHistory();
+
+    initializeSearchForms();
+
+    initializeSearchInputs();
+
+    initializeSearchOutsideClick();
+
+
+    if (
+        !isSearchPage()
+    ) {
+
+        return;
+
+    }
+
+
+    const query =
+        getSearchQueryFromURL();
+
+
+    if (
+        !query
+    ) {
+
+        clearSearchResults();
+
+        SearchState.initialized =
+            true;
+
+        return;
+
+    }
+
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    const page =
+        Math.max(
+            1,
+            Number(
+                url.searchParams.get(
+                    "page"
+                )
+            ) || 1
+        );
+
+
+    await performSearch(
+        query,
+        {
+
+            page:
+                page,
+
+            updateURL:
+                false
+
+        }
+    );
+
+
+    SearchState.initialized =
+        true;
+
+}
+
+
+/* ============================================================
+   SEARCH POPSTATE
+============================================================ */
+
+window.addEventListener(
+    "popstate",
+    () => {
+
+        if (
+            !isSearchPage()
+        ) {
+
+            return;
+
+        }
+
+
+        const query =
+            getSearchQueryFromURL();
+
+
+        if (
+            !query
+        ) {
+
+            clearSearchResults();
+
+            return;
+
+        }
+
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+
+        const page =
+            Math.max(
+                1,
+                Number(
+                    url.searchParams.get(
+                        "page"
+                    )
+                ) || 1
+            );
+
+
+        performSearch(
+            query,
+            {
+
+                page:
+                    page,
+
+                updateURL:
+                    false
+
+            }
+        );
+
+    }
+);
+
+
+/* ============================================================
+   SEARCH GLOBAL EXPORT
+============================================================ */
+
+window.AwaazRajasthan.search = {
+
+    state:
+        SearchState,
+
+    search:
+        performSearch,
+
+    submit:
+        submitSearchFromInput,
+
+    clear:
+        clearSearchResults,
+
+    history:
+        {
+
+            load:
+                loadSearchHistory,
+
+            add:
+                addSearchHistory,
+
+            remove:
+                removeSearchHistory,
+
+            clear:
+                clearSearchHistory
+
+        },
+
+    suggestions:
+        {
+
+            load:
+                loadSearchSuggestions,
+
+            hide:
+                hideSearchSuggestions
+
+        },
+
+    initialize:
+        initializeSearchPage
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeSearchPage();
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 24/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 25/30
+
+   CATEGORY SYSTEM
+   CATEGORY NEWS
+   CATEGORY FILTER
+   CATEGORY NAVIGATION
+   CATEGORY PAGINATION
+============================================================ */
+
+
+/* ============================================================
+   CATEGORY CONFIGURATION
+============================================================ */
+
+const CATEGORY_CONFIG = {
+
+    defaultLimit:
+        12,
+
+    maxLimit:
+        48,
+
+    resultSelectors: [
+
+        "#categoryNews",
+
+        "#categoryNewsGrid",
+
+        "#categoryResults",
+
+        ".category-news-grid",
+
+        ".category-results",
+
+        "[data-category-results]"
+
+    ],
+
+    linkSelectors: [
+
+        "[data-category]",
+
+        ".category-link",
+
+        ".category-item"
+
+    ]
+
+};
+
+
+/* ============================================================
+   CATEGORY STATE
+============================================================ */
+
+const CategoryState = {
+
+    slug:
+        "",
+
+    name:
+        "",
+
+    results:
+        [],
+
+    page:
+        1,
+
+    limit:
+        CATEGORY_CONFIG.defaultLimit,
+
+    total:
+        0,
+
+    totalPages:
+        1,
+
+    loading:
+        false,
+
+    initialized:
+        false
+
+};
+
+
+/* ============================================================
+   NEWS CATEGORIES
+============================================================ */
+
+const NEWS_CATEGORIES = [
+
+    {
+        slug:
+            "rajasthan",
+
+        name:
+            "राजस्थान"
+    },
+
+    {
+        slug:
+            "jaipur",
+
+        name:
+            "जयपुर"
+    },
+
+    {
+        slug:
+            "politics",
+
+        name:
+            "राजनीति"
+    },
+
+    {
+        slug:
+            "crime",
+
+        name:
+            "अपराध"
+    },
+
+    {
+        slug:
+            "education",
+
+        name:
+            "शिक्षा"
+    },
+
+    {
+        slug:
+            "jobs",
+
+        name:
+            "सरकारी नौकरी"
+    },
+
+    {
+        slug:
+            "business",
+
+        name:
+            "बिजनेस"
+    },
+
+    {
+        slug:
+            "sports",
+
+        name:
+            "खेल"
+    },
+
+    {
+        slug:
+            "entertainment",
+
+        name:
+            "मनोरंजन"
+    },
+
+    {
+        slug:
+            "technology",
+
+        name:
+            "टेक्नोलॉजी"
+    },
+
+    {
+        slug:
+            "health",
+
+        name:
+            "स्वास्थ्य"
+    },
+
+    {
+        slug:
+            "weather",
+
+        name:
+            "मौसम"
+    },
+
+    {
+        slug:
+            "national",
+
+        name:
+            "देश"
+    },
+
+    {
+        slug:
+            "international",
+
+        name:
+            "दुनिया"
+    },
+
+    {
+        slug:
+            "religion",
+
+        name:
+            "धर्म"
+    },
+
+    {
+        slug:
+            "lifestyle",
+
+        name:
+            "लाइफस्टाइल"
+    },
+
+    {
+        slug:
+            "viral",
+
+        name:
+            "वायरल"
+    },
+
+    {
+        slug:
+            "other",
+
+        name:
+            "अन्य"
+    }
+
+];
+
+
+/* ============================================================
+   GET CATEGORY BY SLUG
+============================================================ */
+
+function getCategoryBySlug(
+    slug
+) {
+
+    const value =
+        normalizeText(
+            slug
+        )
+        .toLowerCase();
+
+
+    if (
+        !value
+    ) {
+
+        return null;
+
+    }
+
+
+    return NEWS_CATEGORIES.find(
+        category =>
+            category.slug
+                .toLowerCase() ===
+            value
+    ) || null;
+
+}
+
+
+/* ============================================================
+   GET CATEGORY NAME
+============================================================ */
+
+function getCategoryName(
+    slug
+) {
+
+    const category =
+        getCategoryBySlug(
+            slug
+        );
+
+
+    return (
+        category?.name ||
+        normalizeText(
+            slug
+        ) ||
+        "समाचार"
+    );
+
+}
+
+
+/* ============================================================
+   GET CATEGORY FROM URL
+============================================================ */
+
+function getCategorySlugFromURL() {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    const params =
+        url.searchParams;
+
+
+    const queryValue =
+        params.get(
+            "category"
+        ) ||
+        params.get(
+            "cat"
+        );
+
+
+    if (
+        queryValue
+    ) {
+
+        return normalizeText(
+            queryValue
+        );
+
+    }
+
+
+    const path =
+        window.location.pathname
+            .split("/")
+            .filter(Boolean);
+
+
+    const index =
+        path.findIndex(
+            item =>
+                [
+                    "category",
+                    "categories"
+                ].includes(
+                    item.toLowerCase()
+                )
+        );
+
+
+    if (
+        index >= 0 &&
+        path[index + 1]
+    ) {
+
+        return decodeURIComponent(
+            path[
+                index + 1
+            ]
+        );
+
+    }
+
+
+    return "";
+
+}
+
+
+/* ============================================================
+   CATEGORY RESULT CONTAINERS
+============================================================ */
+
+function getCategoryResultContainers() {
+
+    const containers = [];
+
+
+    CATEGORY_CONFIG
+        .resultSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !containers.includes(
+                                    element
+                                )
+                            ) {
+
+                                containers.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return containers;
+
+}
+
+
+/* ============================================================
+   BUILD CATEGORY QUERY
+============================================================ */
+
+function buildCategoryQuery(
+    options = {}
+) {
+
+    const params =
+        new URLSearchParams();
+
+
+    const category =
+        normalizeText(
+            options.category ??
+            CategoryState.slug
+        );
+
+
+    const page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                CategoryState.page
+            ) || 1
+        );
+
+
+    const limit =
+        Math.min(
+            CATEGORY_CONFIG.maxLimit,
+            Math.max(
+                1,
+                Number(
+                    options.limit ??
+                    CategoryState.limit
+                ) ||
+                CATEGORY_CONFIG.defaultLimit
+            )
+        );
+
+
+    if (
+        category
+    ) {
+
+        params.set(
+            "category",
+            category
+        );
+
+    }
+
+
+    params.set(
+        "page",
+        String(
+            page
+        )
+    );
+
+
+    params.set(
+        "limit",
+        String(
+            limit
+        )
+    );
+
+
+    params.set(
+        "sort",
+        options.sort ||
+        "latest"
+    );
+
+
+    if (
+        options.district
+    ) {
+
+        params.set(
+            "district",
+            normalizeText(
+                options.district
+            )
+        );
+
+    }
+
+
+    return params;
+
+}
+
+
+/* ============================================================
+   FETCH CATEGORY NEWS
+============================================================ */
+
+async function fetchCategoryNews(
+    options = {}
+) {
+
+    if (
+        typeof apiGet !==
+        "function"
+    ) {
+
+        throw new Error(
+            "API GET function unavailable"
+        );
+
+    }
+
+
+    const params =
+        buildCategoryQuery(
+            options
+        );
+
+
+    const response =
+        await apiGet(
+            `${API_ENDPOINTS.news}?${params.toString()}`
+        );
+
+
+    const data =
+        response?.data ||
+        response;
+
+
+    const news =
+        data?.news ||
+        data?.articles ||
+        data?.results ||
+        [];
+
+
+    const pagination =
+        normalizePageData(
+            data?.pagination ||
+            data?.meta ||
+            data
+        );
+
+
+    return {
+
+        news:
+            Array.isArray(
+                news
+            )
+                ? news
+                : [],
+
+        total:
+            pagination.totalItems,
+
+        page:
+            pagination.page,
+
+        totalPages:
+            pagination.totalPages,
+
+        limit:
+            pagination.limit
+
+    };
+
+}
+
+
+/* ============================================================
+   CATEGORY LOADING
+============================================================ */
+
+function renderCategoryLoading() {
+
+    const containers =
+        getCategoryResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            container.appendChild(
+                createCategorySkeleton(
+                    8
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CATEGORY EMPTY STATE
+============================================================ */
+
+function createCategoryEmptyState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "category-empty-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="category-empty-icon"
+            aria-hidden="true"
+        >
+            📰
+        </div>
+
+        <h2>
+            ${escapeHTML(
+                CategoryState.name
+            )} में अभी कोई खबर नहीं है
+        </h2>
+
+        <p>
+            इस कैटेगरी में नई खबरें प्रकाशित होने पर
+            यहां दिखाई देंगी।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-category-home
+        >
+            ताजा खबरें देखें
+        </button>
+
+        `;
+
+
+    const button =
+        wrapper.querySelector(
+            "[data-category-home]"
+        );
+
+
+    if (
+        button
+    ) {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                navigateTo(
+                    "/"
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   CATEGORY ERROR STATE
+============================================================ */
+
+function createCategoryErrorState() {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "category-error-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="category-error-icon"
+            aria-hidden="true"
+        >
+            ⚠️
+        </div>
+
+        <h2>
+            खबरें लोड नहीं हो सकीं
+        </h2>
+
+        <p>
+            कैटेगरी की खबरें प्राप्त करने में समस्या हुई।
+        </p>
+
+        <button
+            type="button"
+            class="primary-btn"
+            data-category-retry
+        >
+            दोबारा प्रयास करें
+        </button>
+
+        `;
+
+
+    const retry =
+        wrapper.querySelector(
+            "[data-category-retry]"
+        );
+
+
+    if (
+        retry
+    ) {
+
+        retry.addEventListener(
+            "click",
+            () => {
+
+                loadCategoryNews(
+                    CategoryState.slug,
+                    {
+
+                        page:
+                            CategoryState.page,
+
+                        updateURL:
+                            false
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   RENDER CATEGORY NEWS
+============================================================ */
+
+function renderCategoryNews(
+    result
+) {
+
+    const containers =
+        getCategoryResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !result?.news?.length
+            ) {
+
+                container.appendChild(
+                    createCategoryEmptyState()
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            result.news.forEach(
+                article => {
+
+                    const card =
+                        createSearchResultCard(
+                            article
+                        );
+
+
+                    if (
+                        card
+                    ) {
+
+                        card.classList.add(
+                            "category-news-card"
+                        );
+
+
+                        fragment.appendChild(
+                            card
+                        );
+
+                    }
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+        }
+    );
+
+
+    initializeArticleCards();
+
+    initializeBookmarkButtons();
+
+    initializeLazyImages();
+
+
+    renderCategoryPagination(
+        result
+    );
+
+
+    updateCategoryHeading();
+
+}
+
+
+/* ============================================================
+   CATEGORY HEADING
+============================================================ */
+
+function updateCategoryHeading() {
+
+    const name =
+        CategoryState.name ||
+        getCategoryName(
+            CategoryState.slug
+        );
+
+
+    $$(
+        "[data-category-heading], " +
+        ".category-heading"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                name;
+
+        }
+    );
+
+
+    $$(
+        "[data-category-total], " +
+        ".category-total"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                CategoryState.total
+                    ? `${CategoryState.total} खबरें`
+                    : "";
+
+        }
+    );
+
+
+    $$(
+        "[data-category-description]"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                `${name} की ताजा खबरें`;
+
+        }
+    );
+
+
+    updateActiveCategory();
+
+}
+
+
+/* ============================================================
+   CATEGORY PAGINATION
+============================================================ */
+
+function renderCategoryPagination(
+    result
+) {
+
+    $$(
+        "#categoryPagination, " +
+        ".category-pagination, " +
+        "[data-category-pagination]"
+    )
+    .forEach(
+        container => {
+
+            renderPagination(
+                {
+
+                    page:
+                        result?.page ||
+                        1,
+
+                    totalPages:
+                        result?.totalPages ||
+                        1,
+
+                    totalItems:
+                        result?.total ||
+                        0,
+
+                    limit:
+                        result?.limit ||
+                        CategoryState.limit
+
+                },
+                container,
+                {
+
+                    type:
+                        "category",
+
+                    onPageChange:
+                        page => {
+
+                            CategoryState.page =
+                                page;
+
+
+                            loadCategoryNews(
+                                CategoryState.slug,
+                                {
+
+                                    page:
+                                        page,
+
+                                    updateURL:
+                                        true
+
+                                }
+                            );
+
+                        }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE CATEGORY URL
+============================================================ */
+
+function updateCategoryURL(
+    options = {}
+) {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    if (
+        CategoryState.slug
+    ) {
+
+        url.searchParams.set(
+            "category",
+            CategoryState.slug
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "category"
+        );
+
+    }
+
+
+    if (
+        CategoryState.page > 1
+    ) {
+
+        url.searchParams.set(
+            "page",
+            String(
+                CategoryState.page
+            )
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "page"
+        );
+
+    }
+
+
+    const state = {
+
+        category:
+            CategoryState.slug,
+
+        page:
+            CategoryState.page
+
+    };
+
+
+    if (
+        options.replace
+    ) {
+
+        window.history.replaceState(
+            state,
+            "",
+            url
+        );
+
+    } else {
+
+        window.history.pushState(
+            state,
+            "",
+            url
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   LOAD CATEGORY NEWS
+============================================================ */
+
+async function loadCategoryNews(
+    slug,
+    options = {}
+) {
+
+    const value =
+        normalizeText(
+            slug ||
+            CategoryState.slug ||
+            getCategorySlugFromURL()
+        );
+
+
+    const category =
+        getCategoryBySlug(
+            value
+        );
+
+
+    CategoryState.slug =
+        category?.slug ||
+        value;
+
+
+    CategoryState.name =
+        category?.name ||
+        getCategoryName(
+            value
+        );
+
+
+    CategoryState.page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                CategoryState.page
+            ) || 1
+        );
+
+
+    CategoryState.loading =
+        true;
+
+
+    renderCategoryLoading();
+
+
+    try {
+
+        const result =
+            await fetchCategoryNews(
+                {
+
+                    category:
+                        CategoryState.slug,
+
+                    page:
+                        CategoryState.page,
+
+                    limit:
+                        CategoryState.limit
+
+                }
+            );
+
+
+        CategoryState.results =
+            result.news;
+
+
+        CategoryState.total =
+            result.total;
+
+
+        CategoryState.page =
+            result.page;
+
+
+        CategoryState.totalPages =
+            result.totalPages;
+
+
+        CategoryState.limit =
+            result.limit;
+
+
+        renderCategoryNews(
+            result
+        );
+
+
+        updateDocumentTitle(
+            `${CategoryState.name} की खबरें | आवाज़ राजस्थान`
+        );
+
+
+        if (
+            options.updateURL !==
+            false
+        ) {
+
+            updateCategoryURL();
+
+        }
+
+
+        return result;
+
+    } catch (
+        error
+    ) {
+
+        getCategoryResultContainers()
+            .forEach(
+                container => {
+
+                    container.innerHTML =
+                        "";
+
+
+                    container.appendChild(
+                        createCategoryErrorState()
+                    );
+
+                }
+            );
+
+
+        handleGlobalError(
+            error,
+            "Category"
+        );
+
+
+        return null;
+
+    } finally {
+
+        CategoryState.loading =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   NAVIGATE TO CATEGORY
+============================================================ */
+
+function navigateToCategory(
+    slug,
+    options = {}
+) {
+
+    const category =
+        getCategoryBySlug(
+            slug
+        );
+
+
+    const value =
+        category?.slug ||
+        normalizeText(
+            slug
+        );
+
+
+    if (
+        !value
+    ) {
+
+        return;
+
+    }
+
+
+    CategoryState.slug =
+        value;
+
+
+    CategoryState.name =
+        category?.name ||
+        getCategoryName(
+            value
+        );
+
+
+    CategoryState.page =
+        1;
+
+
+    if (
+        options.navigate !==
+        false
+    ) {
+
+        const path =
+            `/category/${encodeURIComponent(
+                value
+            )}`;
+
+
+        if (
+            typeof navigateTo ===
+            "function"
+        ) {
+
+            navigateTo(
+                path
+            );
+
+        } else {
+
+            window.location.href =
+                path;
+
+        }
+
+    }
+
+
+    return loadCategoryNews(
+        value,
+        {
+
+            page:
+                1,
+
+            updateURL:
+                false
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   INITIALIZE CATEGORY LINKS
+============================================================ */
+
+function initializeCategoryLinks() {
+
+    CATEGORY_CONFIG
+        .linkSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                element.dataset.categoryInitialized ===
+                                "true"
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const raw =
+                                element.dataset.category ||
+                                element.dataset.slug;
+
+
+                            if (
+                                !raw
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            const category =
+                                getCategoryBySlug(
+                                    raw
+                                );
+
+
+                            if (
+                                !category
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            element.dataset.categoryInitialized =
+                                "true";
+
+
+                            element.dataset.category =
+                                category.slug;
+
+
+                            element.addEventListener(
+                                "click",
+                                event => {
+
+                                    event.preventDefault();
+
+
+                                    navigateToCategory(
+                                        category.slug
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+            }
+        );
+
+
+    updateActiveCategory();
+
+}
+
+
+/* ============================================================
+   UPDATE ACTIVE CATEGORY
+============================================================ */
+
+function updateActiveCategory() {
+
+    const active =
+        CategoryState.slug;
+
+
+    $$(
+        "[data-category]"
+    )
+    .forEach(
+        element => {
+
+            const slug =
+                normalizeText(
+                    element.dataset.category
+                );
+
+
+            const isActive =
+                slug ===
+                active;
+
+
+            element.classList.toggle(
+                "active",
+                isActive
+            );
+
+
+            if (
+                isActive
+            ) {
+
+                element.setAttribute(
+                    "aria-current",
+                    "page"
+                );
+
+            } else {
+
+                element.removeAttribute(
+                    "aria-current"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CATEGORY SELECT
+============================================================ */
+
+function initializeCategorySelects() {
+
+    $$(
+        "[data-category-select], " +
+        "#categorySelect"
+    )
+    .forEach(
+        select => {
+
+            if (
+                select.dataset.categoryInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            select.dataset.categoryInitialized =
+                "true";
+
+
+            select.addEventListener(
+                "change",
+                () => {
+
+                    const value =
+                        normalizeText(
+                            select.value
+                        );
+
+
+                    if (
+                        value
+                    ) {
+
+                        navigateToCategory(
+                            value
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CATEGORY PAGE DETECTION
+============================================================ */
+
+function isCategoryPage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path.startsWith(
+            "/category/"
+        ) ||
+        path.startsWith(
+            "/categories/"
+        ) ||
+        !!document.querySelector(
+            "#categoryNews, #categoryResults, [data-category-results]"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   INITIALIZE CATEGORY PAGE
+============================================================ */
+
+async function initializeCategoryPage() {
+
+    initializeCategoryLinks();
+
+    initializeCategorySelects();
+
+
+    if (
+        !isCategoryPage()
+    ) {
+
+        return;
+
+    }
+
+
+    const slug =
+        getCategorySlugFromURL();
+
+
+    if (
+        !slug
+    ) {
+
+        return;
+
+    }
+
+
+    CategoryState.slug =
+        slug;
+
+
+    const category =
+        getCategoryBySlug(
+            slug
+        );
+
+
+    CategoryState.name =
+        category?.name ||
+        getCategoryName(
+            slug
+        );
+
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    CategoryState.page =
+        Math.max(
+            1,
+            Number(
+                url.searchParams.get(
+                    "page"
+                )
+            ) || 1
+        );
+
+
+    await loadCategoryNews(
+        slug,
+        {
+
+            page:
+                CategoryState.page,
+
+            updateURL:
+                false
+
+        }
+    );
+
+
+    CategoryState.initialized =
+        true;
+
+}
+
+
+/* ============================================================
+   CATEGORY POPSTATE
+============================================================ */
+
+window.addEventListener(
+    "popstate",
+    () => {
+
+        if (
+            !isCategoryPage()
+        ) {
+
+            return;
+
+        }
+
+
+        const slug =
+            getCategorySlugFromURL();
+
+
+        if (
+            !slug
+        ) {
+
+            return;
+
+        }
+
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+
+        CategoryState.page =
+            Math.max(
+                1,
+                Number(
+                    url.searchParams.get(
+                        "page"
+                    )
+                ) || 1
+            );
+
+
+        loadCategoryNews(
+            slug,
+            {
+
+                page:
+                    CategoryState.page,
+
+                updateURL:
+                    false
+
+            }
+        );
+
+    }
+);
+
+
+/* ============================================================
+   CATEGORY GLOBAL EXPORT
+============================================================ */
+
+window.AwaazRajasthan.category = {
+
+    state:
+        CategoryState,
+
+    list:
+        NEWS_CATEGORIES,
+
+    get:
+        getCategoryBySlug,
+
+    name:
+        getCategoryName,
+
+    load:
+        loadCategoryNews,
+
+    navigate:
+        navigateToCategory,
+
+    initialize:
+        initializeCategoryPage
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeCategoryPage();
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 25/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 26/30
+
+   ARTICLE DETAILS SYSTEM
+   SINGLE NEWS ARTICLE
+   RELATED NEWS
+   SHARE
+   PRINT
+   FONT SIZE
+   READING PROGRESS
+============================================================ */
+
+
+/* ============================================================
+   ARTICLE CONFIGURATION
+============================================================ */
+
+const ARTICLE_CONFIG = {
+
+    relatedLimit:
+        8,
+
+    popularLimit:
+        6,
+
+    resultSelectors: [
+
+        "#relatedNews",
+
+        "#relatedNewsGrid",
+
+        ".related-news-grid",
+
+        "[data-related-news]"
+
+    ]
+
+};
+
+
+/* ============================================================
+   ARTICLE STATE
+============================================================ */
+
+const ArticleState = {
+
+    id:
+        "",
+
+    slug:
+        "",
+
+    article:
+        null,
+
+    related:
+        [],
+
+    loading:
+        false,
+
+    initialized:
+        false,
+
+    fontScale:
+        1
+
+};
+
+
+/* ============================================================
+   GET ARTICLE ID / SLUG FROM URL
+============================================================ */
+
+function getArticleIdentifierFromURL() {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    const params =
+        url.searchParams;
+
+
+    const queryId =
+        params.get(
+            "id"
+        ) ||
+        params.get(
+            "newsId"
+        ) ||
+        params.get(
+            "articleId"
+        );
+
+
+    if (
+        queryId
+    ) {
+
+        return {
+            type:
+                "id",
+
+            value:
+                normalizeText(
+                    queryId
+                )
+        };
+
+    }
+
+
+    const querySlug =
+        params.get(
+            "slug"
+        );
+
+
+    if (
+        querySlug
+    ) {
+
+        return {
+            type:
+                "slug",
+
+            value:
+                normalizeText(
+                    querySlug
+                )
+        };
+
+    }
+
+
+    const path =
+        window.location.pathname
+            .split("/")
+            .filter(Boolean);
+
+
+    const articleIndex =
+        path.findIndex(
+            item =>
+                [
+                    "news",
+                    "article",
+                    "story",
+                    "post"
+                ].includes(
+                    item.toLowerCase()
+                )
+        );
+
+
+    if (
+        articleIndex >= 0 &&
+        path[articleIndex + 1]
+    ) {
+
+        return {
+
+            type:
+                "slug",
+
+            value:
+                decodeURIComponent(
+                    path[
+                        articleIndex + 1
+                    ]
+                )
+
+        };
+
+    }
+
+
+    return null;
+
+}
+
+
+/* ============================================================
+   ARTICLE PAGE DETECTION
+============================================================ */
+
+function isArticlePage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path.startsWith(
+            "/news/"
+        ) ||
+        path.startsWith(
+            "/article/"
+        ) ||
+        path.startsWith(
+            "/story/"
+        ) ||
+        path.startsWith(
+            "/post/"
+        ) ||
+        !!document.querySelector(
+            "[data-article-page]"
+        ) ||
+        !!document.querySelector(
+            "#articleContent"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   GET ARTICLE CONTAINER
+============================================================ */
+
+function getArticleContainers() {
+
+    const selectors = [
+
+        "#articleContent",
+
+        "#newsArticle",
+
+        ".article-content",
+
+        ".news-article",
+
+        "[data-article-content]"
+
+    ];
+
+
+    const elements = [];
+
+
+    selectors.forEach(
+        selector => {
+
+            $$(selector)
+                .forEach(
+                    element => {
+
+                        if (
+                            !elements.includes(
+                                element
+                            )
+                        ) {
+
+                            elements.push(
+                                element
+                            );
+
+                        }
+
+                    }
+                );
+
+        }
+    );
+
+
+    return elements;
+
+}
+
+
+/* ============================================================
+   FETCH ARTICLE BY ID
+============================================================ */
+
+async function fetchArticleById(
+    id
+) {
+
+    if (
+        !id
+    ) {
+
+        throw new Error(
+            "Article ID missing"
+        );
+
+    }
+
+
+    if (
+        typeof apiGet !==
+        "function"
+    ) {
+
+        throw new Error(
+            "API GET function unavailable"
+        );
+
+    }
+
+
+    const endpoint =
+        API_ENDPOINTS.newsById
+            ? `${API_ENDPOINTS.newsById}/${encodeURIComponent(id)}`
+            : `${API_ENDPOINTS.news}/${encodeURIComponent(id)}`;
+
+
+    const response =
+        await apiGet(
+            endpoint
+        );
+
+
+    const data =
+        response?.data ||
+        response;
+
+
+    return (
+        data?.news ||
+        data?.article ||
+        data?.result ||
+        data
+    );
+
+}
+
+
+/* ============================================================
+   FETCH ARTICLE BY SLUG
+============================================================ */
+
+async function fetchArticleBySlug(
+    slug
+) {
+
+    if (
+        !slug
+    ) {
+
+        throw new Error(
+            "Article slug missing"
+        );
+
+    }
+
+
+    if (
+        typeof apiGet !==
+        "function"
+    ) {
+
+        throw new Error(
+            "API GET function unavailable"
+        );
+
+    }
+
+
+    const params =
+        new URLSearchParams();
+
+
+    params.set(
+        "slug",
+        slug
+    );
+
+
+    params.set(
+        "limit",
+        "1"
+    );
+
+
+    const response =
+        await apiGet(
+            `${API_ENDPOINTS.news}?${params.toString()}`
+        );
+
+
+    const data =
+        response?.data ||
+        response;
+
+
+    const results =
+        data?.news ||
+        data?.articles ||
+        data?.results ||
+        [];
+
+
+    if (
+        Array.isArray(
+            results
+        ) &&
+        results.length
+    ) {
+
+        return results[0];
+
+    }
+
+
+    if (
+        data?.article
+    ) {
+
+        return data.article;
+
+    }
+
+
+    if (
+        data?.news &&
+        !Array.isArray(
+            data.news
+        )
+    ) {
+
+        return data.news;
+
+    }
+
+
+    return null;
+
+}
+
+
+/* ============================================================
+   FETCH ARTICLE
+============================================================ */
+
+async function fetchArticle(
+    identifier
+) {
+
+    if (
+        !identifier
+    ) {
+
+        return null;
+
+    }
+
+
+    if (
+        identifier.type ===
+        "id"
+    ) {
+
+        return fetchArticleById(
+            identifier.value
+        );
+
+    }
+
+
+    return fetchArticleBySlug(
+        identifier.value
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE ARTICLE CONTENT
+============================================================ */
+
+function normalizeArticleContent(
+    article
+) {
+
+    if (
+        !article
+    ) {
+
+        return "";
+
+    }
+
+
+    const content =
+        article.content ||
+        article.body ||
+        article.description ||
+        article.articleContent ||
+        "";
+
+
+    return String(
+        content
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE ARTICLE TITLE
+============================================================ */
+
+function getArticleTitle(
+    article
+) {
+
+    return normalizeText(
+        article?.title ||
+        article?.headline ||
+        article?.name ||
+        "आवाज़ राजस्थान"
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE ARTICLE IMAGE
+============================================================ */
+
+function getArticleImage(
+    article
+) {
+
+    return (
+        article?.image ||
+        article?.imageUrl ||
+        article?.thumbnail ||
+        article?.featuredImage ||
+        article?.coverImage ||
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE ARTICLE CATEGORY
+============================================================ */
+
+function getArticleCategory(
+    article
+) {
+
+    if (
+        typeof article?.category ===
+        "object"
+    ) {
+
+        return normalizeText(
+            article.category.name ||
+            article.category.title ||
+            article.category.slug
+        );
+
+    }
+
+
+    return normalizeText(
+        article?.category ||
+        article?.categoryName ||
+        "समाचार"
+    );
+
+}
+
+
+/* ============================================================
+   NORMALIZE ARTICLE DATE
+============================================================ */
+
+function getArticleDate(
+    article
+) {
+
+    return (
+        article?.publishedAt ||
+        article?.published_at ||
+        article?.createdAt ||
+        article?.created_at ||
+        article?.date ||
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE ARTICLE META
+============================================================ */
+
+function updateArticleMeta(
+    article
+) {
+
+    const title =
+        getArticleTitle(
+            article
+        );
+
+
+    const description =
+        normalizeText(
+            article?.excerpt ||
+            article?.summary ||
+            article?.description ||
+            title
+        );
+
+
+    const image =
+        getArticleImage(
+            article
+        );
+
+
+    document.title =
+        `${title} | आवाज़ राजस्थान`;
+
+
+    const descriptionMeta =
+        document.querySelector(
+            'meta[name="description"]'
+        );
+
+
+    if (
+        descriptionMeta
+    ) {
+
+        descriptionMeta.setAttribute(
+            "content",
+            description.slice(
+                0,
+                160
+            )
+        );
+
+    }
+
+
+    const ogTitle =
+        document.querySelector(
+            'meta[property="og:title"]'
+        );
+
+
+    if (
+        ogTitle
+    ) {
+
+        ogTitle.setAttribute(
+            "content",
+            title
+        );
+
+    }
+
+
+    const ogDescription =
+        document.querySelector(
+            'meta[property="og:description"]'
+        );
+
+
+    if (
+        ogDescription
+    ) {
+
+        ogDescription.setAttribute(
+            "content",
+            description.slice(
+                0,
+                200
+            )
+        );
+
+    }
+
+
+    const ogImage =
+        document.querySelector(
+            'meta[property="og:image"]'
+        );
+
+
+    if (
+        ogImage &&
+        image
+    ) {
+
+        ogImage.setAttribute(
+            "content",
+            image
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   RENDER ARTICLE
+============================================================ */
+
+function renderArticle(
+    article
+) {
+
+    if (
+        !article
+    ) {
+
+        return;
+
+    }
+
+
+    const title =
+        getArticleTitle(
+            article
+        );
+
+
+    const image =
+        getArticleImage(
+            article
+        );
+
+
+    const category =
+        getArticleCategory(
+            article
+        );
+
+
+    const date =
+        getArticleDate(
+            article
+        );
+
+
+    const content =
+        normalizeArticleContent(
+            article
+        );
+
+
+    const author =
+        normalizeText(
+            article.author?.name ||
+            article.author ||
+            article.reporter ||
+            article.byline ||
+            "आवाज़ राजस्थान"
+        );
+
+
+    $$(
+        "[data-article-title], " +
+        ".article-title"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                title;
+
+        }
+    );
+
+
+    $$(
+        "[data-article-category], " +
+        ".article-category"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                category;
+
+        }
+    );
+
+
+    $$(
+        "[data-article-author], " +
+        ".article-author"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                author;
+
+        }
+    );
+
+
+    $$(
+        "[data-article-date], " +
+        ".article-date"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                date
+                    ? formatNewsDate(
+                        date
+                    )
+                    : "";
+
+        }
+    );
+
+
+    $$(
+        "[data-article-image], " +
+        ".article-featured-image"
+    )
+    .forEach(
+        element => {
+
+            if (
+                image
+            ) {
+
+                element.src =
+                    image;
+
+
+                element.alt =
+                    title;
+
+
+                element.loading =
+                    "eager";
+
+            }
+
+        }
+    );
+
+
+    getArticleContainers()
+        .forEach(
+            container => {
+
+                container.innerHTML =
+                    sanitizeArticleHTML(
+                        content
+                    );
+
+            }
+        );
+
+
+    $$(
+        "[data-article-share-title]"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                title;
+
+        }
+    );
+
+
+    updateArticleMeta(
+        article
+    );
+
+
+    initializeArticleContentLinks();
+
+    initializeReadingProgress();
+
+    initializeArticleFontControls();
+
+    initializeShareButtons();
+
+    initializePrintButtons();
+
+}
+
+
+/* ============================================================
+   ARTICLE CONTENT SANITIZATION
+============================================================ */
+
+function sanitizeArticleHTML(
+    html
+) {
+
+    if (
+        !html
+    ) {
+
+        return
+            "<p>इस खबर की सामग्री उपलब्ध नहीं है।</p>";
+
+    }
+
+
+    const template =
+        document.createElement(
+            "template"
+        );
+
+
+    template.innerHTML =
+        String(
+            html
+        );
+
+
+    const allowedTags = new Set([
+
+        "P",
+
+        "BR",
+
+        "STRONG",
+
+        "B",
+
+        "EM",
+
+        "I",
+
+        "U",
+
+        "H2",
+
+        "H3",
+
+        "H4",
+
+        "UL",
+
+        "OL",
+
+        "LI",
+
+        "BLOCKQUOTE",
+
+        "A",
+
+        "IMG",
+
+        "FIGURE",
+
+        "FIGCAPTION",
+
+        "TABLE",
+
+        "THEAD",
+
+        "TBODY",
+
+        "TR",
+
+        "TH",
+
+        "TD"
+
+    ]);
+
+
+    const walker =
+        document.createTreeWalker(
+            template.content,
+            NodeFilter.SHOW_ELEMENT
+        );
+
+
+    const remove = [];
+
+
+    while (
+        walker.nextNode()
+    ) {
+
+        const element =
+            walker.currentNode;
+
+
+        if (
+            !allowedTags.has(
+                element.tagName
+            )
+        ) {
+
+            remove.push(
+                element
+            );
+
+            continue;
+
+        }
+
+
+        [...element.attributes]
+            .forEach(
+                attribute => {
+
+                    const name =
+                        attribute.name
+                            .toLowerCase();
+
+
+                    if (
+                        name.startsWith(
+                            "on"
+                        )
+                    ) {
+
+                        element.removeAttribute(
+                            attribute.name
+                        );
+
+                    }
+
+                }
+            );
+
+
+        if (
+            element.tagName ===
+            "A"
+        ) {
+
+            const href =
+                element.getAttribute(
+                    "href"
+                ) || "";
+
+
+            if (
+                !/^https?:\/\//i.test(
+                    href
+                ) &&
+                !href.startsWith(
+                    "/"
+                ) &&
+                !href.startsWith(
+                    "#"
+                )
+            ) {
+
+                element.removeAttribute(
+                    "href"
+                );
+
+            }
+
+
+            element.setAttribute(
+                "rel",
+                "noopener noreferrer"
+            );
+
+        }
+
+
+        if (
+            element.tagName ===
+            "IMG"
+        ) {
+
+            element.removeAttribute(
+                "onerror"
+            );
+
+
+            element.setAttribute(
+                "loading",
+                "lazy"
+            );
+
+        }
+
+    }
+
+
+    remove.forEach(
+        element => {
+
+            element.replaceWith(
+                ...element.childNodes
+            );
+
+        }
+    );
+
+
+    return template.innerHTML;
+
+}
+
+
+/* ============================================================
+   ARTICLE CONTENT LINKS
+============================================================ */
+
+function initializeArticleContentLinks() {
+
+    $(
+        ".article-content a, " +
+        "#articleContent a, " +
+        "[data-article-content] a"
+    )
+    .forEach(
+        link => {
+
+            if (
+                link.dataset.articleLinkInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            link.dataset.articleLinkInitialized =
+                "true";
+
+
+            link.addEventListener(
+                "click",
+                event => {
+
+                    const href =
+                        link.getAttribute(
+                            "href"
+                        );
+
+
+                    if (
+                        !href
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        href.startsWith(
+                            "#"
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        href.startsWith(
+                            "/"
+                        )
+                    ) {
+
+                        event.preventDefault();
+
+
+                        if (
+                            typeof navigateTo ===
+                            "function"
+                        ) {
+
+                            navigateTo(
+                                href
+                            );
+
+                        } else {
+
+                            window.location.href =
+                                href;
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   ARTICLE READING PROGRESS
+============================================================ */
+
+function initializeReadingProgress() {
+
+    const progressBars =
+        $$(
+            "#readingProgress, " +
+            ".reading-progress, " +
+            "[data-reading-progress]"
+        );
+
+
+    if (
+        !progressBars.length
+    ) {
+
+        return;
+
+    }
+
+
+    const update =
+        () => {
+
+            const article =
+                getArticleContainers()[0];
+
+
+            if (
+                !article
+            ) {
+
+                return;
+
+            }
+
+
+            const rect =
+                article.getBoundingClientRect();
+
+
+            const articleHeight =
+                article.offsetHeight;
+
+
+            const viewport =
+                window.innerHeight;
+
+
+            const start =
+                Math.max(
+                    0,
+                    -rect.top
+                );
+
+
+            const available =
+                Math.max(
+                    1,
+                    articleHeight -
+                    viewport
+                );
+
+
+            const progress =
+                Math.min(
+                    100,
+                    Math.max(
+                        0,
+                        (
+                            start /
+                            available
+                        ) *
+                        100
+                    )
+                );
+
+
+            progressBars.forEach(
+                bar => {
+
+                    bar.style.width =
+                        `${progress}%`;
+
+
+                    bar.setAttribute(
+                        "aria-valuenow",
+                        String(
+                            Math.round(
+                                progress
+                            )
+                        );
+
+                }
+            );
+
+        };
+
+
+    if (
+        !window.__articleProgressHandler
+    ) {
+
+        window.__articleProgressHandler =
+            update;
+
+
+        window.addEventListener(
+            "scroll",
+            update,
+            {
+                passive:
+                    true
+            }
+        );
+
+
+        window.addEventListener(
+            "resize",
+            update
+        );
+
+    }
+
+
+    update();
+
+}
+
+
+/* ============================================================
+   ARTICLE FONT CONTROLS
+============================================================ */
+
+function initializeArticleFontControls() {
+
+    $$(
+        "[data-font-increase], " +
+        ".font-increase"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.fontInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.fontInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    changeArticleFont(
+                        0.1
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    $$(
+        "[data-font-decrease], " +
+        ".font-decrease"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.fontInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.fontInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    changeArticleFont(
+                        -0.1
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    $$(
+        "[data-font-reset], " +
+        ".font-reset"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.fontInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.fontInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    ArticleState.fontScale =
+                        1;
+
+
+                    applyArticleFontScale();
+
+                }
+            );
+
+        }
+    );
+
+
+    applyArticleFontScale();
+
+}
+
+
+/* ============================================================
+   CHANGE ARTICLE FONT
+============================================================ */
+
+function changeArticleFont(
+    amount
+) {
+
+    ArticleState.fontScale =
+        Math.min(
+            1.5,
+            Math.max(
+                0.8,
+                ArticleState.fontScale +
+                amount
+            )
+        );
+
+
+    applyArticleFontScale();
+
+}
+
+
+/* ============================================================
+   APPLY ARTICLE FONT SCALE
+============================================================ */
+
+function applyArticleFontScale() {
+
+    getArticleContainers()
+        .forEach(
+            container => {
+
+                container.style.fontSize =
+                    `${ArticleState.fontScale}em`;
+
+            }
+        );
+
+
+    $$(
+        "[data-font-scale]"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                `${Math.round(
+                    ArticleState.fontScale *
+                    100
+                )}%`;
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SHARE ARTICLE
+============================================================ */
+
+async function shareArticle(
+    article =
+        ArticleState.article
+) {
+
+    if (
+        !article
+    ) {
+
+        return;
+
+    }
+
+
+    const title =
+        getArticleTitle(
+            article
+        );
+
+
+    const url =
+        window.location.href;
+
+
+    if (
+        navigator.share
+    ) {
+
+        try {
+
+            await navigator.share(
+                {
+
+                    title:
+                        title,
+
+                    text:
+                        title,
+
+                    url:
+                        url
+
+                }
+            );
+
+
+            return true;
+
+        } catch (
+            error
+        ) {
+
+            if (
+                error?.name ===
+                "AbortError"
+            ) {
+
+                return false;
+
+            }
+
+        }
+
+    }
+
+
+    try {
+
+        await navigator.clipboard.writeText(
+            url
+        );
+
+
+        showToast(
+            "खबर का लिंक कॉपी हो गया",
+            "success"
+        );
+
+
+        return true;
+
+    } catch (
+        error
+    ) {
+
+        showToast(
+            "लिंक कॉपी नहीं हो सका",
+            "error"
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* ============================================================
+   SHARE BUTTONS
+============================================================ */
+
+       function initializeShareButtons() {
+
+    $$(
+        "[data-share-article], " +
+        ".share-article"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.shareInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.shareInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    shareArticle();
+
+                }
+            );
+
+        }
+    );
+
+
+    $$(
+        "[data-share-copy]"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.shareInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.shareInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    try {
+
+                        await navigator.clipboard.writeText(
+                            window.location.href
+                        );
+
+
+                        showToast(
+                            "लिंक कॉपी हो गया",
+                            "success"
+                        );
+
+                    } catch (
+                        error
+                    ) {
+
+                        showToast(
+                            "लिंक कॉपी नहीं हो सका",
+                            "error"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   PRINT ARTICLE
+============================================================ */
+
+function initializePrintButtons() {
+
+    $$(
+        "[data-print-article], " +
+        ".print-article"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.printInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.printInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    window.print();
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   ARTICLE LOADING
+============================================================ */
+
+function renderArticleLoading() {
+
+    getArticleContainers()
+        .forEach(
+            container => {
+
+                container.innerHTML =
+                    `
+
+                    <div
+                        class="article-loading"
+                        aria-live="polite"
+                    >
+
+                        <div
+                            class="loading-spinner"
+                        ></div>
+
+                        <p>
+                            खबर लोड हो रही है...
+                        </p>
+
+                    </div>
+
+                    `;
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   ARTICLE ERROR
+============================================================ */
+
+function renderArticleError() {
+
+    getArticleContainers()
+        .forEach(
+            container => {
+
+                container.innerHTML =
+                    `
+
+                    <div
+                        class="article-error"
+                    >
+
+                        <div
+                            class="article-error-icon"
+                            aria-hidden="true"
+                        >
+                            ⚠️
+                        </div>
+
+                        <h2>
+                            खबर उपलब्ध नहीं है
+                        </h2>
+
+                        <p>
+                            खबर लोड करने में समस्या हुई।
+                        </p>
+
+                        <button
+                            type="button"
+                            class="primary-btn"
+                            data-article-retry
+                        >
+                            दोबारा प्रयास करें
+                        </button>
+
+                    </div>
+
+                    `;
+
+            }
+        );
+
+
+    $$(
+        "[data-article-retry]"
+    )
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    loadArticlePage();
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   LOAD ARTICLE PAGE
+============================================================ */
+
+async function loadArticlePage() {
+
+    const identifier =
+        getArticleIdentifierFromURL();
+
+
+    if (
+        !identifier
+    ) {
+
+        return null;
+
+    }
+
+
+    ArticleState.id =
+        identifier.type ===
+        "id"
+            ? identifier.value
+            : "";
+
+
+    ArticleState.slug =
+        identifier.type ===
+        "slug"
+            ? identifier.value
+            : "";
+
+
+    ArticleState.loading =
+        true;
+
+
+    renderArticleLoading();
+
+
+    try {
+
+        const article =
+            await fetchArticle(
+                identifier
+            );
+
+
+        if (
+            !article
+        ) {
+
+            throw new Error(
+                "Article not found"
+            );
+
+        }
+
+
+        ArticleState.article =
+            article;
+
+
+        renderArticle(
+            article
+        );
+
+
+        return article;
+
+    } catch (
+        error
+    ) {
+
+        renderArticleError();
+
+
+        handleGlobalError(
+            error,
+            "Article"
+        );
+
+
+        return null;
+
+    } finally {
+
+        ArticleState.loading =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   ARTICLE GLOBAL EXPORT
+============================================================ */
+
+window.AwaazRajasthan.article = {
+
+    state:
+        ArticleState,
+
+    load:
+        loadArticlePage,
+
+    share:
+        shareArticle,
+
+    print:
+        () => window.print(),
+
+    increaseFont:
+        () => changeArticleFont(
+            0.1
+        ),
+
+    decreaseFont:
+        () => changeArticleFont(
+            -0.1
+        ),
+
+    resetFont:
+        () => {
+
+            ArticleState.fontScale =
+                1;
+
+            applyArticleFontScale();
+
+        }
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        if (
+            isArticlePage()
+        ) {
+
+            loadArticlePage();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 26/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 27/30
+
+   SEARCH SYSTEM
+   SEARCH INPUT
+   SEARCH RESULTS
+   SEARCH SUGGESTIONS
+   SEARCH PAGINATION
+   SEARCH URL STATE
+============================================================ */
+
+
+/* ============================================================
+   SEARCH CONFIGURATION
+============================================================ */
+
+const SEARCH_CONFIG = {
+
+    minLength:
+        2,
+
+    debounce:
+        450,
+
+    limit:
+        12,
+
+    suggestionLimit:
+        6,
+
+    maxRecentSearches:
+        8,
+
+    resultSelectors: [
+
+        "#searchResults",
+
+        "#searchNews",
+
+        "#searchNewsGrid",
+
+        ".search-results",
+
+        ".search-news-grid",
+
+        "[data-search-results]"
+
+    ]
+
+};
+
+
+/* ============================================================
+   SEARCH STATE
+============================================================ */
+
+const SearchState = {
+
+    query:
+        "",
+
+    results:
+        [],
+
+    suggestions:
+        [],
+
+    recent:
+        [],
+
+    page:
+        1,
+
+    limit:
+        SEARCH_CONFIG.limit,
+
+    total:
+        0,
+
+    totalPages:
+        1,
+
+    loading:
+        false,
+
+    initialized:
+        false
+
+};
+
+
+/* ============================================================
+   SEARCH STORAGE KEY
+============================================================ */
+
+const SEARCH_STORAGE_KEY =
+    "awaaz_rajasthan_recent_searches";
+
+
+/* ============================================================
+   LOAD RECENT SEARCHES
+============================================================ */
+
+function loadRecentSearches() {
+
+    try {
+
+        const stored =
+            localStorage.getItem(
+                SEARCH_STORAGE_KEY
+            );
+
+
+        if (
+            !stored
+        ) {
+
+            SearchState.recent =
+                [];
+
+            return [];
+
+        }
+
+
+        const parsed =
+            JSON.parse(
+                stored
+            );
+
+
+        SearchState.recent =
+            Array.isArray(
+                parsed
+            )
+                ? parsed
+                    .filter(
+                        item =>
+                            typeof item ===
+                            "string"
+                    )
+                    .slice(
+                        0,
+                        SEARCH_CONFIG.maxRecentSearches
+                    )
+                : [];
+
+
+        return SearchState.recent;
+
+    } catch (
+        error
+    ) {
+
+        SearchState.recent =
+            [];
+
+        return [];
+
+    }
+
+}
+
+
+/* ============================================================
+   SAVE RECENT SEARCH
+============================================================ */
+
+function saveRecentSearch(
+    query
+) {
+
+    const value =
+        normalizeText(
+            query
+        );
+
+
+    if (
+        value.length <
+        SEARCH_CONFIG.minLength
+    ) {
+
+        return;
+
+    }
+
+
+    const current =
+        loadRecentSearches();
+
+
+    const filtered =
+        current.filter(
+            item =>
+                item.toLowerCase() !==
+                value.toLowerCase()
+        );
+
+
+    SearchState.recent =
+        [
+            value,
+            ...filtered
+        ].slice(
+            0,
+            SEARCH_CONFIG.maxRecentSearches
+        );
+
+
+    try {
+
+        localStorage.setItem(
+            SEARCH_STORAGE_KEY,
+            JSON.stringify(
+                SearchState.recent
+            )
+        );
+
+    } catch (
+        error
+    ) {
+
+        /* Storage may be unavailable. */
+
+    }
+
+}
+
+
+/* ============================================================
+   CLEAR RECENT SEARCHES
+============================================================ */
+
+function clearRecentSearches() {
+
+    SearchState.recent =
+        [];
+
+
+    try {
+
+        localStorage.removeItem(
+            SEARCH_STORAGE_KEY
+        );
+
+    } catch (
+        error
+    ) {
+
+        /* Ignore storage errors. */
+
+    }
+
+
+    renderSearchSuggestions(
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   GET SEARCH INPUTS
+============================================================ */
+
+function getSearchInputs() {
+
+    const selectors = [
+
+        "#searchInput",
+
+        "#headerSearchInput",
+
+        "#mobileSearchInput",
+
+        ".search-input",
+
+        "[data-search-input]"
+
+    ];
+
+
+    const inputs = [];
+
+
+    selectors.forEach(
+        selector => {
+
+            $$(selector)
+                .forEach(
+                    input => {
+
+                        if (
+                            !inputs.includes(
+                                input
+                            )
+                        ) {
+
+                            inputs.push(
+                                input
+                            );
+
+                        }
+
+                    }
+                );
+
+        }
+    );
+
+
+    return inputs;
+
+}
+
+
+/* ============================================================
+   GET SEARCH RESULT CONTAINERS
+============================================================ */
+
+function getSearchResultContainers() {
+
+    const containers = [];
+
+
+    SEARCH_CONFIG
+        .resultSelectors
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !containers.includes(
+                                    element
+                                )
+                            ) {
+
+                                containers.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return containers;
+
+}
+
+
+/* ============================================================
+   BUILD SEARCH QUERY
+============================================================ */
+
+function buildSearchQuery(
+    options = {}
+) {
+
+    const params =
+        new URLSearchParams();
+
+
+    const query =
+        normalizeText(
+            options.query ??
+            SearchState.query
+        );
+
+
+    const page =
+        Math.max(
+            1,
+            Number(
+                options.page ??
+                SearchState.page
+            ) || 1
+        );
+
+
+    const limit =
+        Math.max(
+            1,
+            Number(
+                options.limit ??
+                SearchState.limit
+            ) ||
+            SEARCH_CONFIG.limit
+        );
+
+
+    if (
+        query
+    ) {
+
+        params.set(
+            "search",
+            query
+        );
+
+    }
+
+
+    params.set(
+        "page",
+        String(
+            page
+        )
+    );
+
+
+    params.set(
+        "limit",
+        String(
+            limit
+        )
+    );
+
+
+    if (
+        options.category
+    ) {
+
+        params.set(
+            "category",
+            normalizeText(
+                options.category
+            )
+        );
+
+    }
+
+
+    if (
+        options.district
+    ) {
+
+        params.set(
+            "district",
+            normalizeText(
+                options.district
+            )
+        );
+
+    }
+
+
+    params.set(
+        "sort",
+        options.sort ||
+        "latest"
+    );
+
+
+    return params;
+
+}
+
+
+/* ============================================================
+   FETCH SEARCH RESULTS
+============================================================ */
+
+async function fetchSearchResults(
+    query,
+    options = {}
+) {
+
+    const value =
+        normalizeText(
+            query
+        );
+
+
+    if (
+        value.length <
+        SEARCH_CONFIG.minLength
+    ) {
+
+        return {
+
+            results:
+                [],
+
+            total:
+                0,
+
+            page:
+                1,
+
+            totalPages:
+                1,
+
+            limit:
+                SEARCH_CONFIG.limit
+
+        };
+
+    }
+
+
+    if (
+        typeof apiGet !==
+        "function"
+    ) {
+
+        throw new Error(
+            "API GET function unavailable"
+        );
+
+    }
+
+
+    const params =
+        buildSearchQuery(
+            {
+
+                ...options,
+
+                query:
+                    value
+
+            }
+        );
+
+
+    const response =
+        await apiGet(
+            `${API_ENDPOINTS.news}?${params.toString()}`
+        );
+
+
+    const data =
+        response?.data ||
+        response;
+
+
+    const results =
+        data?.news ||
+        data?.articles ||
+        data?.results ||
+        [];
+
+
+    const pagination =
+        normalizePageData(
+            data?.pagination ||
+            data?.meta ||
+            data
+        );
+
+
+    return {
+
+        results:
+            Array.isArray(
+                results
+            )
+                ? results
+                : [],
+
+        total:
+            pagination.totalItems,
+
+        page:
+            pagination.page,
+
+        totalPages:
+            pagination.totalPages,
+
+        limit:
+            pagination.limit
+
+    };
+
+}
+
+
+/* ============================================================
+   SEARCH LOADING
+============================================================ */
+
+function renderSearchLoading() {
+
+    getSearchResultContainers()
+        .forEach(
+            container => {
+
+                container.innerHTML =
+                    "";
+
+
+                container.appendChild(
+                    createCategorySkeleton(
+                        6
+                    )
+                );
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   SEARCH EMPTY STATE
+============================================================ */
+
+function createSearchEmptyState(
+    query
+) {
+
+    const wrapper =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "search-empty-state"
+
+            }
+        );
+
+
+    wrapper.innerHTML =
+        `
+
+        <div
+            class="search-empty-icon"
+            aria-hidden="true"
+        >
+            🔎
+        </div>
+
+        <h2>
+            कोई खबर नहीं मिली
+        </h2>
+
+        <p>
+            “${escapeHTML(
+                query
+            )}” के लिए कोई परिणाम नहीं मिला।
+        </p>
+
+        <div
+            class="search-empty-help"
+        >
+            दूसरा कीवर्ड डालकर दोबारा खोजें।
+        </div>
+
+        `;
+
+
+    return wrapper;
+
+}
+
+
+/* ============================================================
+   SEARCH RESULT RENDER
+============================================================ */
+
+function renderSearchResults(
+    result,
+    query
+) {
+
+    const containers =
+        getSearchResultContainers();
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !result?.results?.length
+            ) {
+
+                container.appendChild(
+                    createSearchEmptyState(
+                        query
+                    )
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            result.results.forEach(
+                article => {
+
+                    const card =
+                        createSearchResultCard(
+                            article
+                        );
+
+
+                    if (
+                        card
+                    ) {
+
+                        card.classList.add(
+                            "search-result-card"
+                        );
+
+
+                        fragment.appendChild(
+                            card
+                        );
+
+                    }
+
+                }
+            );
+
+
+            container.appendChild(
+                fragment
+            );
+
+        }
+    );
+
+
+    initializeArticleCards();
+
+    initializeBookmarkButtons();
+
+    initializeLazyImages();
+
+
+    renderSearchPagination(
+        result
+    );
+
+
+    updateSearchCount(
+        result.total
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH COUNT
+============================================================ */
+
+function updateSearchCount(
+    total
+) {
+
+    $$(
+        "[data-search-count], " +
+        ".search-count"
+    )
+    .forEach(
+        element => {
+
+            const count =
+                Number(
+                    total
+                ) || 0;
+
+
+            element.textContent =
+                count
+                    ? `${count} खबरें मिलीं`
+                    : "";
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH HEADING
+============================================================ */
+
+function updateSearchHeading(
+    query
+) {
+
+    $$(
+        "[data-search-heading], " +
+        ".search-heading"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                query
+                    ? `“${query}” के लिए खोज परिणाम`
+                    : "खबर खोजें";
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH PAGINATION
+============================================================ */
+
+function renderSearchPagination(
+    result
+) {
+
+    $$(
+        "#searchPagination, " +
+        ".search-pagination, " +
+        "[data-search-pagination]"
+    )
+    .forEach(
+        container => {
+
+            renderPagination(
+                {
+
+                    page:
+                        result?.page ||
+                        1,
+
+                    totalPages:
+                        result?.totalPages ||
+                        1,
+
+                    totalItems:
+                        result?.total ||
+                        0,
+
+                    limit:
+                        result?.limit ||
+                        SEARCH_CONFIG.limit
+
+                },
+                container,
+                {
+
+                    type:
+                        "search",
+
+                    onPageChange:
+                        page => {
+
+                            SearchState.page =
+                                page;
+
+
+                            executeSearch(
+                                SearchState.query,
+                                {
+
+                                    page:
+                                        page,
+
+                                    updateURL:
+                                        true,
+
+                                    saveRecent:
+                                        false
+
+                                }
+                            );
+
+                        }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE SEARCH URL
+============================================================ */
+
+function updateSearchURL(
+    options = {}
+) {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    if (
+        SearchState.query
+    ) {
+
+        url.searchParams.set(
+            "search",
+            SearchState.query
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "search"
+        );
+
+    }
+
+
+    if (
+        SearchState.page > 1
+    ) {
+
+        url.searchParams.set(
+            "page",
+            String(
+                SearchState.page
+            )
+        );
+
+    } else {
+
+        url.searchParams.delete(
+            "page"
+        );
+
+    }
+
+
+    const state = {
+
+        search:
+            SearchState.query,
+
+        page:
+            SearchState.page
+
+    };
+
+
+    if (
+        options.replace
+    ) {
+
+        window.history.replaceState(
+            state,
+            "",
+            url
+        );
+
+    } else {
+
+        window.history.pushState(
+            state,
+            "",
+            url
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   SEARCH SUGGESTION CONTAINER
+============================================================ */
+
+function getSearchSuggestionContainers() {
+
+    const selectors = [
+
+        "#searchSuggestions",
+
+        ".search-suggestions",
+
+        "[data-search-suggestions]"
+
+    ];
+
+
+    const containers = [];
+
+
+    selectors.forEach(
+        selector => {
+
+            $$(selector)
+                .forEach(
+                    element => {
+
+                        if (
+                            !containers.includes(
+                                element
+                            )
+                        ) {
+
+                            containers.push(
+                                element
+                            );
+
+                        }
+
+                    }
+                );
+
+        }
+    );
+
+
+    return containers;
+
+}
+
+
+/* ============================================================
+   SEARCH SUGGESTION ITEM
+============================================================ */
+
+function createSearchSuggestionItem(
+    text,
+    type = "recent"
+) {
+
+    const item =
+        createElement(
+            "button",
+            {
+
+                className:
+                    "search-suggestion-item",
+
+                type:
+                    "button"
+
+            }
+        );
+
+
+    item.dataset.searchSuggestion =
+        text;
+
+
+    item.innerHTML =
+        `
+
+        <span
+            class="search-suggestion-icon"
+            aria-hidden="true"
+        >
+            ${
+                type ===
+                "recent"
+                    ? "🕘"
+                    : "🔎"
+            }
+        </span>
+
+        <span
+            class="search-suggestion-text"
+        >
+            ${escapeHTML(
+                text
+            )}
+        </span>
+
+        `;
+
+
+    item.addEventListener(
+        "click",
+        () => {
+
+            getSearchInputs()
+                .forEach(
+                    input => {
+
+                        input.value =
+                            text;
+
+                    }
+                );
+
+
+            executeSearch(
+                text,
+                {
+
+                    page:
+                        1,
+
+                    updateURL:
+                        true,
+
+                    saveRecent:
+                        true
+
+                }
+            );
+
+        }
+    );
+
+
+    return item;
+
+}
+
+
+/* ============================================================
+   RENDER SEARCH SUGGESTIONS
+============================================================ */
+
+function renderSearchSuggestions(
+    query = ""
+) {
+
+    const containers =
+        getSearchSuggestionContainers();
+
+
+    if (
+        !containers.length
+    ) {
+
+        return;
+
+    }
+
+
+    const value =
+        normalizeText(
+            query
+        );
+
+
+    loadRecentSearches();
+
+
+    let items = [];
+
+
+    if (
+        value.length >=
+        SEARCH_CONFIG.minLength
+    ) {
+
+        const localMatches =
+            NEWS_CATEGORIES
+                .filter(
+                    category =>
+                        category.name
+                            .toLowerCase()
+                            .includes(
+                                value.toLowerCase()
+                            ) ||
+                        category.slug
+                            .toLowerCase()
+                            .includes(
+                                value.toLowerCase()
+                            )
+                )
+                .map(
+                    category =>
+                        category.name
+                );
+
+
+        items =
+            [
+                ...localMatches,
+
+                ...SearchState.recent
+                    .filter(
+                        item =>
+                            item.toLowerCase()
+                                .includes(
+                                    value.toLowerCase()
+                                )
+                    )
+
+            ]
+            .filter(
+                (
+                    item,
+                    index,
+                    array
+                ) =>
+                    array.indexOf(
+                        item
+                    ) === index
+            )
+            .slice(
+                0,
+                SEARCH_CONFIG.suggestionLimit
+            );
+
+    } else {
+
+        items =
+            SearchState.recent
+                .slice(
+                    0,
+                    SEARCH_CONFIG.suggestionLimit
+                );
+
+    }
+
+
+    containers.forEach(
+        container => {
+
+            container.innerHTML =
+                "";
+
+
+            if (
+                !items.length
+            ) {
+
+                container.classList.remove(
+                    "is-visible"
+                );
+
+
+                return;
+
+            }
+
+
+            const fragment =
+                document.createDocumentFragment();
+
+
+            items.forEach(
+                item => {
+
+                    fragment.appendChild(
+                        createSearchSuggestionItem(
+                            item,
+                            value
+                                ? "suggestion"
+                                : "recent"
+                        )
+                    );
+
+                }
+            );
+
+
+            if (
+                !value &&
+                SearchState.recent.length
+            ) {
+
+                const clear =
+                    createElement(
+                        "button",
+                        {
+
+                            className:
+                                "search-clear-recent",
+
+                            type:
+                                "button"
+
+                        }
+                    );
+
+
+                clear.textContent =
+                    "हाल की खोज साफ करें";
+
+
+                clear.addEventListener(
+                    "click",
+                    clearRecentSearches
+                );
+
+
+                fragment.appendChild(
+                    clear
+                );
+
+            }
+
+
+            container.appendChild(
+                fragment
+            );
+
+
+            container.classList.add(
+                "is-visible"
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   HIDE SEARCH SUGGESTIONS
+============================================================ */
+
+function hideSearchSuggestions() {
+
+    getSearchSuggestionContainers()
+        .forEach(
+            container => {
+
+                container.classList.remove(
+                    "is-visible"
+                );
+
+            }
+        );
+
+}
+
+
+/* ============================================================
+   EXECUTE SEARCH
+============================================================ */
+
+async function executeSearch(
+    query,
+    options = {}
+) {
+
+    const value =
+        normalizeText(
+            query
+        );
+
+
+    SearchState.query =
+        value;
+
+
+    SearchState.page =
+        Math.max(
+            1,
+            Number(
+                options.page
+            ) || 1
+        );
+
+
+    if (
+        value.length <
+        SEARCH_CONFIG.minLength
+    ) {
+
+        SearchState.results =
+            [];
+
+        SearchState.total =
+            0;
+
+        SearchState.totalPages =
+            1;
+
+
+        getSearchResultContainers()
+            .forEach(
+                container => {
+
+                    container.innerHTML =
+                        "";
+
+                }
+            );
+
+
+        updateSearchHeading(
+            ""
+        );
+
+
+        updateSearchCount(
+            0
+        );
+
+
+        hideSearchSuggestions();
+
+
+        return null;
+
+    }
+
+
+    SearchState.loading =
+        true;
+
+
+    renderSearchLoading();
+
+    hideSearchSuggestions();
+
+
+    try {
+
+        const result =
+            await fetchSearchResults(
+                value,
+                {
+
+                    page:
+                        SearchState.page,
+
+                    limit:
+                        SearchState.limit
+
+                }
+            );
+
+
+        SearchState.results =
+            result.results;
+
+
+        SearchState.total =
+            result.total;
+
+
+        SearchState.page =
+            result.page;
+
+
+        SearchState.totalPages =
+            result.totalPages;
+
+
+        SearchState.limit =
+            result.limit;
+
+
+        renderSearchResults(
+            result,
+            value
+        );
+
+
+        updateSearchHeading(
+            value
+        );
+
+
+        if (
+            options.saveRecent !==
+            false
+        ) {
+
+            saveRecentSearch(
+                value
+            );
+
+        }
+
+
+        if (
+            options.updateURL !==
+            false
+        ) {
+
+            updateSearchURL();
+
+        }
+
+
+        updateDocumentTitle(
+            `${value} - खोज परिणाम | आवाज़ राजस्थान`
+        );
+
+
+        return result;
+
+    } catch (
+        error
+    ) {
+
+        getSearchResultContainers()
+            .forEach(
+                container => {
+
+                    container.innerHTML =
+                        `
+
+                        <div
+                            class="search-error-state"
+                        >
+
+                            <div
+                                class="search-error-icon"
+                                aria-hidden="true"
+                            >
+                                ⚠️
+                            </div>
+
+                            <h2>
+                                खोज पूरी नहीं हो सकी
+                            </h2>
+
+                            <p>
+                                कृपया कुछ समय बाद दोबारा प्रयास करें।
+                            </p>
+
+                            <button
+                                type="button"
+                                class="primary-btn"
+                                data-search-retry
+                            >
+                                दोबारा प्रयास करें
+                            </button>
+
+                        </div>
+
+                        `;
+
+                }
+            );
+
+
+        $$(
+            "[data-search-retry]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        executeSearch(
+                            SearchState.query,
+                            {
+
+                                page:
+                                    SearchState.page,
+
+                                updateURL:
+                                    false,
+
+                                saveRecent:
+                                    false
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        handleGlobalError(
+            error,
+            "Search"
+        );
+
+
+        return null;
+
+    } finally {
+
+        SearchState.loading =
+            false;
+
+    }
+
+}
+
+
+/* ============================================================
+   SEARCH DEBOUNCE
+============================================================ */
+
+function createSearchDebounce(
+    callback,
+    delay
+) {
+
+    let timer =
+        null;
+
+
+    return (
+        ...args
+    ) => {
+
+        if (
+            timer
+        ) {
+
+            clearTimeout(
+                timer
+            );
+
+        }
+
+
+        timer =
+            setTimeout(
+                () => {
+
+                    callback(
+                        ...args
+                    );
+
+                },
+                delay
+            );
+
+    };
+
+}
+
+
+/* ============================================================
+   INITIALIZE SEARCH INPUTS
+============================================================ */
+
+function initializeSearchInputs() {
+
+    const inputs =
+        getSearchInputs();
+
+
+    if (
+        !inputs.length
+    ) {
+
+        return;
+
+    }
+
+
+    loadRecentSearches();
+
+
+    inputs.forEach(
+        input => {
+
+            if (
+                input.dataset.searchInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            input.dataset.searchInitialized =
+                "true";
+
+
+            const searchHandler =
+                createSearchDebounce(
+                    value => {
+
+                        renderSearchSuggestions(
+                            value
+                        );
+
+                    },
+                    SEARCH_CONFIG.debounce
+                );
+
+
+            input.addEventListener(
+                "input",
+                () => {
+
+                    searchHandler(
+                        input.value
+                    );
+
+                }
+            );
+
+
+            input.addEventListener(
+                "focus",
+                () => {
+
+                    renderSearchSuggestions(
+                        input.value
+                    );
+
+                }
+            );
+
+
+            input.addEventListener(
+                "keydown",
+                event => {
+
+                    if (
+                        event.key ===
+                        "Enter"
+                    ) {
+
+                        event.preventDefault();
+
+
+                        executeSearch(
+                            input.value,
+                            {
+
+                                page:
+                                    1,
+
+                                updateURL:
+                                    true,
+
+                                saveRecent:
+                                    true
+
+                            }
+                        );
+
+                    }
+
+
+                    if (
+                        event.key ===
+                        "Escape"
+                    ) {
+
+                        hideSearchSuggestions();
+
+                        input.blur();
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    $$(
+        "[data-search-submit], " +
+        "#searchSubmit, " +
+        ".search-submit"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.searchInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.searchInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const input =
+                        button.closest(
+                            "form"
+                        )?.querySelector(
+                            "input"
+                        ) ||
+                        getSearchInputs()[0];
+
+
+                    if (
+                        input
+                    ) {
+
+                        executeSearch(
+                            input.value,
+                            {
+
+                                page:
+                                    1,
+
+                                updateURL:
+                                    true,
+
+                                saveRecent:
+                                    true
+
+                            }
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH FORM
+============================================================ */
+
+       function initializeSearchForms() {
+
+    $$(
+        "form[data-search-form], " +
+        ".search-form"
+    )
+    .forEach(
+        form => {
+
+            if (
+                form.dataset.searchInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            form.dataset.searchInitialized =
+                "true";
+
+
+            form.addEventListener(
+                "submit",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const input =
+                        form.querySelector(
+                            "input"
+                        );
+
+
+                    if (
+                        input
+                    ) {
+
+                        executeSearch(
+                            input.value,
+                            {
+
+                                page:
+                                    1,
+
+                                updateURL:
+                                    true,
+
+                                saveRecent:
+                                    true
+
+                            }
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SEARCH PAGE DETECTION
+============================================================ */
+
+function isSearchPage() {
+
+    const path =
+        window.location.pathname
+            .toLowerCase();
+
+
+    return (
+        path ===
+        "/search" ||
+        path.startsWith(
+            "/search/"
+        ) ||
+        !!document.querySelector(
+            "#searchResults, [data-search-results]"
+        )
+    );
+
+}
+
+
+/* ============================================================
+   INITIALIZE SEARCH PAGE
+============================================================ */
+
+async function initializeSearchPage() {
+
+    initializeSearchInputs();
+
+    initializeSearchForms();
+
+
+    if (
+        !isSearchPage()
+    ) {
+
+        return;
+
+    }
+
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    const query =
+        normalizeText(
+            url.searchParams.get(
+                "search"
+            ) ||
+            url.searchParams.get(
+                "q"
+            ) ||
+            ""
+        );
+
+
+    const page =
+        Math.max(
+            1,
+            Number(
+                url.searchParams.get(
+                    "page"
+                )
+            ) || 1
+        );
+
+
+    if (
+        query
+    ) {
+
+        getSearchInputs()
+            .forEach(
+                input => {
+
+                    input.value =
+                        query;
+
+                }
+            );
+
+
+        await executeSearch(
+            query,
+            {
+
+                page:
+                    page,
+
+                updateURL:
+                    false,
+
+                saveRecent:
+                    false
+
+            }
+        );
+
+    } else {
+
+        renderSearchSuggestions(
+            ""
+        );
+
+    }
+
+
+    SearchState.initialized =
+        true;
+
+}
+
+
+/* ============================================================
+   CLOSE SUGGESTIONS ON OUTSIDE CLICK
+============================================================ */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        const searchArea =
+            event.target.closest(
+                ".search-box, " +
+                ".search-container, " +
+                "[data-search-container]"
+            );
+
+
+        if (
+            !searchArea
+        ) {
+
+            hideSearchSuggestions();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   SEARCH POPSTATE
+============================================================ */
+
+window.addEventListener(
+    "popstate",
+    () => {
+
+        if (
+            !isSearchPage()
+        ) {
+
+            return;
+
+        }
+
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+
+        const query =
+            normalizeText(
+                url.searchParams.get(
+                    "search"
+                ) ||
+                url.searchParams.get(
+                    "q"
+                ) ||
+                ""
+            );
+
+
+        const page =
+            Math.max(
+                1,
+                Number(
+                    url.searchParams.get(
+                        "page"
+                    )
+                ) || 1
+            );
+
+
+        getSearchInputs()
+            .forEach(
+                input => {
+
+                    input.value =
+                        query;
+
+                }
+            );
+
+
+        executeSearch(
+            query,
+            {
+
+                page:
+                    page,
+
+                updateURL:
+                    false,
+
+                saveRecent:
+                    false
+
+            }
+        );
+
+    }
+);
+
+
+/* ============================================================
+   SEARCH GLOBAL EXPORT
+============================================================ */
+
+window.AwaazRajasthan.search = {
+
+    state:
+        SearchState,
+
+    search:
+        executeSearch,
+
+    clearRecent:
+        clearRecentSearches,
+
+    recent:
+        loadRecentSearches,
+
+    initialize:
+        initializeSearchPage
+
+};
+
+
+/* ============================================================
+   AUTO INITIALIZATION
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeSearchPage();
+
+    }
+);
+
+
+/* ============================================================
+   END OF PART 27/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 28/30
+
+   VIDEO NEWS SYSTEM
+   PHOTO GALLERY
+   MEDIA VIEWER
+   LIGHTBOX
+   VIDEO CONTROLS
+   MEDIA NAVIGATION
+============================================================ */
+
+
+/* ============================================================
+   MEDIA CONFIGURATION
+============================================================ */
+
+const MEDIA_CONFIG = {
+
+    galleryLimit:
+        20,
+
+    videoLimit:
+        12,
+
+    animationDuration:
+        250,
+
+    selectors: {
+
+        gallery:
+            [
+                "#photoGallery",
+                "#galleryGrid",
+                ".photo-gallery",
+                "[data-photo-gallery]"
+            ],
+
+        videos:
+            [
+                "#videoNews",
+                "#videoNewsGrid",
+                ".video-news-grid",
+                "[data-video-news]"
+            ],
+
+        viewer:
+            [
+                "#mediaViewer",
+                ".media-viewer",
+                "[data-media-viewer]"
+            ]
+
+    }
+
+};
+
+
+/* ============================================================
+   MEDIA STATE
+============================================================ */
+
+const MediaState = {
+
+    gallery:
+        [],
+
+    videos:
+        [],
+
+    activeGalleryIndex:
+        0,
+
+    activeVideoIndex:
+        0,
+
+    viewerOpen:
+        false,
+
+    viewerItems:
+        [],
+
+    viewerIndex:
+        0
+
+};
+
+
+/* ============================================================
+   GET MEDIA URL
+============================================================ */
+
+function getMediaURL(
+    item
+) {
+
+    if (
+        typeof item ===
+        "string"
+    ) {
+
+        return item;
+
+    }
+
+
+    return (
+        item?.url ||
+        item?.image ||
+        item?.imageUrl ||
+        item?.src ||
+        item?.videoUrl ||
+        ""
+    );
+
+}
+
+
+/* ============================================================
+   GET MEDIA TITLE
+============================================================ */
+
+function getMediaTitle(
+    item
+) {
+
+    if (
+        typeof item ===
+        "string"
+    ) {
+
+        return "आवाज़ राजस्थान";
+
+    }
+
+
+    return normalizeText(
+        item?.title ||
+        item?.caption ||
+        item?.headline ||
+        "आवाज़ राजस्थान"
+    );
+
+}
+
+
+/* ============================================================
+   GET MEDIA ALT
+============================================================ */
+
+function getMediaAlt(
+    item
+) {
+
+    if (
+        typeof item ===
+        "string"
+    ) {
+
+        return "आवाज़ राजस्थान";
+
+    }
+
+
+    return normalizeText(
+        item?.alt ||
+        item?.caption ||
+        item?.title ||
+        "आवाज़ राजस्थान"
+    );
+
+}
+
+
+/* ============================================================
+   GET GALLERY CONTAINERS
+============================================================ */
+
+function getGalleryContainers() {
+
+    const elements = [];
+
+
+    MEDIA_CONFIG.selectors.gallery
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !elements.includes(
+                                    element
+                                )
+                            ) {
+
+                                elements.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return elements;
+
+}
+
+
+/* ============================================================
+   GET VIDEO CONTAINERS
+============================================================ */
+
+function getVideoContainers() {
+
+    const elements = [];
+
+
+    MEDIA_CONFIG.selectors.videos
+        .forEach(
+            selector => {
+
+                $$(selector)
+                    .forEach(
+                        element => {
+
+                            if (
+                                !elements.includes(
+                                    element
+                                )
+                            ) {
+
+                                elements.push(
+                                    element
+                                );
+
+                            }
+
+                        }
+                    );
+
+            }
+        );
+
+
+    return elements;
+
+}
+
+
+/* ============================================================
+   NORMALIZE GALLERY DATA
+============================================================ */
+
+function normalizeGalleryData(
+    data
+) {
+
+    if (
+        !data
+    ) {
+
+        return [];
+
+    }
+
+
+    const source =
+        Array.isArray(
+            data
+        )
+            ? data
+            : (
+                data.images ||
+                data.gallery ||
+                data.photos ||
+                data.items ||
+                []
+            );
+
+
+    if (
+        !Array.isArray(
+            source
+        )
+    ) {
+
+        return [];
+
+    }
+
+
+    return source
+        .map(
+            item => {
+
+                const url =
+                    getMediaURL(
+                        item
+                    );
+
+
+                if (
+                    !url
+                ) {
+
+                    return null;
+
+                }
+
+
+                return {
+
+                    ...(
+                        typeof item ===
+                        "object"
+                            ? item
+                            : {}
+                    ),
+
+                    url:
+                        url,
+
+                    title:
+                        getMediaTitle(
+                            item
+                        ),
+
+                    alt:
+                        getMediaAlt(
+                            item
+                        )
+
+                };
+
+            }
+        )
+        .filter(
+            Boolean
+        )
+        .slice(
+            0,
+            MEDIA_CONFIG.galleryLimit
+        );
+
+}
+
+
+/* ============================================================
+   NORMALIZE VIDEO DATA
+============================================================ */
+
+function normalizeVideoData(
+    data
+) {
+
+    if (
+        !data
+    ) {
+
+        return [];
+
+    }
+
+
+    const source =
+        Array.isArray(
+            data
+        )
+            ? data
+            : (
+                data.videos ||
+                data.videoNews ||
+                data.items ||
+                []
+            );
+
+
+    if (
+        !Array.isArray(
+            source
+        )
+    ) {
+
+        return [];
+
+    }
+
+
+    return source
+        .map(
+            item => {
+
+                const url =
+                    getMediaURL(
+                        item
+                    );
+
+
+                if (
+                    !url
+                ) {
+
+                    return null;
+
+                }
+
+
+                return {
+
+                    ...(
+                        typeof item ===
+                        "object"
+                            ? item
+                            : {}
+                    ),
+
+                    url:
+                        url,
+
+                    title:
+                        getMediaTitle(
+                            item
+                        ),
+
+                    thumbnail:
+                        item?.thumbnail ||
+                        item?.thumbnailUrl ||
+                        item?.image ||
+                        ""
+
+                };
+
+            }
+        )
+        .filter(
+            Boolean
+        )
+        .slice(
+            0,
+            MEDIA_CONFIG.videoLimit
+        );
+
+}
+
+
+/* ============================================================
+   CREATE GALLERY CARD
+============================================================ */
+
+function createGalleryCard(
+    item,
+    index
+) {
+
+    const card =
+        createElement(
+            "button",
+            {
+
+                className:
+                    "gallery-card",
+
+                type:
+                    "button"
+
+            }
+        );
+
+
+    card.dataset.galleryIndex =
+        String(
+            index
+        );
+
+
+    card.setAttribute(
+        "aria-label",
+        `फोटो देखें: ${getMediaTitle(
+            item
+        )}`
+    );
+
+
+    const image =
+        document.createElement(
+            "img"
+        );
+
+
+    image.src =
+        getMediaURL(
+            item
+        );
+
+
+    image.alt =
+        getMediaAlt(
+            item
+        );
+
+
+    image.loading =
+        "lazy";
+
+
+    image.decoding =
+        "async";
+
+
+    const overlay =
+        createElement(
+            "span",
+            {
+
+                className:
+                    "gallery-card-overlay"
+
+            }
+        );
+
+
+    overlay.innerHTML =
+        `
+
+        <span
+            class="gallery-card-icon"
+            aria-hidden="true"
+        >
+            ⛶
+        </span>
+
+        `;
+
+
+    const caption =
+        createElement(
+            "span",
+            {
+
+                className:
+                    "gallery-card-caption"
+
+            }
+        );
+
+
+    caption.textContent =
+        getMediaTitle(
+            item
+        );
+
+
+    card.appendChild(
+        image
+    );
+
+
+    card.appendChild(
+        overlay
+    );
+
+
+    card.appendChild(
+        caption
+    );
+
+
+    card.addEventListener(
+        "click",
+        () => {
+
+            openMediaViewer(
+                MediaState.gallery,
+                index
+            );
+
+        }
+    );
+
+
+    return card;
+
+}
+
+
+/* ============================================================
+   RENDER PHOTO GALLERY
+============================================================ */
+
+function renderPhotoGallery(
+    data
+) {
+
+    const gallery =
+        normalizeGalleryData(
+            data
+        );
+
+
+    MediaState.gallery =
+        gallery;
+
+
+    getGalleryContainers()
+        .forEach(
+            container => {
+
+                container.innerHTML =
+                    "";
+
+
+                if (
+                    !gallery.length
+                ) {
+
+                    const empty =
+                        createElement(
+                            "div",
+                            {
+
+                                className:
+                                    "media-empty-state"
+
+                            }
+                        );
+
+
+                    empty.innerHTML =
+                        `
+
+                        <div
+                            aria-hidden="true"
+                        >
+                            🖼️
+                        </div>
+
+                        <p>
+                            फोटो गैलरी उपलब्ध नहीं है।
+                        </p>
+
+                        `;
+
+
+                    container.appendChild(
+                        empty
+                    );
+
+
+                    return;
+
+                }
+
+
+                const fragment =
+                    document.createDocumentFragment();
+
+
+                gallery.forEach(
+                    (
+                        item,
+                        index
+                    ) => {
+
+                        fragment.appendChild(
+                            createGalleryCard(
+                                item,
+                                index
+                            )
+                        );
+
+                    }
+                );
+
+
+                container.appendChild(
+                    fragment
+                );
+
+            }
+        );
+
+
+    initializeLazyImages();
+
+}
+
+
+/* ============================================================
+   CREATE VIDEO CARD
+============================================================ */
+
+function createVideoCard(
+    item,
+    index
+) {
+
+    const card =
+        createElement(
+            "article",
+            {
+
+                className:
+                    "video-news-card"
+
+            }
+        );
+
+
+    const button =
+        createElement(
+            "button",
+            {
+
+                className:
+                    "video-news-button",
+
+                type:
+                    "button"
+
+            }
+        );
+
+
+    button.setAttribute(
+        "aria-label",
+        `वीडियो चलाएं: ${getMediaTitle(
+            item
+        )}`
+    );
+
+
+    const media =
+        createElement(
+            "div",
+            {
+
+                className:
+                    "video-card-media"
+
+            }
+        );
+
+
+    const thumbnail =
+        item.thumbnail;
+
+
+    if (
+        thumbnail
+    ) {
+
+        const image =
+            document.createElement(
+                "img"
+            );
+
+
+        image.src =
+            thumbnail;
+
+
+        image.alt =
+            getMediaAlt(
+                item
+            );
+
+
+        image.loading =
+            "lazy";
+
+
+        media.appendChild(
+            image
+        );
+
+    } else {
+
+        media.classList.add(
+            "video-card-placeholder"
+        );
+
+    }
+
+
+    const play =
+        createElement(
+            "span",
+            {
+
+                className:
+                    "video-play-button"
+
+            }
+        );
+
+
+    play.innerHTML =
+        "▶";
+
+
+    media.appendChild(
+        play
+    );
+
+
+    button.appendChild(
+        media
+    );
+
+
+    const title =
+        createElement(
+            "h3",
+            {
+
+                className:
+                    "video-news-title"
+
+            }
+        );
+
+
+    title.textContent =
+        getMediaTitle(
+            item
+        );
+
+
+    button.appendChild(
+        title
+    );
+
+
+    button.addEventListener(
+        "click",
+        () => {
+
+            openVideoViewer(
+                MediaState.videos,
+                index
+            );
+
+        }
+    );
+
+
+    card.appendChild(
+        button
+    );
+
+
+    return card;
+
+}
+
+
+/* ============================================================
+   RENDER VIDEO NEWS
+============================================================ */
+
+function renderVideoNews(
+    data
+) {
+
+    const videos =
+        normalizeVideoData(
+            data
+        );
+
+
+    MediaState.videos =
+        videos;
+
+
+    getVideoContainers()
+        .forEach(
+            container => {
+
+                container.innerHTML =
+                    "";
+
+
+                if (
+                    !videos.length
+                ) {
+
+                    const empty =
+                        createElement(
+                            "div",
+                            {
+
+                                className:
+                                    "media-empty-state"
+
+                            }
+                        );
+
+
+                    empty.innerHTML =
+                        `
+
+                        <div
+                            aria-hidden="true"
+                        >
+                            🎬
+                        </div>
+
+                        <p>
+                            वीडियो न्यूज़ उपलब्ध नहीं है।
+                        </p>
+
+                        `;
+
+
+                    container.appendChild(
+                        empty
+                    );
+
+
+                    return;
+
+                }
+
+
+                const fragment =
+                    document.createDocumentFragment();
+
+
+                videos.forEach(
+                    (
+                        item,
+                        index
+                    ) => {
+
+                        fragment.appendChild(
+                            createVideoCard(
+                                item,
+                                index
+                            )
+                        );
+
+                    }
+                );
+
+
+                container.appendChild(
+                    fragment
+                );
+
+            }
+        );
+
+
+    initializeLazyImages();
+
+}
+
+
+/* ============================================================
+   CREATE MEDIA VIEWER
+============================================================ */
+
+function createMediaViewer() {
+
+    let viewer =
+        document.querySelector(
+            "#awaazMediaViewer"
+        );
+
+
+    if (
+        viewer
+    ) {
+
+        return viewer;
+
+    }
+
+
+    viewer =
+        createElement(
+            "div",
+            {
+
+                id:
+                    "awaazMediaViewer",
+
+                className:
+                    "awaaz-media-viewer"
+
+            }
+        );
+
+
+    viewer.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    viewer.innerHTML =
+        `
+
+        <div
+            class="media-viewer-backdrop"
+            data-viewer-close
+        ></div>
+
+        <div
+            class="media-viewer-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label="मीडिया व्यूअर"
+        >
+
+            <button
+                type="button"
+                class="media-viewer-close"
+                data-viewer-close
+                aria-label="बंद करें"
+            >
+                ×
+            </button>
+
+            <button
+                type="button"
+                class="media-viewer-prev"
+                data-viewer-prev
+                aria-label="पिछली फोटो"
+            >
+                ‹
+            </button>
+
+            <div
+                class="media-viewer-content"
+                data-viewer-content
+            ></div>
+
+            <button
+                type="button"
+                class="media-viewer-next"
+                data-viewer-next
+                aria-label="अगली फोटो"
+            >
+                ›
+            </button>
+
+            <div
+                class="media-viewer-caption"
+                data-viewer-caption
+            ></div>
+
+            <div
+                class="media-viewer-counter"
+                data-viewer-counter
+            ></div>
+
+        </div>
+
+        `;
+
+
+    document.body.appendChild(
+        viewer
+    );
+
+
+    viewer.querySelectorAll(
+        "[data-viewer-close]"
+    )
+    .forEach(
+        element => {
+
+            element.addEventListener(
+                "click",
+                closeMediaViewer
+            );
+
+        }
+    );
+
+
+    viewer.querySelector(
+        "[data-viewer-prev]"
+    )
+    ?.addEventListener(
+        "click",
+        () => {
+
+            changeViewerItem(
+                -1
+            );
+
+        }
+    );
+
+
+    viewer.querySelector(
+        "[data-viewer-next]"
+    )
+    ?.addEventListener(
+        "click",
+        () => {
+
+            changeViewerItem(
+                1
+            );
+
+        }
+    );
+
+
+    return viewer;
+
+}
+
+
+/* ============================================================
+   OPEN MEDIA VIEWER
+============================================================ */
+
+function openMediaViewer(
+    items,
+    index = 0
+) {
+
+    const validItems =
+        Array.isArray(
+            items
+        )
+            ? items.filter(
+                item =>
+                    !!getMediaURL(
+                        item
+                    )
+            )
+            : [];
+
+
+    if (
+        !validItems.length
+    ) {
+
+        return;
+
+    }
+
+
+    const viewer =
+        createMediaViewer();
+
+
+    MediaState.viewerItems =
+        validItems;
+
+
+    MediaState.viewerIndex =
+        Math.min(
+            Math.max(
+                0,
+                Number(
+                    index
+                ) || 0
+            ),
+            validItems.length - 1
+        );
+
+
+    MediaState.viewerOpen =
+        true;
+
+
+    viewer.classList.add(
+        "is-open"
+    );
+
+
+    viewer.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.classList.add(
+        "media-viewer-open"
+    );
+
+
+    renderViewerItem();
+
+
+    const closeButton =
+        viewer.querySelector(
+            ".media-viewer-close"
+        );
+
+
+    closeButton?.focus();
+
+}
+
+
+/* ============================================================
+   RENDER VIEWER ITEM
+============================================================ */
+
+function renderViewerItem() {
+
+    const viewer =
+        document.querySelector(
+            "#awaazMediaViewer"
+        );
+
+
+    if (
+        !viewer
+    ) {
+
+        return;
+
+    }
+
+
+    const content =
+        viewer.querySelector(
+            "[data-viewer-content]"
+        );
+
+
+    const caption =
+        viewer.querySelector(
+            "[data-viewer-caption]"
+        );
+
+
+    const counter =
+        viewer.querySelector(
+            "[data-viewer-counter]"
+        );
+
+
+    const item =
+        MediaState.viewerItems[
+            MediaState.viewerIndex
+        ];
+
+
+    if (
+        !item
+    ) {
+
+        return;
+
+    }
+
+
+    content.innerHTML =
+        "";
+
+
+    const image =
+        document.createElement(
+            "img"
+        );
+
+
+    image.src =
+        getMediaURL(
+            item
+        );
+
+
+    image.alt =
+        getMediaAlt(
+            item
+        );
+
+
+    image.className =
+        "media-viewer-image";
+
+
+    content.appendChild(
+        image
+    );
+
+
+    caption.textContent =
+        getMediaTitle(
+            item
+        );
+
+
+    counter.textContent =
+        `${MediaState.viewerIndex + 1} / ${MediaState.viewerItems.length}`;
+
+
+    const previous =
+        viewer.querySelector(
+            "[data-viewer-prev]"
+        );
+
+
+    const next =
+        viewer.querySelector(
+            "[data-viewer-next]"
+        );
+
+
+    if (
+        MediaState.viewerItems.length <=
+        1
+    ) {
+
+        previous?.setAttribute(
+            "hidden",
+            ""
+        );
+
+
+        next?.setAttribute(
+            "hidden",
+            ""
+        );
+
+    } else {
+
+        previous?.removeAttribute(
+            "hidden"
+        );
+
+
+        next?.removeAttribute(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   CHANGE VIEWER ITEM
+============================================================ */
+
+function changeViewerItem(
+    direction
+) {
+
+    const length =
+        MediaState.viewerItems.length;
+
+
+    if (
+        length <=
+        1
+    ) {
+
+        return;
+
+    }
+
+
+    let nextIndex =
+        MediaState.viewerIndex +
+        direction;
+
+
+    if (
+        nextIndex < 0
+    ) {
+
+        nextIndex =
+            length - 1;
+
+    }
+
+
+    if (
+        nextIndex >=
+        length
+    ) {
+
+        nextIndex =
+            0;
+
+    }
+
+
+    MediaState.viewerIndex =
+        nextIndex;
+
+
+    renderViewerItem();
+
+}
+
+
+/* ============================================================
+   CLOSE MEDIA VIEWER
+============================================================ */
+
+function closeMediaViewer() {
+
+    const viewer =
+        document.querySelector(
+            "#awaazMediaViewer"
+        );
+
+
+    if (
+        !viewer
+    ) {
+
+        return;
+
+    }
+
+
+    viewer.classList.remove(
+        "is-open"
+    );
+
+
+    viewer.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    document.body.classList.remove(
+        "media-viewer-open"
+    );
+
+
+    MediaState.viewerOpen =
+        false;
+
+
+    const content =
+        viewer.querySelector(
+            "[data-viewer-content]"
+        );
+
+
+    if (
+        content
+    ) {
+
+        content.innerHTML =
+            "";
+
+    }
+
+}
+
+
+/* ============================================================
+   VIDEO VIEWER
+============================================================ */
+
+function openVideoViewer(
+    items,
+    index = 0
+) {
+
+    const validItems =
+        Array.isArray(
+            items
+        )
+            ? items.filter(
+                item =>
+                    !!getMediaURL(
+                        item
+                    )
+            )
+            : [];
+
+
+    if (
+        !validItems.length
+    ) {
+
+        return;
+
+    }
+
+
+    const viewer =
+        createMediaViewer();
+
+
+    MediaState.viewerItems =
+        validItems;
+
+
+    MediaState.viewerIndex =
+        Math.min(
+            Math.max(
+                0,
+                Number(
+                    index
+                ) || 0
+            ),
+            validItems.length - 1
+        );
+
+
+    MediaState.viewerOpen =
+        true;
+
+
+    viewer.classList.add(
+        "is-open"
+    );
+
+
+    viewer.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.classList.add(
+        "media-viewer-open"
+    );
+
+
+    renderVideoViewerItem();
+
+}
+
+
+/* ============================================================
+   RENDER VIDEO VIEWER ITEM
+============================================================ */
+
+function renderVideoViewerItem() {
+
+    const viewer =
+        document.querySelector(
+            "#awaazMediaViewer"
+        );
+
+
+    if (
+        !viewer
+    ) {
+
+        return;
+
+    }
+
+
+    const content =
+        viewer.querySelector(
+            "[data-viewer-content]"
+        );
+
+
+    const caption =
+        viewer.querySelector(
+            "[data-viewer-caption]"
+        );
+
+
+    const counter =
+        viewer.querySelector(
+            "[data-viewer-counter]"
+        );
+
+
+    const item =
+        MediaState.viewerItems[
+            MediaState.viewerIndex
+        ];
+
+
+    if (
+        !item
+    ) {
+
+        return;
+
+    }
+
+
+    content.innerHTML =
+        "";
+
+
+    const video =
+        document.createElement(
+            "video"
+        );
+
+
+    video.src =
+        getMediaURL(
+            item
+        );
+
+
+    video.controls =
+        true;
+
+
+    video.autoplay =
+        true;
+
+
+    video.playsInline =
+        true;
+
+
+    video.preload =
+        "metadata";
+
+
+    video.className =
+        "media-viewer-video";
+
+
+    content.appendChild(
+        video
+    );
+
+
+    caption.textContent =
+        getMediaTitle(
+            item
+        );
+
+
+    counter.textContent =
+        `${MediaState.viewerIndex + 1} / ${MediaState.viewerItems.length}`;
+
+}
+
+
+/* ============================================================
+   KEYBOARD MEDIA CONTROLS
+============================================================ */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            !MediaState.viewerOpen
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            closeMediaViewer();
+
+            return;
+
+        }
+
+
+        if (
+            event.key ===
+            "ArrowLeft"
+        ) {
+
+            event.preventDefault();
+
+
+            changeViewerItem(
+                -1
+            );
+
+            return;
+
+        }
+
+
+        if (
+            event.key ===
+            "ArrowRight"
+        ) {
+
+            event.preventDefault();
+
+
+            changeViewerItem(
+                1
+            );
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   TOUCH SWIPE SUPPORT
+============================================================ */
+
+let mediaTouchStartX =
+    0;
+
+let mediaTouchEndX =
+    0;
+
+
+document.addEventListener(
+    "touchstart",
+    event => {
+
+        if (
+            !MediaState.viewerOpen
+        ) {
+
+            return;
+
+        }
+
+
+        mediaTouchStartX =
+            event.changedTouches[0]?.screenX ||
+            0;
+
+    },
+    {
+        passive:
+            true
+    }
+);
+
+
+document.addEventListener(
+    "touchend",
+    event => {
+
+        if (
+            !MediaState.viewerOpen
+        ) {
+
+            return;
+
+        }
+
+
+        mediaTouchEndX =
+            event.changedTouches[0]?.screenX ||
+            0;
+
+
+        const difference =
+            mediaTouchEndX -
+            mediaTouchStartX;
+
+
+        if (
+            Math.abs(
+                difference
+            ) <
+            50
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            difference > 0
+        ) {
+
+            changeViewerItem(
+                -1
+            );
+
+        } else {
+
+            changeViewerItem(
+                1
+            );
+
+        }
+
+    },
+    {
+        passive:
+            true
+    }
+);
+
+
+/* ============================================================
+   MEDIA GLOBAL EXPORT
+============================================================ */
+
+window.AwaazRajasthan.media = {
+
+    state:
+        MediaState,
+
+    gallery:
+        renderPhotoGallery,
+
+    videos:
+        renderVideoNews,
+
+    open:
+        openMediaViewer,
+
+    openVideo:
+        openVideoViewer,
+
+    close:
+        closeMediaViewer
+
+};
+
+
+/* ============================================================
+   END OF PART 28/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 29/30
+
+   NOTIFICATION SYSTEM
+   TOASTS
+   MODALS
+   CONFIRMATION DIALOGS
+   SHARE SYSTEM
+   COPY LINK
+   SOCIAL SHARE
+   SCROLL / UI HELPERS
+============================================================ */
+
+
+/* ============================================================
+   NOTIFICATION CONFIG
+============================================================ */
+
+const NotificationConfig = {
+
+    duration:
+        3500,
+
+    maxVisible:
+        4,
+
+    position:
+        "top-right"
+
+};
+
+
+/* ============================================================
+   NOTIFICATION STATE
+============================================================ */
+
+const NotificationState = {
+
+    items:
+        [],
+
+    nextId:
+        1
+
+};
+
+
+/* ============================================================
+   CREATE NOTIFICATION CONTAINER
+============================================================ */
+
+function getNotificationContainer() {
+
+    let container =
+        document.querySelector(
+            "#awaazNotifications"
+        );
+
+
+    if (
+        container
+    ) {
+
+        return container;
+
+    }
+
+
+    container =
+        createElement(
+            "div",
+            {
+
+                id:
+                    "awaazNotifications",
+
+                className:
+                    "awaaz-notifications",
+
+                "aria-live":
+                    "polite",
+
+                "aria-atomic":
+                    "true"
+
+            }
+        );
+
+
+    document.body.appendChild(
+        container
+    );
+
+
+    return container;
+
+}
+
+
+/* ============================================================
+   SHOW TOAST
+============================================================ */
+
+function showToast(
+    message,
+    type = "info",
+    options = {}
+) {
+
+    const text =
+        normalizeText(
+            message
+        );
+
+
+    if (
+        !text
+    ) {
+
+        return null;
+
+    }
+
+
+    const container =
+        getNotificationContainer();
+
+
+    const id =
+        NotificationState.nextId++;
+
+
+    const toast =
+        createElement(
+            "div",
+            {
+
+                className:
+                    `awaaz-toast awaaz-toast-${type}`
+
+            }
+        );
+
+
+    toast.dataset.toastId =
+        String(
+            id
+        );
+
+
+    const iconMap = {
+
+        success:
+            "✓",
+
+        error:
+            "✕",
+
+        warning:
+            "!",
+
+        info:
+            "i"
+
+    };
+
+
+    toast.innerHTML =
+        `
+
+        <span
+            class="awaaz-toast-icon"
+            aria-hidden="true"
+        >
+            ${iconMap[type] || "i"}
+        </span>
+
+        <span
+            class="awaaz-toast-message"
+        >
+            ${escapeHTML(
+                text
+            )}
+        </span>
+
+        <button
+            type="button"
+            class="awaaz-toast-close"
+            aria-label="सूचना बंद करें"
+        >
+            ×
+        </button>
+
+        `;
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    NotificationState.items.push(
+        {
+
+            id:
+                id,
+
+            element:
+                toast
+
+        }
+    );
+
+
+    while (
+        NotificationState.items.length >
+        NotificationConfig.maxVisible
+    ) {
+
+        const first =
+            NotificationState.items.shift();
+
+
+        first?.element?.remove();
+
+    }
+
+
+    const close =
+        () => {
+
+            removeToast(
+                id
+            );
+
+        };
+
+
+    toast.querySelector(
+        ".awaaz-toast-close"
+    )
+    ?.addEventListener(
+        "click",
+        close
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            toast.classList.add(
+                "is-visible"
+            );
+
+        }
+    );
+
+
+    const duration =
+        Number(
+            options.duration
+        ) ||
+        NotificationConfig.duration;
+
+
+    if (
+        duration > 0
+    ) {
+
+        setTimeout(
+            close,
+            duration
+        );
+
+    }
+
+
+    return id;
+
+}
+
+
+/* ============================================================
+   REMOVE TOAST
+============================================================ */
+
+function removeToast(
+    id
+) {
+
+    const index =
+        NotificationState.items.findIndex(
+            item =>
+                item.id ===
+                id
+        );
+
+
+    if (
+        index ===
+        -1
+    ) {
+
+        return;
+
+    }
+
+
+    const item =
+        NotificationState.items[index];
+
+
+    NotificationState.items.splice(
+        index,
+        1
+    );
+
+
+    if (
+        item.element
+    ) {
+
+        item.element.classList.remove(
+            "is-visible"
+        );
+
+
+        setTimeout(
+            () => {
+
+                item.element.remove();
+
+            },
+            220
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   TOAST SHORTCUTS
+============================================================ */
+
+function showSuccess(
+    message,
+    options
+) {
+
+    return showToast(
+        message,
+        "success",
+        options
+    );
+
+}
+
+
+function showError(
+    message,
+    options
+) {
+
+    return showToast(
+        message,
+        "error",
+        options
+    );
+
+}
+
+
+function showWarning(
+    message,
+    options
+) {
+
+    return showToast(
+        message,
+        "warning",
+        options
+    );
+
+}
+
+
+function showInfo(
+    message,
+    options
+) {
+
+    return showToast(
+        message,
+        "info",
+        options
+    );
+
+}
+
+
+/* ============================================================
+   MODAL STATE
+============================================================ */
+
+const ModalState = {
+
+    active:
+        null,
+
+    previousFocus:
+        null
+
+};
+
+
+/* ============================================================
+   CREATE MODAL CONTAINER
+============================================================ */
+
+function getModalContainer() {
+
+    let container =
+        document.querySelector(
+            "#awaazModalContainer"
+        );
+
+
+    if (
+        container
+    ) {
+
+        return container;
+
+    }
+
+
+    container =
+        createElement(
+            "div",
+            {
+
+                id:
+                    "awaazModalContainer",
+
+                className:
+                    "awaaz-modal-container"
+
+            }
+        );
+
+
+    document.body.appendChild(
+        container
+    );
+
+
+    return container;
+
+}
+
+
+/* ============================================================
+   OPEN MODAL
+============================================================ */
+
+function openModal(
+    options = {}
+) {
+
+    const {
+
+        title =
+            "आवाज़ राजस्थान",
+
+        content =
+            "",
+
+        size =
+            "medium",
+
+        closeOnBackdrop =
+            true,
+
+        showClose =
+            true,
+
+        className =
+            ""
+
+    } =
+        options;
+
+
+    closeModal();
+
+
+    const container =
+        getModalContainer();
+
+
+    const modal =
+        createElement(
+            "div",
+            {
+
+                className:
+                    `awaaz-modal ${className}`,
+
+                role:
+                    "dialog",
+
+                "aria-modal":
+                    "true",
+
+                "aria-labelledby":
+                    "awaazModalTitle"
+
+            }
+        );
+
+
+    modal.dataset.modalSize =
+        size;
+
+
+    modal.innerHTML =
+        `
+
+        <div
+            class="awaaz-modal-backdrop"
+            data-modal-backdrop
+        ></div>
+
+        <div
+            class="awaaz-modal-dialog"
+        >
+
+            <div
+                class="awaaz-modal-header"
+            >
+
+                <h2
+                    id="awaazModalTitle"
+                    class="awaaz-modal-title"
+                >
+                    ${escapeHTML(
+                        title
+                    )}
+                </h2>
+
+                ${
+                    showClose
+                        ? `
+                            <button
+                                type="button"
+                                class="awaaz-modal-close"
+                                data-modal-close
+                                aria-label="बंद करें"
+                            >
+                                ×
+                            </button>
+                          `
+                        : ""
+                }
+
+            </div>
+
+            <div
+                class="awaaz-modal-body"
+                data-modal-body
+            ></div>
+
+        </div>
+
+        `;
+
+
+    const body =
+        modal.querySelector(
+            "[data-modal-body]"
+        );
+
+
+    if (
+        typeof content ===
+        "string"
+    ) {
+
+        body.innerHTML =
+            content;
+
+    } else if (
+        content instanceof
+        Node
+    ) {
+
+        body.appendChild(
+            content
+        );
+
+    }
+
+
+    container.appendChild(
+        modal
+    );
+
+
+    ModalState.previousFocus =
+        document.activeElement;
+
+
+    ModalState.active =
+        modal;
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+
+
+    requestAnimationFrame(
+        () => {
+
+            modal.classList.add(
+                "is-open"
+            );
+
+        }
+    );
+
+
+    modal.querySelector(
+        "[data-modal-close]"
+    )
+    ?.addEventListener(
+        "click",
+        closeModal
+    );
+
+
+    if (
+        closeOnBackdrop
+    ) {
+
+        modal.querySelector(
+            "[data-modal-backdrop]"
+        )
+        ?.addEventListener(
+            "click",
+            closeModal
+        );
+
+    }
+
+
+    const focusTarget =
+        modal.querySelector(
+            "button, input, select, textarea"
+        );
+
+
+    setTimeout(
+        () => {
+
+            focusTarget?.focus();
+
+        },
+        50
+    );
+
+
+    return modal;
+
+}
+
+
+/* ============================================================
+   CLOSE MODAL
+============================================================ */
+
+function closeModal() {
+
+    const modal =
+        ModalState.active;
+
+
+    if (
+        !modal
+    ) {
+
+        return;
+
+    }
+
+
+    modal.classList.remove(
+        "is-open"
+    );
+
+
+    setTimeout(
+        () => {
+
+            modal.remove();
+
+        },
+        220
+    );
+
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+
+
+    try {
+
+        ModalState.previousFocus?.focus();
+
+    } catch (
+        error
+    ) {
+
+        /* Ignore focus restoration errors. */
+
+    }
+
+
+    ModalState.active =
+        null;
+
+}
+
+
+/* ============================================================
+   CONFIRMATION MODAL
+============================================================ */
+
+function confirmAction(
+    options = {}
+) {
+
+    return new Promise(
+        resolve => {
+
+            const {
+
+                title =
+                    "पुष्टि करें",
+
+                message =
+                    "क्या आप यह कार्रवाई करना चाहते हैं?",
+
+                confirmText =
+                    "हाँ, जारी रखें",
+
+                cancelText =
+                    "रद्द करें",
+
+                danger =
+                    false
+
+            } =
+                options;
+
+
+            const modal =
+                openModal(
+                    {
+
+                        title:
+                            title,
+
+                        content:
+                            `
+
+                            <div
+                                class="confirm-dialog"
+                            >
+
+                                <p
+                                    class="confirm-message"
+                                >
+                                    ${escapeHTML(
+                                        message
+                                    )}
+                                </p>
+
+                                <div
+                                    class="confirm-actions"
+                                >
+
+                                    <button
+                                        type="button"
+                                        class="secondary-btn"
+                                        data-confirm-cancel
+                                    >
+                                        ${escapeHTML(
+                                            cancelText
+                                        )}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="${
+                                            danger
+                                                ? "danger-btn"
+                                                : "primary-btn"
+                                        }"
+                                        data-confirm-ok
+                                    >
+                                        ${escapeHTML(
+                                            confirmText
+                                        )}
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            `
+
+                    }
+                );
+
+
+            let settled =
+                false;
+
+
+            const finish =
+                value => {
+
+                    if (
+                        settled
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    settled =
+                        true;
+
+
+                    closeModal();
+
+
+                    resolve(
+                        value
+                    );
+
+                };
+
+
+            modal.querySelector(
+                "[data-confirm-cancel]"
+            )
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    finish(
+                        false
+                    );
+
+                }
+            );
+
+
+            modal.querySelector(
+                "[data-confirm-ok]"
+            )
+            ?.addEventListener(
+                "click",
+                () => {
+
+                    finish(
+                        true
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SHARE URL
+============================================================ */
+
+function getShareURL(
+    article
+) {
+
+    if (
+        article?.url
+    ) {
+
+        return article.url;
+
+    }
+
+
+    if (
+        article?.slug
+    ) {
+
+        return new URL(
+            `/news/${encodeURIComponent(
+                article.slug
+            )}`,
+            window.location.origin
+        ).href;
+
+    }
+
+
+    if (
+        article?._id
+    ) {
+
+        return new URL(
+            `/news/${encodeURIComponent(
+                article._id
+            )}`,
+            window.location.origin
+        ).href;
+
+    }
+
+
+    return window.location.href;
+
+}
+
+
+/* ============================================================
+   SHARE ARTICLE
+============================================================ */
+
+async function shareArticle(
+    article
+) {
+
+    const title =
+        getMediaTitle(
+            article
+        ) ||
+        article?.headline ||
+        "आवाज़ राजस्थान";
+
+
+    const url =
+        getShareURL(
+            article
+        );
+
+
+    const text =
+        normalizeText(
+            article?.excerpt ||
+            article?.description ||
+            article?.title ||
+            title
+        );
+
+
+    if (
+        navigator.share
+    ) {
+
+        try {
+
+            await navigator.share(
+                {
+
+                    title:
+                        title,
+
+                    text:
+                        text,
+
+                    url:
+                        url
+
+                }
+            );
+
+
+            return true;
+
+        } catch (
+            error
+        ) {
+
+            if (
+                error?.name ===
+                "AbortError"
+            ) {
+
+                return false;
+
+            }
+
+        }
+
+    }
+
+
+    return showShareFallback(
+        {
+
+            title:
+                title,
+
+            text:
+                text,
+
+            url:
+                url
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SHARE FALLBACK
+============================================================ */
+
+function showShareFallback(
+    options
+) {
+
+    const encodedURL =
+        encodeURIComponent(
+            options.url
+        );
+
+
+    const encodedText =
+        encodeURIComponent(
+            `${options.title}\n${options.text}`
+        );
+
+
+    const content =
+        `
+
+        <div
+            class="share-options"
+        >
+
+            <a
+                href="https://wa.me/?text=${encodedText}%20${encodedURL}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="share-option whatsapp"
+            >
+                WhatsApp
+            </a>
+
+            <a
+                href="https://www.facebook.com/sharer/sharer.php?u=${encodedURL}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="share-option facebook"
+            >
+                Facebook
+            </a>
+
+            <a
+                href="https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedURL}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="share-option twitter"
+            >
+                X
+            </a>
+
+            <button
+                type="button"
+                class="share-option copy-link"
+                data-copy-share
+            >
+                लिंक कॉपी करें
+            </button>
+
+        </div>
+
+        `;
+
+
+    const modal =
+        openModal(
+            {
+
+                title:
+                    "खबर शेयर करें",
+
+                content:
+                    content
+
+            }
+        );
+
+
+    modal.querySelector(
+        "[data-copy-share]"
+    )
+    ?.addEventListener(
+        "click",
+        async () => {
+
+            const copied =
+                await copyToClipboard(
+                    options.url
+                );
+
+
+            if (
+                copied
+            ) {
+
+                showSuccess(
+                    "लिंक कॉपी हो गया।"
+                );
+
+            } else {
+
+                showError(
+                    "लिंक कॉपी नहीं हो सका।"
+                );
+
+            }
+
+        }
+    );
+
+
+    return true;
+
+}
+
+
+/* ============================================================
+   COPY TO CLIPBOARD
+============================================================ */
+
+async function copyToClipboard(
+    text
+) {
+
+    const value =
+        String(
+            text ||
+            ""
+        );
+
+
+    if (
+        !value
+    ) {
+
+        return false;
+
+    }
+
+
+    try {
+
+        if (
+            navigator.clipboard &&
+            window.isSecureContext
+        ) {
+
+            await navigator.clipboard.writeText(
+                value
+            );
+
+
+            return true;
+
+        }
+
+    } catch (
+        error
+    ) {
+
+        /* Continue with fallback. */
+
+    }
+
+
+    try {
+
+        const textarea =
+            document.createElement(
+                "textarea"
+            );
+
+
+        textarea.value =
+            value;
+
+
+        textarea.setAttribute(
+            "readonly",
+            ""
+        );
+
+
+        textarea.style.position =
+            "fixed";
+
+
+        textarea.style.opacity =
+            "0";
+
+
+        textarea.style.pointerEvents =
+            "none";
+
+
+        document.body.appendChild(
+            textarea
+        );
+
+
+        textarea.select();
+
+
+        const success =
+            document.execCommand(
+                "copy"
+            );
+
+
+        textarea.remove();
+
+
+        return success;
+
+    } catch (
+        error
+    ) {
+
+        return false;
+
+    }
+
+}
+
+
+/* ============================================================
+   COPY LINK BUTTONS
+============================================================ */
+
+function initializeCopyButtons() {
+
+    $$(
+        "[data-copy-link]"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.copyInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.copyInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                async event => {
+
+                    event.preventDefault();
+
+
+                    const url =
+                        button.dataset.copyLink ||
+                        window.location.href;
+
+
+                    const copied =
+                        await copyToClipboard(
+                            url
+                        );
+
+
+                    if (
+                        copied
+                    ) {
+
+                        showSuccess(
+                            "लिंक कॉपी हो गया।"
+                        );
+
+
+                        const original =
+                            button.textContent;
+
+
+                        button.textContent =
+                            "कॉपी हो गया";
+
+
+                        setTimeout(
+                            () => {
+
+                                button.textContent =
+                                    original;
+
+                            },
+                            1800
+                        );
+
+                    } else {
+
+                        showError(
+                            "लिंक कॉपी नहीं हो सका।"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SHARE BUTTON INITIALIZATION
+============================================================ */
+
+function initializeShareButtons() {
+
+    $$(
+        "[data-share-article]"
+    )
+    .forEach(
+        button => {
+
+            if (
+                button.dataset.shareInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            button.dataset.shareInitialized =
+                "true";
+
+
+            button.addEventListener(
+                "click",
+                async event => {
+
+                    event.preventDefault();
+
+
+                    let article =
+                        null;
+
+
+                    const raw =
+                        button.dataset.shareArticle;
+
+
+                    if (
+                        raw
+                    ) {
+
+                        try {
+
+                            article =
+                                JSON.parse(
+                                    raw
+                                );
+
+                        } catch (
+                            error
+                        ) {
+
+                            article = {
+
+                                title:
+                                    raw,
+
+                                url:
+                                    button.dataset.url ||
+                                    window.location.href
+
+                            };
+
+                        }
+
+                    }
+
+
+                    if (
+                        !article
+                    ) {
+
+                        const card =
+                            button.closest(
+                                "[data-article-id], " +
+                                ".news-card, " +
+                                ".article-card"
+                            );
+
+
+                        const id =
+                            card?.dataset.articleId;
+
+
+                        if (
+                            id &&
+                            Array.isArray(
+                                window.AwaazRajasthan?.news?.state?.items
+                            )
+                        ) {
+
+                            article =
+                                window.AwaazRajasthan.news.state.items.find(
+                                    item =>
+                                        String(
+                                            item._id ||
+                                            item.id
+                                        ) ===
+                                        String(
+                                            id
+                                        )
+                                );
+
+                        }
+
+                    }
+
+
+                    article =
+                        article ||
+                        {
+
+                            title:
+                                document.title,
+
+                            url:
+                                window.location.href
+
+                        };
+
+
+                    await shareArticle(
+                        article
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SCROLL TO TOP
+============================================================ */
+
+function scrollToTop(
+    smooth = true
+) {
+
+    window.scrollTo(
+        {
+
+            top:
+                0,
+
+            behavior:
+                smooth
+                    ? "smooth"
+                    : "auto"
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   BACK TO TOP BUTTON
+============================================================ */
+
+function initializeBackToTop() {
+
+    let button =
+        document.querySelector(
+            "#backToTop"
+        );
+
+
+    if (
+        !button
+    ) {
+
+        button =
+            document.querySelector(
+                "[data-back-to-top]"
+            );
+
+    }
+
+
+    if (
+        !button
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        button.dataset.backTopInitialized ===
+        "true"
+    ) {
+
+        return;
+
+    }
+
+
+    button.dataset.backTopInitialized =
+        "true";
+
+
+    const update =
+        () => {
+
+            if (
+                window.scrollY >
+                450
+            ) {
+
+                button.classList.add(
+                    "is-visible"
+                );
+
+                button.removeAttribute(
+                    "hidden"
+                );
+
+            } else {
+
+                button.classList.remove(
+                    "is-visible"
+                );
+
+            }
+
+        };
+
+
+    window.addEventListener(
+        "scroll",
+        update,
+        {
+            passive:
+                true
+        }
+    );
+
+
+    button.addEventListener(
+        "click",
+        event => {
+
+            event.preventDefault();
+
+            scrollToTop(
+                true
+            );
+
+        }
+    );
+
+
+    update();
+
+}
+
+
+/* ============================================================
+   SMOOTH ANCHOR SCROLL
+============================================================ */
+
+function initializeAnchorScrolling() {
+
+    $$(
+        'a[href^="#"]'
+    )
+    .forEach(
+        link => {
+
+            if (
+                link.dataset.anchorInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            link.dataset.anchorInitialized =
+                "true";
+
+
+            link.addEventListener(
+                "click",
+                event => {
+
+                    const href =
+                        link.getAttribute(
+                            "href"
+                        );
+
+
+                    if (
+                        !href ||
+                        href === "#"
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const target =
+                        document.querySelector(
+                            href
+                        );
+
+
+                    if (
+                        !target
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    event.preventDefault();
+
+
+                    target.scrollIntoView(
+                        {
+
+                            behavior:
+                                "smooth",
+
+                            block:
+                                "start"
+
+                        }
+                    );
+
+
+                    try {
+
+                        history.pushState(
+                            null,
+                            "",
+                            href
+                        );
+
+                    } catch (
+                        error
+                    ) {
+
+                        /* Ignore history errors. */
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   MODAL ESCAPE KEY
+============================================================ */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key ===
+            "Escape" &&
+            ModalState.active
+        ) {
+
+            closeModal();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   GLOBAL SHARE EXPORT
+============================================================ */
+
+window.AwaazRajasthan.notifications = {
+
+    show:
+        showToast,
+
+    success:
+        showSuccess,
+
+    error:
+        showError,
+
+    warning:
+        showWarning,
+
+    info:
+        showInfo
+
+};
+
+
+window.AwaazRajasthan.modal = {
+
+    open:
+        openModal,
+
+    close:
+        closeModal,
+
+    confirm:
+        confirmAction
+
+};
+
+
+window.AwaazRajasthan.share = {
+
+    article:
+        shareArticle,
+
+    copy:
+        copyToClipboard
+
+};
+
+
+/* ============================================================
+   UI HELPER INITIALIZATION
+============================================================ */
+
+function initializeUIHelpers() {
+
+    initializeCopyButtons();
+
+    initializeShareButtons();
+
+    initializeBackToTop();
+
+    initializeAnchorScrolling();
+
+}
+
+
+/* ============================================================
+   READY HOOK
+============================================================ */
+
+window.addEventListener(
+    "awaaz:ready",
+    () => {
+
+        initializeUIHelpers();
+
+    }
+);
+
+
+/* ============================================================
+   DOM FALLBACK INITIALIZATION
+============================================================ */
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+
+            initializeUIHelpers();
+
+        },
+        {
+            once:
+                true
+        }
+    );
+
+} else {
+
+    initializeUIHelpers();
+
+}
+
+
+/* ============================================================
+   END OF PART 29/30
+============================================================ */
+/* ============================================================
+   AAWAAZ RAJASTHAN
+   SCRIPT.JS — PART 30/30
+
+   FINAL SYSTEM
+   PERFORMANCE
+   ACCESSIBILITY
+   ERROR HANDLING
+   OFFLINE HANDLING
+   IMAGE FALLBACK
+   FINAL INITIALIZATION
+   GLOBAL EXPORTS
+============================================================ */
+
+
+/* ============================================================
+   FINAL CONFIGURATION
+============================================================ */
+
+const FinalConfig = {
+
+    appName:
+        "आवाज़ राजस्थान",
+
+    defaultTitle:
+        "आवाज़ राजस्थान | राजस्थान की हर खबर सबसे पहले",
+
+    defaultDescription:
+        "राजस्थान की ताज़ा खबरें, ब्रेकिंग न्यूज़, राजनीति, क्राइम, शिक्षा, रोजगार, खेल और देश-दुनिया की महत्वपूर्ण खबरें।",
+
+    imageFallback:
+        "",
+
+    scrollOffset:
+        80,
+
+    lazyLoadRootMargin:
+        "250px"
+
+};
+
+
+/* ============================================================
+   SAFE FUNCTION EXECUTOR
+============================================================ */
+
+function safeExecute(
+    callback,
+    fallback = null
+) {
+
+    try {
+
+        if (
+            typeof callback !==
+            "function"
+        ) {
+
+            return fallback;
+
+        }
+
+
+        return callback();
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "Awaaz Rajasthan error:",
+            error
+        );
+
+
+        return fallback;
+
+    }
+
+}
+
+
+/* ============================================================
+   GLOBAL ERROR HANDLER
+============================================================ */
+
+function initializeGlobalErrorHandler() {
+
+    window.addEventListener(
+        "error",
+        event => {
+
+            console.error(
+                "Global error:",
+                event.error ||
+                event.message
+            );
+
+        }
+    );
+
+
+    window.addEventListener(
+        "unhandledrejection",
+        event => {
+
+            console.error(
+                "Unhandled promise rejection:",
+                event.reason
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   IMAGE FALLBACK SYSTEM
+============================================================ */
+
+function initializeImageFallbacks() {
+
+    $$(
+        "img"
+    )
+    .forEach(
+        image => {
+
+            if (
+                image.dataset.fallbackInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            image.dataset.fallbackInitialized =
+                "true";
+
+
+            image.addEventListener(
+                "error",
+                () => {
+
+                    if (
+                        image.dataset.fallbackUsed ===
+                        "true"
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    image.dataset.fallbackUsed =
+                        "true";
+
+
+                    image.classList.add(
+                        "image-load-error"
+                    );
+
+
+                    image.removeAttribute(
+                        "srcset"
+                    );
+
+
+                    if (
+                        FinalConfig.imageFallback
+                    ) {
+
+                        image.src =
+                            FinalConfig.imageFallback;
+
+                    } else {
+
+                        image.removeAttribute(
+                            "src"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   ONLINE / OFFLINE STATUS
+============================================================ */
+
+function createNetworkStatus() {
+
+    let status =
+        document.querySelector(
+            "#networkStatus"
+        );
+
+
+    if (
+        status
+    ) {
+
+        return status;
+
+    }
+
+
+    status =
+        createElement(
+            "div",
+            {
+
+                id:
+                    "networkStatus",
+
+                className:
+                    "network-status"
+
+            }
+        );
+
+
+    status.setAttribute(
+        "role",
+        "status"
+    );
+
+
+    status.innerHTML =
+        `
+
+        <span
+            class="network-status-icon"
+            aria-hidden="true"
+        >
+            ⚠️
+        </span>
+
+        <span
+            class="network-status-text"
+        >
+            इंटरनेट कनेक्शन उपलब्ध नहीं है।
+        </span>
+
+        `;
+
+
+    document.body.appendChild(
+        status
+    );
+
+
+    return status;
+
+}
+
+
+/* ============================================================
+   UPDATE NETWORK STATUS
+============================================================ */
+
+function updateNetworkStatus(
+    online
+) {
+
+    const status =
+        createNetworkStatus();
+
+
+    if (
+        online
+    ) {
+
+        status.classList.remove(
+            "is-offline"
+        );
+
+
+        status.classList.add(
+            "is-online"
+        );
+
+
+        status.querySelector(
+            ".network-status-text"
+        ).textContent =
+            "इंटरनेट कनेक्शन वापस आ गया।";
+
+
+        setTimeout(
+            () => {
+
+                status.classList.remove(
+                    "is-online"
+                );
+
+            },
+            2500
+        );
+
+    } else {
+
+        status.classList.remove(
+            "is-online"
+        );
+
+
+        status.classList.add(
+            "is-offline"
+        );
+
+
+        status.querySelector(
+            ".network-status-text"
+        ).textContent =
+            "इंटरनेट कनेक्शन उपलब्ध नहीं है।";
+
+    }
+
+}
+
+
+/* ============================================================
+   INITIALIZE NETWORK MONITOR
+============================================================ */
+
+function initializeNetworkMonitor() {
+
+    window.addEventListener(
+        "offline",
+        () => {
+
+            updateNetworkStatus(
+                false
+            );
+
+
+            showWarning(
+                "आप ऑफलाइन हैं। कुछ सुविधाएँ उपलब्ध नहीं हो सकतीं।"
+            );
+
+        }
+    );
+
+
+    window.addEventListener(
+        "online",
+        () => {
+
+            updateNetworkStatus(
+                true
+            );
+
+
+            showSuccess(
+                "इंटरनेट कनेक्शन वापस आ गया।"
+            );
+
+        }
+    );
+
+
+    if (
+        !navigator.onLine
+    ) {
+
+        updateNetworkStatus(
+            false
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   PAGE VISIBILITY
+============================================================ */
+
+function initializeVisibilityHandler() {
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+
+            if (
+                document.hidden
+            ) {
+
+                document.body.classList.add(
+                    "page-hidden"
+                );
+
+            } else {
+
+                document.body.classList.remove(
+                    "page-hidden"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   PREVENT DOUBLE FORM SUBMISSION
+============================================================ */
+
+function initializeFormProtection() {
+
+    $$(
+        "form"
+    )
+    .forEach(
+        form => {
+
+            if (
+                form.dataset.formProtectionInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            form.dataset.formProtectionInitialized =
+                "true";
+
+
+            form.addEventListener(
+                "submit",
+                () => {
+
+                    const buttons =
+                        form.querySelectorAll(
+                            'button[type="submit"], input[type="submit"]'
+                        );
+
+
+                    buttons.forEach(
+                        button => {
+
+                            if (
+                                button.dataset.allowMultiple ===
+                                "true"
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            if (
+                                button.dataset.submitting ===
+                                "true"
+                            ) {
+
+                                return;
+
+                            }
+
+
+                            button.dataset.submitting =
+                                "true";
+
+
+                            setTimeout(
+                                () => {
+
+                                    delete button.dataset.submitting;
+
+                                },
+                                1500
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   PREVENT IMAGE DRAG
+============================================================ */
+
+function initializeImageDragProtection() {
+
+    $$(
+        "img"
+    )
+    .forEach(
+        image => {
+
+            image.setAttribute(
+                "draggable",
+                "false"
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   EXTERNAL LINKS SECURITY
+============================================================ */
+
+function initializeExternalLinks() {
+
+    $$(
+        'a[target="_blank"]'
+    )
+    .forEach(
+        link => {
+
+            const rel =
+                link.getAttribute(
+                    "rel"
+                ) ||
+                "";
+
+
+            const values =
+                new Set(
+                    rel
+                        .split(
+                            /\s+/
+                        )
+                        .filter(
+                            Boolean
+                        )
+                );
+
+
+            values.add(
+                "noopener"
+            );
+
+
+            values.add(
+                "noreferrer"
+            );
+
+
+            link.setAttribute(
+                "rel",
+                Array.from(
+                    values
+                ).join(
+                    " "
+                )
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   CURRENT YEAR
+============================================================ */
+
+function initializeCurrentYear() {
+
+    const year =
+        new Date()
+            .getFullYear();
+
+
+    $$(
+        "[data-current-year], " +
+        "#currentYear, " +
+        ".current-year"
+    )
+    .forEach(
+        element => {
+
+            element.textContent =
+                String(
+                    year
+                );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   DYNAMIC COPYRIGHT
+============================================================ */
+
+function initializeCopyright() {
+
+    $$(
+        "[data-copyright]"
+    )
+    .forEach(
+        element => {
+
+            const year =
+                new Date()
+                    .getFullYear();
+
+
+            element.textContent =
+                `© ${year} आवाज़ राजस्थान. सर्वाधिकार सुरक्षित।`;
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   DOCUMENT TITLE
+============================================================ */
+
+function initializeDefaultTitle() {
+
+    if (
+        !document.title ||
+        document.title.trim().length ===
+        0
+    ) {
+
+        document.title =
+            FinalConfig.defaultTitle;
+
+    }
+
+}
+
+
+/* ============================================================
+   META DESCRIPTION
+============================================================ */
+
+function initializeMetaDescription() {
+
+    let meta =
+        document.querySelector(
+            'meta[name="description"]'
+        );
+
+
+    if (
+        !meta
+    ) {
+
+        meta =
+            document.createElement(
+                "meta"
+            );
+
+
+        meta.name =
+            "description";
+
+
+        document.head.appendChild(
+            meta
+        );
+
+    }
+
+
+    if (
+        !meta.content ||
+        meta.content.trim().length ===
+        0
+    ) {
+
+        meta.content =
+            FinalConfig.defaultDescription;
+
+    }
+
+}
+
+
+/* ============================================================
+   PREFETCH INTERNAL LINKS
+============================================================ */
+
+function initializeLinkPrefetch() {
+
+    if (
+        !("connection" in navigator)
+    ) {
+
+        return;
+
+    }
+
+
+    const connection =
+        navigator.connection;
+
+
+    if (
+        connection?.saveData
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        /2g/.test(
+            connection?.effectiveType ||
+            ""
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    $$(
+        "a[href]"
+    )
+    .forEach(
+        link => {
+
+            if (
+                link.dataset.prefetchInitialized ===
+                "true"
+            ) {
+
+                return;
+
+            }
+
+
+            link.dataset.prefetchInitialized =
+                "true";
+
+
+            const href =
+                link.getAttribute(
+                    "href"
+                );
+
+
+            if (
+                !href ||
+                href.startsWith(
+                    "#"
+                ) ||
+                href.startsWith(
+                    "mailto:"
+                ) ||
+                href.startsWith(
+                    "tel:"
+                ) ||
+                href.startsWith(
+                    "javascript:"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            let url;
+
+
+            try {
+
+                url =
+                    new URL(
+                        href,
+                        window.location.href
+                    );
+
+            } catch (
+                error
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                url.origin !==
+                window.location.origin
+            ) {
+
+                return;
+
+            }
+
+
+            link.addEventListener(
+                "mouseenter",
+                () => {
+
+                    if (
+                        document.querySelector(
+                            `link[rel="prefetch"][href="${url.href}"]`
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const prefetch =
+                        document.createElement(
+                            "link"
+                        );
+
+
+                    prefetch.rel =
+                        "prefetch";
+
+
+                    prefetch.href =
+                        url.href;
+
+
+                    document.head.appendChild(
+                        prefetch
+                    );
+
+                },
+                {
+                    once:
+                        true
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   ACCESSIBILITY — KEYBOARD NAVIGATION
+============================================================ */
+
+function initializeKeyboardAccessibility() {
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key !==
+                "Tab"
+            ) {
+
+                return;
+
+            }
+
+
+            document.body.classList.add(
+                "keyboard-navigation"
+            );
+
+        }
+    );
+
+
+    document.addEventListener(
+        "mousedown",
+        () => {
+
+            document.body.classList.remove(
+                "keyboard-navigation"
+            );
+
+        },
+        {
+            passive:
+                true
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SKIP TO CONTENT
+============================================================ */
+
+function initializeSkipLink() {
+
+    let skip =
+        document.querySelector(
+            ".skip-to-content"
+        );
+
+
+    if (
+        skip
+    ) {
+
+        return;
+
+    }
+
+
+    const target =
+        document.querySelector(
+            "#main-content, main, [role='main']"
+        );
+
+
+    if (
+        !target
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !target.id
+    ) {
+
+        target.id =
+            "main-content";
+
+    }
+
+
+    skip =
+        createElement(
+            "a",
+            {
+
+                className:
+                    "skip-to-content",
+
+                href:
+                    `#${target.id}`
+
+            }
+        );
+
+
+    skip.textContent =
+        "मुख्य सामग्री पर जाएँ";
+
+
+    document.body.prepend(
+        skip
+    );
+
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+============================================================ */
+
+function initializeReducedMotion() {
+
+    const media =
+        window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        );
+
+
+    const update =
+        () => {
+
+            if (
+                media.matches
+            ) {
+
+                document.documentElement.classList.add(
+                    "reduced-motion"
+                );
+
+            } else {
+
+                document.documentElement.classList.remove(
+                    "reduced-motion"
+                );
+
+            }
+
+        };
+
+
+    update();
+
+
+    if (
+        typeof media.addEventListener ===
+        "function"
+    ) {
+
+        media.addEventListener(
+            "change",
+            update
+        );
+
+    } else if (
+        typeof media.addListener ===
+        "function"
+    ) {
+
+        media.addListener(
+            update
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   MOBILE VIEWPORT FIX
+============================================================ */
+
+function initializeViewportHeight() {
+
+    const setViewportHeight =
+        () => {
+
+            const height =
+                window.innerHeight *
+                0.01;
+
+
+            document.documentElement.style.setProperty(
+                "--vh",
+                `${height}px`
+            );
+
+        };
+
+
+    setViewportHeight();
+
+
+    window.addEventListener(
+        "resize",
+        setViewportHeight,
+        {
+            passive:
+                true
+        }
+    );
+
+
+    window.addEventListener(
+        "orientationchange",
+        setViewportHeight,
+        {
+            passive:
+                true
+        }
+    );
+
+}
+
+
+/* ============================================================
+   SCROLL LOCK HELPERS
+============================================================ */
+
+function lockBodyScroll() {
+
+    document.body.classList.add(
+        "scroll-locked"
+    );
+
+}
+
+
+function unlockBodyScroll() {
+
+    document.body.classList.remove(
+        "scroll-locked"
+    );
+
+}
+
+
+/* ============================================================
+   FINAL LAZY IMAGE INITIALIZATION
+============================================================ */
+
+function initializeFinalLazyImages() {
+
+    $$(
+        "img[loading='lazy']"
+    )
+    .forEach(
+        image => {
+
+            if (
+                image.complete
+            ) {
+
+                return;
+
+            }
+
+
+            image.addEventListener(
+                "load",
+                () => {
+
+                    image.classList.add(
+                        "image-loaded"
+                    );
+
+                },
+                {
+                    once:
+                        true
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+   PAGE LOADING COMPLETE
+============================================================ */
+
+function markPageLoaded() {
+
+    document.documentElement.classList.add(
+        "page-loaded"
+    );
+
+
+    document.body.classList.add(
+        "page-ready"
+    );
+
+
+    const loader =
+        document.querySelector(
+            "#pageLoader, " +
+            ".page-loader, " +
+            "[data-page-loader]"
+        );
+
+
+    if (
+        loader
+    ) {
+
+        loader.classList.add(
+            "is-hidden"
+        );
+
+
+        setTimeout(
+            () => {
+
+                loader.setAttribute(
+                    "hidden",
+                    ""
+                );
+
+            },
+            500
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   PERFORMANCE MONITOR
+============================================================ */
+
+function initializePerformanceMonitor() {
+
+    if (
+        !window.performance
+    ) {
+
+        return;
+
+    }
+
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            setTimeout(
+                () => {
+
+                    const navigation =
+                        performance.getEntriesByType(
+                            "navigation"
+                        )[0];
+
+
+                    if (
+                        navigation
+                    ) {
+
+                        console.info(
+                            "Awaaz Rajasthan page load:",
+                            Math.round(
+                                navigation.loadEventEnd -
+                                navigation.startTime
+                            ),
+                            "ms"
+                        );
+
+                    }
+
+                },
+                0
+            );
+
+        },
+        {
+            once:
+                true
+        }
+    );
+
+}
+
+
+/* ============================================================
+   FINAL INITIALIZATION
+============================================================ */
+
+function initializeAwaazRajasthan() {
+
+    if (
+        window.__AWAazRajasthanInitialized
+    ) {
+
+        return;
+
+    }
+
+
+    window.__AWAazRajasthanInitialized =
+        true;
+
+
+    safeExecute(
+        initializeGlobalErrorHandler
+    );
+
+
+    safeExecute(
+        initializeImageFallbacks
+    );
+
+
+    safeExecute(
+        initializeNetworkMonitor
+    );
+
+
+    safeExecute(
+        initializeVisibilityHandler
+    );
+
+
+    safeExecute(
+        initializeFormProtection
+    );
+
+
+    safeExecute(
+        initializeImageDragProtection
+    );
+
+
+    safeExecute(
+        initializeExternalLinks
+    );
+
+
+    safeExecute(
+        initializeCurrentYear
+    );
+
+
+    safeExecute(
+        initializeCopyright
+    );
+
+
+    safeExecute(
+        initializeDefaultTitle
+    );
+
+
+    safeExecute(
+        initializeMetaDescription
+    );
+
+
+    safeExecute(
+        initializeLinkPrefetch
+    );
+
+
+    safeExecute(
+        initializeKeyboardAccessibility
+    );
+
+
+    safeExecute(
+        initializeSkipLink
+    );
+
+
+    safeExecute(
+        initializeReducedMotion
+    );
+
+
+    safeExecute(
+        initializeViewportHeight
+    );
+
+
+    safeExecute(
+        initializeFinalLazyImages
+    );
+
+
+    safeExecute(
+        initializePerformanceMonitor
+    );
+
+
+    safeExecute(
+        initializeUIHelpers
+    );
+
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "awaaz:ready"
+        )
+    );
+
+
+    setTimeout(
+        () => {
+
+            safeExecute(
+                markPageLoaded
+            );
+
+        },
+        50
+    );
+
+}
+
+
+/* ============================================================
+   DOM READY
+============================================================ */
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeAwaazRajasthan,
+        {
+            once:
+                true
+        }
+    );
+
+} else {
+
+    initializeAwaazRajasthan();
+
+}
+
+
+/* ============================================================
+   WINDOW LOAD
+============================================================ */
+
+window.addEventListener(
+    "load",
+    () => {
+
+        safeExecute(
+            initializeImageFallbacks
+        );
+
+
+        safeExecute(
+            initializeFinalLazyImages
+        );
+
+
+        safeExecute(
+            markPageLoaded
+        );
+
+    },
+    {
+        once:
+            true
+    }
+);
+
+
+/* ============================================================
+   FINAL GLOBAL OBJECT
+============================================================ */
+
+window.AwaazRajasthan =
+    window.AwaazRajasthan ||
+    {};
+
+
+window.AwaazRajasthan.config =
+    FinalConfig;
+
+
+window.AwaazRajasthan.state =
+    window.AwaazRajasthan.state ||
+    {};
+
+
+window.AwaazRajasthan.utils =
+    {
+
+        safe:
+            safeExecute,
+
+        scrollTop:
+            scrollToTop,
+
+        lockScroll:
+            lockBodyScroll,
+
+        unlockScroll:
+            unlockBodyScroll,
+
+        copy:
+            copyToClipboard
+
+    };
+
+
+/* ============================================================
+   DEBUG INFORMATION
+============================================================ */
+
+if (
+    window.location.hostname ===
+    "localhost" ||
+    window.location.hostname ===
+    "127.0.0.1"
+) {
+
+    console.info(
+        "आवाज़ राजस्थान frontend initialized successfully."
+    );
+
+}
+
+
+/* ============================================================
+   SCRIPT.JS COMPLETE
+============================================================
+
+   PART 01  ✓
+   PART 02  ✓
+   PART 03  ✓
+   PART 04  ✓
+   PART 05  ✓
+   PART 06  ✓
+   PART 07  ✓
+   PART 08  ✓
+   PART 09  ✓
+   PART 10  ✓
+   PART 11  ✓
+   PART 12  ✓
+   PART 13  ✓
+   PART 14  ✓
+   PART 15  ✓
+   PART 16  ✓
+   PART 17  ✓
+   PART 18  ✓
+   PART 19  ✓
+   PART 20  ✓
+   PART 21  ✓
+   PART 22  ✓
+   PART 23  ✓
+   PART 24  ✓
+   PART 25  ✓
+   PART 26  ✓
+   PART 27  ✓
+   PART 28  ✓
+   PART 29  ✓
+   PART 30  ✓
+
+============================================================ */
