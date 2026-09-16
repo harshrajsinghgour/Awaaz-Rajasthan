@@ -5163,25 +5163,101 @@ window.AwaazRajasthan.navigation = {
 /* ============================================================
    SEARCH CONFIGURATION
 ============================================================ */
-
 const SEARCH_CONFIG = {
 
     minQueryLength:
         2,
 
+    minLength:
+        2,
+
     debounceDelay:
+        350,
+
+    debounce:
         350,
 
     resultsPerPage:
         10,
 
+    resultsLimit:
+        12,
+
+    defaultLimit:
+        12,
+
+    maxLimit:
+        48,
+
+    limit:
+        12,
+
+    suggestionLimit:
+        6,
+
     historyKey:
         "awaaz_search_history",
 
     maxHistoryItems:
-        8
+        8,
+
+    maxHistory:
+        8,
+
+    historyLimit:
+        8,
+
+    maxRecentSearches:
+        8,
+
+    inputSelectors: [
+
+        "#searchInput",
+
+        "#headerSearchInput",
+
+        "#mobileSearchInput",
+
+        "#globalSearch",
+
+        ".search-input",
+
+        "[data-search-input]"
+
+    ],
+
+    resultSelectors: [
+
+        "#searchResults",
+
+        "#searchNews",
+
+        "#searchNewsGrid",
+
+        "#newsGrid",
+
+        ".search-results",
+
+        ".search-results-grid",
+
+        ".search-news-grid",
+
+        "[data-search-results]"
+
+    ],
+
+    suggestionSelectors: [
+
+        "#searchSuggestions",
+
+        ".search-suggestions",
+
+        "[data-search-suggestions]"
+
+    ]
 
 };
+
 
 
 /* ============================================================
