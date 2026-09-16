@@ -1,0 +1,13 @@
+{
+  "name":"आवाज़ राजस्थान",
+  "short_name":"आवाज़ राजस्थान",
+  "description":"राजस्थान की ताज़ा और स्थानीय खबरें",
+  "lang":"hi-IN",
+  "dir":"ltr",
+  "start_url":"/",
+  "scope":"/",
+  "display":"standalone",
+  "background_color":"#f4f5f7",
+  "theme_color":"#07111f",
+  "icons":[{"src":"/news-placeholder.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
