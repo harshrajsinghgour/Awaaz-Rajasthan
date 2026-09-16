@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
+const E_PAPER_URL = import.meta.env.VITE_E_PAPER_URL || "/epaper";
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
 
 const categories = [
   "होम","राजस्थान","जयपुर","जोधपुर","उदयपुर","कोटा","अजमेर","भीलवाड़ा",
@@ -50,6 +52,7 @@ function normalizeNews(item, index) {
 
 function AdSlot({position="home_top", className=""}) {
   const [ad, setAd] = useState(null);
+  const impressionSent = useRef(false);
   useEffect(() => {
     if (!API_BASE) return;
     fetch(`${API_BASE}/api/ads?position=${encodeURIComponent(position)}&device=${window.innerWidth < 768 ? "mobile" : "desktop"}`)
@@ -59,6 +62,13 @@ function AdSlot({position="home_top", className=""}) {
         if (list[0]) setAd(list[0]);
       }).catch(() => {});
   }, [position]);
+  useEffect(() => {
+    const id = ad?._id || ad?.id;
+    if (!API_BASE || !id || impressionSent.current) return;
+    impressionSent.current = true;
+    fetch(`${API_BASE}/api/ads/${id}/impression`, { method: "POST", credentials: "include" }).catch(() => {});
+  }, [ad]);
+
   if (!ad) return <div className={`ad-slot ${className}`}><span>विज्ञापन</span></div>;
   const href = ad.link || ad.targetUrl || "#";
   const image = ad.image || ad.imageUrl || ad.banner;
@@ -75,7 +85,8 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [article, setArticle] = useState(null);
-  const [bookmarks, setBookmarks] = useState(() => JSON.parse(localStorage.getItem("awaaz-bookmarks") || "[]"));
+  const [bookmarks, setBookmarks] = useState(() => { try { return JSON.parse(localStorage.getItem("awaaz-bookmarks") || "[]"); } catch { return []; } });
+  const [notificationState, setNotificationState] = useState("idle");
   const [savedOnly, setSavedOnly] = useState(false);
   const [toast, setToast] = useState("");
 
@@ -83,7 +94,7 @@ function App() {
     document.documentElement.lang = "hi";
     if (!API_BASE) return;
     let cancelled = false;
-    fetch(`${API_BASE}/api/news?limit=30`)
+    fetch(`${API_BASE}/api/news?limit=50`)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
         const list = Array.isArray(data) ? data : data.news || data.data || data.articles || [];
@@ -144,9 +155,72 @@ function App() {
     window.scrollTo({top:0, behavior:"smooth"});
   }
 
+  async function openArticle(item) {
+    setArticle(item);
+    window.history.replaceState(null, "", `#news-${encodeURIComponent(item.id)}`);
+    window.scrollTo({top:0, behavior:"smooth"});
+
+    if (!API_BASE || !item.id || String(item.id).startsWith("f")) return;
+    const candidates = [
+      `/api/news/${encodeURIComponent(item.id)}`,
+      `/api/articles/${encodeURIComponent(item.id)}`
+    ];
+    for (const path of candidates) {
+      try {
+        const response = await fetch(`${API_BASE}${path}`, { credentials:"include", headers:{Accept:"application/json"} });
+        if (!response.ok) continue;
+        const payload = await response.json();
+        const data = payload?.news || payload?.article || payload?.data || payload;
+        if (data && typeof data === "object") {
+          setArticle(prev => prev ? {
+            ...prev,
+            content: data.content || data.body || data.articleBody || data.text || data.description || prev.content,
+            excerpt: data.excerpt || data.summary || data.description || prev.excerpt,
+            image: data.image || data.imageUrl || data.thumbnail || prev.image,
+            author: data.author || data.reporter || prev.author
+          } : prev);
+          break;
+        }
+      } catch {}
+    }
+  }
+
   function closeArticle() {
     setArticle(null);
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+
+  async function subscribeNotifications() {
+    if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+      setNotificationState("error");
+      setToast("इस डिवाइस पर नोटिफिकेशन उपलब्ध नहीं है");
+      return;
+    }
+    setNotificationState("loading");
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") throw new Error("permission");
+      const registration = await navigator.serviceWorker.register("/sw.js");
+      if (VAPID_PUBLIC_KEY && "PushManager" in window) {
+        const padding = "=".repeat((4 - VAPID_PUBLIC_KEY.length % 4) % 4);
+        const base64 = (VAPID_PUBLIC_KEY + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const raw = window.atob(base64);
+        const key = Uint8Array.from([...raw].map(char => char.charCodeAt(0)));
+        const subscription = await registration.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:key });
+        if (API_BASE) {
+          await fetch(`${API_BASE}/api/notifications/subscribe`, {
+            method:"POST", credentials:"include",
+            headers:{"Content-Type":"application/json",Accept:"application/json"},
+            body:JSON.stringify(subscription)
+          });
+        }
+      }
+      setNotificationState("on");
+      setToast("नोटिफिकेशन चालू हो गए");
+    } catch {
+      setNotificationState("error");
+      setToast("नोटिफिकेशन सेट नहीं हो सके");
+    }
   }
 
   return (
@@ -167,9 +241,9 @@ function App() {
           </button>
           <div className="header-actions">
             <button className="header-btn" onClick={() => setSearchOpen(v=>!v)} aria-label="सर्च"><Icon name="search"/></button>
-            <button className="header-btn notification-button" onClick={() => setNotificationOpen(v=>!v)} aria-label="नोटिफिकेशन"><Icon name="bell"/><em>3</em></button>
+            <button className="header-btn notification-button" onClick={() => setNotificationOpen(v=>!v)} aria-label="नोटिफिकेशन"><Icon name="bell"/><em className={notificationState === "on" ? "on" : ""}>{notificationState === "on" ? "✓" : "3"}</em></button>
           </div>
-          {notificationOpen && <div className="notification-pop"><b>नवीनतम अपडेट</b><p>ताज़ा खबरों के लिए नोटिफिकेशन जल्द उपलब्ध होगा।</p><button onClick={()=>setNotificationOpen(false)}>ठीक है</button></div>}
+          {notificationOpen && <div className="notification-pop"><b>नवीनतम अपडेट</b><p>आवाज़ राजस्थान की महत्वपूर्ण खबरों की सूचना सीधे आपके डिवाइस पर पाएं।</p><button onClick={subscribeNotifications}>{notificationState === "on" ? "नोटिफिकेशन चालू हैं" : notificationState === "loading" ? "सेट हो रहा है…" : "नोटिफिकेशन चालू करें"}</button>{notificationState === "error" && <small>ब्राउज़र की notification permission जांचें।</small>}</div>}
         </div>
 
         <div className={`nav-wrap ${menuOpen ? "nav-open" : ""}`}>
@@ -242,7 +316,7 @@ function App() {
                 <div className="widget-head"><div><span className="section-kicker">TRENDING</span><h3>आज की चर्चा</h3></div><span className="fire"><Icon name="fire"/></span></div>
                 {trending.map((item,index)=><button className="trend-item" key={item.id} onClick={()=>openArticle(item)}><b>{String(index+1).padStart(2,"0")}</b><span>{item.title}</span></button>)}
               </div>
-              <div className="widget quick-widget"><div className="widget-head"><div><span className="section-kicker">स्पेशल</span><h3>ई-पेपर</h3></div></div><div className="epaper"><div className="paper-lines"><i></i><i></i><i></i><i></i><i></i></div><div><b>आज का ई-पेपर</b><span>मुख्य पृष्ठ और प्रमुख खबरें</span></div><button>देखें <Icon name="arrow"/></button></div></div>
+              <div className="widget quick-widget"><div className="widget-head"><div><span className="section-kicker">स्पेशल</span><h3>ई-पेपर</h3></div></div><div className="epaper"><div className="paper-lines"><i></i><i></i><i></i><i></i><i></i></div><div><b>आज का ई-पेपर</b><span>मुख्य पृष्ठ और प्रमुख खबरें</span></div><a href={E_PAPER_URL}>देखें <Icon name="arrow"/></a></div></div>
             </aside>
           </div>
         </section>
@@ -273,7 +347,7 @@ function App() {
             <h1>{article.title}</h1>
             <div className="article-meta"><span><Icon name="clock"/> {article.time}</span><span><Icon name="location"/> {article.location}</span><span>रिपोर्ट: {article.author}</span></div>
             <p className="article-lead">{article.excerpt}</p>
-            <div className="article-placeholder">यह न्यूज़ डिटेल पेज API से मिलने वाली पूरी खबर की सामग्री दिखाने के लिए तैयार है। बैकएंड से content/body मिलने पर यही स्थान विस्तृत समाचार, फोटो और संबंधित खबरों को प्रदर्शित करेगा।</div>
+            {article.content ? <div className="article-body">{String(article.content).split(/\n+/).filter(Boolean).map((paragraph,index)=><p key={index}>{paragraph}</p>)}</div> : <div className="article-placeholder">पूरी खबर की सामग्री उपलब्ध होने पर यहां विस्तृत समाचार प्रदर्शित होगा।</div>}
             <div className="article-tools"><button className={bookmarks.includes(String(article.id)) ? "saved":""} onClick={()=>toggleBookmark(article.id)}><Icon name="bookmark"/> {bookmarks.includes(String(article.id)) ? "सेव है":"सेव करें"}</button><button onClick={()=>shareArticle(article)}><Icon name="share"/> शेयर</button></div>
           </div>
         </div>
