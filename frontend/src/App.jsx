@@ -149,12 +149,6 @@ function App() {
     } catch {}
   }
 
-  function openArticle(item) {
-    setArticle(item);
-    window.history.replaceState(null, "", `#news-${item.id}`);
-    window.scrollTo({top:0, behavior:"smooth"});
-  }
-
   async function openArticle(item) {
     setArticle(item);
     window.history.replaceState(null, "", `#news-${encodeURIComponent(item.id)}`);
