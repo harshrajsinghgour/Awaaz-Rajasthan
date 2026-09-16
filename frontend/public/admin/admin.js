@@ -12,7 +12,7 @@ function toast(msg){const e=document.createElement("div");e.className="toast";e.
 async function boot(){try{me=(await api("/api/admin/me")).admin;showPanel();loadAll()}catch{showLogin()}}
 function showLogin(){$("login").classList.remove("hidden");$("panel").classList.add("hidden")}
 function showPanel(){$("login").classList.add("hidden");$("panel").classList.remove("hidden");document.querySelector('[data-tab="ads"]').style.display=me.role==="owner"?"":"none";document.querySelector('[data-tab="admins"]').style.display=me.role==="owner"?"":"none"}
-$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="";try{const r=await api("/api/admin/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});me=r.admin;showPanel();loadAll()}catch(err){$("loginError").textContent=err.message}};
+$("loginForm").onsubmit=async e=>{e.preventDefault();setApiBase();if(!API){$("loginError").textContent="पहले Backend API URL भरें।";return;}$("loginError").textContent="";try{const r=await api("/api/admin/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});me=r.admin;showPanel();loadAll()}catch(err){$("loginError").textContent=err.message}};
 $("logout").onclick=async()=>{await api("/api/admin/logout",{method:"POST"});location.reload()};
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button,.tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active")});
 async function loadAll(){await loadDashboard();await loadNews();if(me.role==="owner"){await loadAds();await loadAdmins()}}
