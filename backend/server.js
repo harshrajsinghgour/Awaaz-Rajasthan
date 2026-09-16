@@ -215,7 +215,12 @@ app.post("/api/admin/login", async(req,res,next)=>{
   }catch(e){next(e);}
 });
 app.post("/api/admin/logout",(req,res)=>{res.clearCookie("awaaz_admin",{httpOnly:true,secure:process.env.COOKIE_SECURE!=="false",sameSite:process.env.COOKIE_SECURE!=="false"?"none":"lax",path:"/"});res.json({ok:true});});
-app.get("/api/admin/me",auth,(req,res)=>res.json({admin:safe(req.admin)}));\napp.post("/api/admin/change-password",auth,authLimiter,async(req,res,next)=>{\n  try{const current=String(req.body.currentPassword||""),nextPassword=String(req.body.newPassword||"");if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});if(!(await bcrypt.compare(current,req.admin.passwordHash)))return res.status(401).json({message:"Current password is incorrect"});req.admin.passwordHash=await bcrypt.hash(nextPassword,12);req.admin.sessionVersion+=1;await req.admin.save();setCookie(res,sign(req.admin));res.json({ok:true});}catch(e){next(e);}\n});\napp.post("/api/admin/logout-all",auth,async(req,res)=>{req.admin.sessionVersion+=1;await req.admin.save();res.clearCookie("awaaz_admin",{httpOnly:true,secure:process.env.COOKIE_SECURE!=="false",sameSite:process.env.COOKIE_SECURE!=="false"?"none":"lax",path:"/"});res.json({ok:true});});\n
+app.get("/api/admin/me",auth,(req,res)=>res.json({admin:safe(req.admin)}));
+app.post("/api/admin/change-password",auth,authLimiter,async(req,res,next)=>{
+  try{const current=String(req.body.currentPassword||""),nextPassword=String(req.body.newPassword||"");if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});if(!(await bcrypt.compare(current,req.admin.passwordHash)))return res.status(401).json({message:"Current password is incorrect"});req.admin.passwordHash=await bcrypt.hash(nextPassword,12);req.admin.sessionVersion+=1;await req.admin.save();setCookie(res,sign(req.admin));res.json({ok:true});}catch(e){next(e);}
+});
+app.post("/api/admin/logout-all",auth,async(req,res)=>{req.admin.sessionVersion+=1;await req.admin.save();res.clearCookie("awaaz_admin",{httpOnly:true,secure:process.env.COOKIE_SECURE!=="false",sameSite:process.env.COOKIE_SECURE!=="false"?"none":"lax",path:"/"});res.json({ok:true});});
+
 
 app.get("/api/admin/dashboard",auth,async(req,res,next)=>{
   try{
