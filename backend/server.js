@@ -82,6 +82,7 @@ const adminSchema = new mongoose.Schema({
   role: { type: String, enum: ["owner","admin","editor"], default: "editor", index: true },
   permissions: { type: [String], default: [] },
   active: { type: Boolean, default: true },
+  sessionVersion: { type: Number, default: 0 },
   lastLoginAt: { type: Date, default: null }
 }, { timestamps: true });
 
@@ -105,7 +106,7 @@ const upload = multer({
   fileFilter: (_req, file, cb) => cb(/^(image\\/(jpeg|png|webp|gif)|application\\/pdf)$/.test(file.mimetype) ? null : new Error("केवल JPG, PNG, WEBP, GIF या PDF फ़ाइल स्वीकार है।"), true)
 });
 
-const sign = admin => jwt.sign({ sub: String(admin._id), role: admin.role, email: admin.email }, JWT_SECRET, { expiresIn: "8h" });
+const sign = admin => jwt.sign({ sub: String(admin._id), role: admin.role, email: admin.email, sv: admin.sessionVersion || 0 }, JWT_SECRET, { expiresIn: "8h" });
 const safe = admin => { const o = admin.toObject ? admin.toObject() : admin; delete o.passwordHash; return o; };
 const activeAd = (ad, now = new Date()) => ad.status === "active" && (!ad.startDate || ad.startDate <= now) && (!ad.endDate || ad.endDate >= now);
 const slugify = value => String(value).toLowerCase().trim().replace(/[^a-z0-9\\u0900-\\u097f]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 150) || crypto.randomUUID();
@@ -114,7 +115,7 @@ function setCookie(res, token) {
   res.cookie("awaaz_admin", token, {
     httpOnly: true,
     secure: process.env.COOKIE_SECURE !== "false",
-    sameSite: "lax",
+    sameSite: process.env.COOKIE_SECURE !== "false" ? "none" : "lax",
     maxAge: 8 * 60 * 60 * 1000,
     path: "/"
   });
@@ -125,7 +126,7 @@ async function auth(req, res, next) {
     if (!token) return res.status(401).json({ message: "Authentication required" });
     const p = jwt.verify(token, JWT_SECRET);
     const admin = await Admin.findById(p.sub);
-    if (!admin || !admin.active) return res.status(401).json({ message: "Session expired" });
+    if (!admin || !admin.active || Number(p.sv || 0) !== Number(admin.sessionVersion || 0)) return res.status(401).json({ message: "Session expired" });
     req.admin = admin;
     next();
   } catch { res.status(401).json({ message: "Invalid or expired session" }); }
@@ -213,8 +214,8 @@ app.post("/api/admin/login", async(req,res,next)=>{
     res.json({admin:safe(admin)});
   }catch(e){next(e);}
 });
-app.post("/api/admin/logout",(req,res)=>{res.clearCookie("awaaz_admin",{httpOnly:true,secure:process.env.COOKIE_SECURE!=="false",sameSite:"lax",path:"/"});res.json({ok:true});});
-app.get("/api/admin/me",auth,(req,res)=>res.json({admin:safe(req.admin)}));
+app.post("/api/admin/logout",(req,res)=>{res.clearCookie("awaaz_admin",{httpOnly:true,secure:process.env.COOKIE_SECURE!=="false",sameSite:process.env.COOKIE_SECURE!=="false"?"none":"lax",path:"/"});res.json({ok:true});});
+app.get("/api/admin/me",auth,(req,res)=>res.json({admin:safe(req.admin)}));\napp.post("/api/admin/change-password",auth,authLimiter,async(req,res,next)=>{\n  try{const current=String(req.body.currentPassword||""),nextPassword=String(req.body.newPassword||"");if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});if(!(await bcrypt.compare(current,req.admin.passwordHash)))return res.status(401).json({message:"Current password is incorrect"});req.admin.passwordHash=await bcrypt.hash(nextPassword,12);req.admin.sessionVersion+=1;await req.admin.save();setCookie(res,sign(req.admin));res.json({ok:true});}catch(e){next(e);}\n});\napp.post("/api/admin/logout-all",auth,async(req,res)=>{req.admin.sessionVersion+=1;await req.admin.save();res.clearCookie("awaaz_admin",{httpOnly:true,secure:process.env.COOKIE_SECURE!=="false",sameSite:process.env.COOKIE_SECURE!=="false"?"none":"lax",path:"/"});res.json({ok:true});});\n
 
 app.get("/api/admin/dashboard",auth,async(req,res,next)=>{
   try{
@@ -265,10 +266,10 @@ app.get("/api/admin/ad-analytics",auth,ownerOnly,async(_req,res,next)=>{
 
 app.get("/api/admin/admins",auth,ownerOnly,async(_req,res,next)=>{try{res.json({admins:await Admin.find({}).select("-passwordHash").sort({createdAt:1}).lean()});}catch(e){next(e);}});
 app.post("/api/admin/admins",auth,ownerOnly,async(req,res,next)=>{
-  try{const b=req.body||{},email=String(b.email||"").toLowerCase().trim();if(!email||!b.password)return res.status(400).json({message:"Email and password required"});if(await Admin.exists({email}))return res.status(409).json({message:"Admin already exists"});const a=await Admin.create({name:b.name,email,passwordHash:await bcrypt.hash(String(b.password),12),role:b.role||"editor",permissions:Array.isArray(b.permissions)?b.permissions:[]});res.status(201).json({admin:safe(a)});}catch(e){next(e);}
+  try{const b=req.body||{},email=String(b.email||"").toLowerCase().trim();if(!email||!b.password)return res.status(400).json({message:"Email and password required"});if(b.role==="owner")return res.status(400).json({message:"Owner role is reserved"});if(await Admin.exists({email}))return res.status(409).json({message:"Admin already exists"});const a=await Admin.create({name:b.name,email,passwordHash:await bcrypt.hash(String(b.password),12),role:b.role||"editor",permissions:Array.isArray(b.permissions)?b.permissions:[]});res.status(201).json({admin:safe(a)});}catch(e){next(e);}
 });
 app.patch("/api/admin/admins/:id",auth,ownerOnly,async(req,res,next)=>{
-  try{const u={};["name","role","permissions","active"].forEach(k=>{if(req.body[k]!==undefined)u[k]=req.body[k]});if(req.body.password)u.passwordHash=await bcrypt.hash(String(req.body.password),12);const a=await Admin.findByIdAndUpdate(req.params.id,u,{new:true,runValidators:true});if(!a)return res.status(404).json({message:"Admin not found"});res.json({admin:safe(a)});}catch(e){next(e);}
+  try{const u={};["name","permissions","active"].forEach(k=>{if(req.body[k]!==undefined)u[k]=req.body[k]});if(req.body.role!==undefined){if(req.body.role==="owner")return res.status(400).json({message:"Owner role is reserved"});u.role=req.body.role;}if(req.body.password)u.passwordHash=await bcrypt.hash(String(req.body.password),12);const a=await Admin.findByIdAndUpdate(req.params.id,u,{new:true,runValidators:true});if(!a)return res.status(404).json({message:"Admin not found"});res.json({admin:safe(a)});}catch(e){next(e);}
 });
 app.delete("/api/admin/admins/:id",auth,ownerOnly,async(req,res,next)=>{try{if(String(req.admin._id)===req.params.id)return res.status(400).json({message:"Owner cannot delete own account"});await Admin.findByIdAndDelete(req.params.id);res.json({ok:true});}catch(e){next(e);}});
 
