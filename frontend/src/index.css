@@ -121,3 +121,26 @@ main{min-height:60vh}.hero-shell{padding:22px 0 60px}
   .article-overlay{padding:0;align-items:flex-end}.article-modal{max-height:94vh;border-radius:16px 16px 0 0}.article-cover{height:210px}.article-content{padding:17px}.article-content h1{font-size:21px}.article-lead{font-size:13px}.article-placeholder{font-size:12px}
 }
 @media(min-width:768px){.app{min-height:100vh}}
+
+
+/* Production hardening */
+.header-btn em.on{background:#198754}
+.notification-pop small{display:block;color:var(--red);font-size:9px;margin-top:8px}
+.section-tools{display:flex;align-items:center;gap:10px}
+.refresh-btn{width:32px;height:32px;border:1px solid var(--line);background:#fff;border-radius:50%;display:grid;place-items:center;color:#6b7280}
+.refresh-btn .svg-icon{width:15px;height:15px}
+.refresh-btn:disabled .svg-icon{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.article-body{font-size:15px;line-height:2;color:#252d37}
+.article-body p{margin:0 0 15px}
+.epaper a{grid-column:2;border:0;background:var(--gold);color:#111;border-radius:5px;padding:7px 9px;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:5px}
+.epaper a .svg-icon{width:13px;height:13px}
+@media(max-width:767px){
+  .section-tools{gap:6px}
+  .refresh-btn{width:28px;height:28px}
+  .article-body{font-size:13px;line-height:1.9}
+  .epaper{grid-template-columns:42px 1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  .refresh-btn:disabled .svg-icon{animation:none}
+}
