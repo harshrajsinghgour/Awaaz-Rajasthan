@@ -6,6 +6,7 @@ import App from "./AppProduction";
 import "./index.css";
 import "./production-polish.css";
 import "./app-production.css";
+import "./final-production-polish.css";
 
 function handlePwaShortcut() {
   const section = new URLSearchParams(window.location.search).get("section");
