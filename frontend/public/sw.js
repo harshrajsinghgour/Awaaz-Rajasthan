@@ -1,4 +1,4 @@
-const CACHE = "awaaz-rajasthan-v4";
+const CACHE = "awaaz-rajasthan-v5";
 const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -13,7 +13,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
       .then((keys) => Promise.all(
-        keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))
+        keys.filter((key) => key.startsWith("awaaz-rajasthan-") && key !== CACHE).map((key) => caches.delete(key))
       ))
       .then(() => self.clients.claim())
   );
@@ -21,10 +21,8 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
-
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
-
   if (url.pathname === "/admin" || url.pathname.startsWith("/admin/") || url.pathname.startsWith("/api/")) return;
 
   event.respondWith(
@@ -67,12 +65,13 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   const target = event.notification.data?.url || "/";
-
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true })
       .then((list) => {
         for (const client of list) {
-          if ("focus" in client && "navigate" in client) return client.navigate(target).then(() => client.focus());
+          if ("focus" in client && "navigate" in client) {
+            return client.navigate(target).then(() => client.focus());
+          }
         }
         return clients.openWindow(target);
       })
