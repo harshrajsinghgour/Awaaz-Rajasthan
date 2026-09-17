@@ -47,3 +47,5 @@ services:
         sync: false
       - key: PUSH_WORKER_POLL_MS
         value: "30000"
+      - key: PUSH_WORKER_CONCURRENCY
+        value: "10"
