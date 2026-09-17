@@ -49,3 +49,5 @@ services:
         value: "30000"
       - key: PUSH_WORKER_CONCURRENCY
         value: "10"
+      - key: PUSH_WORKER_CLAIM_TIMEOUT_MS
+        value: "600000"
