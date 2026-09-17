@@ -25,20 +25,30 @@ function syncMobileNavigation() {
 
   if (!buttons[1].dataset.productionBound) {
     buttons[1].dataset.productionBound = "1";
-    buttons[1].addEventListener("click", () => {
+    buttons[1].addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
       const target = [...document.querySelectorAll(".category-nav button")]
         .find((node) => node.textContent?.includes("राजस्थान"));
       target?.click();
-      scrollToElement(".latest-section");
+      window.setTimeout(() => scrollToElement(".latest-section"), 0);
     });
   }
   if (!buttons[2].dataset.productionBound) {
     buttons[2].dataset.productionBound = "1";
-    buttons[2].addEventListener("click", () => scrollToElement(".district-section"));
+    buttons[2].addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      scrollToElement(".district-section");
+    });
   }
   if (!buttons[3].dataset.productionBound) {
     buttons[3].dataset.productionBound = "1";
-    buttons[3].addEventListener("click", () => scrollToElement(".live-hub"));
+    buttons[3].addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      scrollToElement(".live-hub");
+    });
   }
 }
 
@@ -56,15 +66,27 @@ function renderLiveHub() {
     else main.appendChild(hub);
   }
 
-  const existingKey = hub.dataset.key || "";
   const key = `${LIVE_TV_URL}|${tickerButtons.map((node) => node.textContent).join("|")}`;
-  if (existingKey === key) return;
+  if (hub.dataset.key === key) return;
   hub.dataset.key = key;
+  hub.replaceChildren();
 
-  hub.innerHTML = "";
   const header = document.createElement("div");
   header.className = "live-hub-head";
-  header.innerHTML = `<div><span class="section-label">LIVE DESK</span><h2>लाइव न्यूज़</h2><p>ब्रेकिंग अपडेट्स और लाइव कवरेज एक ही जगह।</p></div><span class="live-status"><i></i> LIVE</span>`;
+  const headingWrap = document.createElement("div");
+  const label = document.createElement("span");
+  label.className = "section-label";
+  label.textContent = "LIVE DESK";
+  const heading = document.createElement("h2");
+  heading.textContent = "लाइव न्यूज़";
+  const description = document.createElement("p");
+  description.textContent = "ब्रेकिंग अपडेट्स और लाइव कवरेज एक ही जगह।";
+  headingWrap.append(label, heading, description);
+  const status = document.createElement("span");
+  status.className = "live-status";
+  const statusDot = document.createElement("i");
+  status.append(statusDot, document.createTextNode(" LIVE"));
+  header.append(headingWrap, status);
   hub.appendChild(header);
 
   const grid = document.createElement("div");
@@ -76,7 +98,16 @@ function renderLiveHub() {
     tv.href = LIVE_TV_URL;
     tv.target = "_blank";
     tv.rel = "noopener noreferrer";
-    tv.innerHTML = `<div class="live-tv-art"><span>▶</span></div><div><b>आवाज़ राजस्थान LIVE TV</b><small>लाइव कवरेज देखें</small></div>`;
+    const art = document.createElement("div");
+    art.className = "live-tv-art";
+    art.textContent = "▶";
+    const copy = document.createElement("div");
+    const title = document.createElement("b");
+    title.textContent = "आवाज़ राजस्थान LIVE TV";
+    const meta = document.createElement("small");
+    meta.textContent = "लाइव कवरेज देखें";
+    copy.append(title, meta);
+    tv.append(art, copy);
     grid.appendChild(tv);
   }
 
@@ -84,7 +115,14 @@ function renderLiveHub() {
     const card = document.createElement("button");
     card.className = "live-news-card";
     card.type = "button";
-    card.innerHTML = `<span class="live-dot">LIVE</span><strong>${source.textContent || "ताज़ा अपडेट"}</strong><small>ब्रेकिंग अपडेट ${index + 1}</small>`;
+    const live = document.createElement("span");
+    live.className = "live-dot";
+    live.textContent = "LIVE";
+    const title = document.createElement("strong");
+    title.textContent = source.textContent || "ताज़ा अपडेट";
+    const meta = document.createElement("small");
+    meta.textContent = `ब्रेकिंग अपडेट ${index + 1}`;
+    card.append(live, title, meta);
     card.addEventListener("click", () => source.click());
     grid.appendChild(card);
   });
