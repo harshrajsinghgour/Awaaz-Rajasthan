@@ -3,10 +3,12 @@ import ReactDOM from "react-dom/client";
 import "./article-route.js";
 import "./seo-runtime.js";
 import App from "./AppProduction";
+import ProductionEnhancements from "./production-enhancements";
 import "./index.css";
 import "./production-polish.css";
 import "./app-production.css";
 import "./final-production-polish.css";
+import "./production-completion.css";
 
 function handlePwaShortcut() {
   const section = new URLSearchParams(window.location.search).get("section");
@@ -43,7 +45,7 @@ function AppBootstrap() {
     handlePwaShortcut();
   }, []);
 
-  return <App />;
+  return <><App /><ProductionEnhancements /></>;
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
