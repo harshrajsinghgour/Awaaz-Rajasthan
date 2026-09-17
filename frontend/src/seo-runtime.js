@@ -23,6 +23,11 @@
     el.setAttribute("content", value);
   }
 
+  function removeMeta(key, property = false) {
+    const attr = property ? "property" : "name";
+    document.head.querySelector(`meta[${attr}="${key}"]`)?.remove();
+  }
+
   function setCanonical(href) {
     let el = document.head.querySelector('link[rel="canonical"]');
     if (!el) {
@@ -46,6 +51,10 @@
     setMeta("twitter:description", DEFAULT_DESCRIPTION);
     setMeta("twitter:image", DEFAULT_IMAGE);
     setCanonical(`${ORIGIN}/`);
+    removeMeta("article:section", true);
+    removeMeta("article:published_time", true);
+    removeMeta("article:modified_time", true);
+    removeMeta("article:author", true);
   }
 
   function build() {
@@ -65,16 +74,16 @@
     );
 
     const rawImage = modal.querySelector(".article-cover")?.getAttribute("src");
-    const image = rawImage ? new URL(rawImage, ORIGIN).href : DEFAULT_IMAGE;
-    const path = window.location.pathname.startsWith("/news/")
-      ? window.location.pathname
-      : `${window.location.pathname}`;
-    const canonical = `${ORIGIN}${path}`;
+    let image = DEFAULT_IMAGE;
+    try { if (rawImage) image = new URL(rawImage, ORIGIN).href; } catch { /* keep default */ }
+
+    const canonical = `${ORIGIN}${window.location.pathname || "/"}`;
     const byline = clean(modal.querySelector(".article-byline span")?.textContent) || "आवाज़ राजस्थान";
     const category = clean(modal.querySelector(".news-kicker")?.textContent).split("•")[0].trim();
-    const datePublished = modal.querySelector("time[datetime]")?.getAttribute("datetime") || undefined;
+    const time = modal.querySelector("time[datetime]");
+    const datePublished = time?.getAttribute("datetime") || "";
     const articleBody = clean(modal.querySelector(".article-body")?.textContent);
-    const wordCount = articleBody ? articleBody.split(/\s+/u).filter(Boolean).length : undefined;
+    const wordCount = articleBody ? articleBody.split(/\s+/u).filter(Boolean).length : 0;
 
     document.title = `${title} | आवाज़ राजस्थान`;
     setMeta("description", description);
@@ -88,6 +97,9 @@
     setMeta("twitter:description", description);
     setMeta("twitter:image", image);
     setMeta("twitter:image:alt", title);
+    setMeta("article:section", category, true);
+    setMeta("article:published_time", datePublished, true);
+    setMeta("article:author", byline, true);
     setCanonical(canonical);
 
     let script = document.getElementById(SCRIPT_ID);
@@ -119,6 +131,17 @@
     if (category) article.articleSection = category;
     if (datePublished) article.datePublished = datePublished;
     if (wordCount) article.wordCount = wordCount;
+
+    // A visible publication time is the most reliable runtime signal available
+    // in the current renderer. Do not fabricate a modification timestamp.
+    const modified = modal.querySelector("time[data-modified][datetime]")?.getAttribute("datetime");
+    if (modified) {
+      article.dateModified = modified;
+      setMeta("article:modified_time", modified, true);
+    } else {
+      removeMeta("article:modified_time", true);
+    }
+
     script.textContent = JSON.stringify(article);
   }
 
@@ -136,7 +159,7 @@
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ["src", "datetime"]
+    attributeFilter: ["src", "datetime", "data-modified"]
   });
   window.addEventListener("popstate", schedule);
   window.addEventListener("hashchange", schedule);
