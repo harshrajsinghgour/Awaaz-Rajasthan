@@ -41,6 +41,7 @@ app.use(cookieParser());
 app.use(morgan(isProd ? "combined" : "dev"));
 
 app.use("/api", rateLimit({ windowMs: 15 * 60 * 1000, limit: 500, standardHeaders: "draft-8", legacyHeaders: false }));
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: "draft-8", legacyHeaders: false });
 app.use("/api/admin/login", rateLimit({ windowMs: 15 * 60 * 1000, limit: 25, standardHeaders: "draft-8", legacyHeaders: false }));
 app.use("/uploads", express.static(uploadDir, { maxAge: "7d", immutable: true }));
 
@@ -103,13 +104,13 @@ const upload = multer({
     filename: (_req, file, cb) => cb(null, crypto.randomBytes(10).toString("hex") + path.extname(file.originalname).toLowerCase())
   }),
   limits: { fileSize: Number(process.env.MAX_UPLOAD_MB || 8) * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => cb(/^(image\\/(jpeg|png|webp|gif)|application\\/pdf)$/.test(file.mimetype) ? null : new Error("केवल JPG, PNG, WEBP, GIF या PDF फ़ाइल स्वीकार है।"), true)
+  fileFilter: (_req, file, cb) => cb(/^(image\/(jpeg|png|webp|gif)|application\/pdf)$/.test(file.mimetype) ? null : new Error("केवल JPG, PNG, WEBP, GIF या PDF फ़ाइल स्वीकार है।"), true)
 });
 
 const sign = admin => jwt.sign({ sub: String(admin._id), role: admin.role, email: admin.email, sv: admin.sessionVersion || 0 }, JWT_SECRET, { expiresIn: "8h" });
 const safe = admin => { const o = admin.toObject ? admin.toObject() : admin; delete o.passwordHash; return o; };
 const activeAd = (ad, now = new Date()) => ad.status === "active" && (!ad.startDate || ad.startDate <= now) && (!ad.endDate || ad.endDate >= now);
-const slugify = value => String(value).toLowerCase().trim().replace(/[^a-z0-9\\u0900-\\u097f]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 150) || crypto.randomUUID();
+const slugify = value => String(value).toLowerCase().trim().replace(/[^a-z0-9\u0900-\u097f]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 150) || crypto.randomUUID();
 
 function setCookie(res, token) {
   res.cookie("awaaz_admin", token, {
@@ -122,14 +123,15 @@ function setCookie(res, token) {
 }
 async function auth(req, res, next) {
   try {
-    const token = req.cookies.awaaz_admin || String(req.headers.authorization || "").replace(/^Bearer\\s+/i, "");
+    const token = req.cookies.awaaz_admin || String(req.headers.authorization || "").replace(/^Bearer\s+/i, "");
     if (!token) return res.status(401).json({ message: "Authentication required" });
     const p = jwt.verify(token, JWT_SECRET);
     const admin = await Admin.findById(p.sub);
     if (!admin || !admin.active || Number(p.sv || 0) !== Number(admin.sessionVersion || 0)) return res.status(401).json({ message: "Session expired" });
     req.admin = admin;
     next();
-  } catch { res.status(401).json({ message: "Invalid or expired session" }); }
+  } catch { res.status(401).json({ message: "Invalid or expired session" });
+  }
 }
 function ownerOnly(req, res, next) {
   if (req.admin.role !== "owner") return res.status(403).json({ message: "केवल owner यह कार्रवाई कर सकता है।" });
@@ -217,10 +219,18 @@ app.post("/api/admin/login", async(req,res,next)=>{
 app.post("/api/admin/logout",(req,res)=>{res.clearCookie("awaaz_admin",{httpOnly:true,secure:process.env.COOKIE_SECURE!=="false",sameSite:process.env.COOKIE_SECURE!=="false"?"none":"lax",path:"/"});res.json({ok:true});});
 app.get("/api/admin/me",auth,(req,res)=>res.json({admin:safe(req.admin)}));
 app.post("/api/admin/change-password",auth,authLimiter,async(req,res,next)=>{
-  try{const current=String(req.body.currentPassword||""),nextPassword=String(req.body.newPassword||"");if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});if(!(await bcrypt.compare(current,req.admin.passwordHash)))return res.status(401).json({message:"Current password is incorrect"});req.admin.passwordHash=await bcrypt.hash(nextPassword,12);req.admin.sessionVersion+=1;await req.admin.save();setCookie(res,sign(req.admin));res.json({ok:true});}catch(e){next(e);}
+  try{
+    const current=String(req.body.currentPassword||""),nextPassword=String(req.body.newPassword||"");
+    if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});
+    if(!(await bcrypt.compare(current,req.admin.passwordHash)))return res.status(401).json({message:"Current password is incorrect"});
+    req.admin.passwordHash=await bcrypt.hash(nextPassword,12);
+    req.admin.sessionVersion+=1;
+    await req.admin.save();
+    setCookie(res,sign(req.admin));
+    res.json({ok:true});
+  }catch(e){next(e);}
 });
 app.post("/api/admin/logout-all",auth,async(req,res)=>{req.admin.sessionVersion+=1;await req.admin.save();res.clearCookie("awaaz_admin",{httpOnly:true,secure:process.env.COOKIE_SECURE!=="false",sameSite:process.env.COOKIE_SECURE!=="false"?"none":"lax",path:"/"});res.json({ok:true});});
-
 
 app.get("/api/admin/dashboard",auth,async(req,res,next)=>{
   try{
