@@ -39,9 +39,7 @@ async function claimDelivery(newsId) {
   if (existing?.status === "sent") return null;
   if (existing?.status === "processing" && existing.lockedAt && existing.lockedAt >= cutoff) return null;
   try {
-    const filter = existing
-      ? { newsId, status: "processing", lockedAt: { $lt: cutoff } }
-      : { newsId };
+    const filter = existing ? { newsId, status: "processing", lockedAt: { $lt: cutoff } } : { newsId };
     const row = await Delivery.findOneAndUpdate(
       filter,
       { $set: { claimToken, status: "processing", lockedAt: new Date() }, $setOnInsert: { deliveredEndpoints: [] } },
@@ -73,10 +71,7 @@ async function claim(newsId) {
 
 async function releaseClaim(newsId, claimToken) {
   if (!claimToken) return;
-  await Delivery.updateOne(
-    { newsId, claimToken, status: "processing" },
-    { $set: { claimToken: "", lockedAt: null } }
-  );
+  await Delivery.updateOne({ newsId, claimToken, status: "processing" }, { $set: { claimToken: "", lockedAt: null } });
 }
 
 async function markSent(newsId, claimToken) {
@@ -88,10 +83,8 @@ async function markSent(newsId, claimToken) {
 }
 
 async function markDelivered(newsId, claimToken, endpoint) {
-  await Delivery.updateOne(
-    { newsId, claimToken, status: "processing" },
-    { $addToSet: { deliveredEndpoints: endpoint } }
-  );
+  if (!endpoint) return;
+  await Delivery.updateOne({ newsId, claimToken, status: "processing" }, { $addToSet: { deliveredEndpoints: endpoint } });
 }
 
 async function sendOne(row, payload) {
@@ -110,12 +103,12 @@ async function sendOne(row, payload) {
 
 async function sendToSubscribers(news, claimToken) {
   const subscribers = await Subscriber.find({ active: true }).select("endpoint subscription").lean();
-  if (!subscribers.length) return { sent: 0, removed: 0, retry: 0, remaining: 0 };
+  if (!subscribers.length) return { sent: 0, removed: 0, retry: 0, remaining: 0, noSubscribers: true };
 
   const delivery = await Delivery.findOne({ newsId: news._id, claimToken, status: "processing" }).select("deliveredEndpoints").lean();
   const delivered = new Set(Array.isArray(delivery?.deliveredEndpoints) ? delivery.deliveredEndpoints : []);
   const pending = subscribers.filter(row => row.endpoint && !delivered.has(String(row.endpoint)));
-  if (!pending.length) return { sent: 0, removed: 0, retry: 0, remaining: 0 };
+  if (!pending.length) return { sent: 0, removed: 0, retry: 0, remaining: 0, noSubscribers: false };
 
   const payload = JSON.stringify({
     title: "🔴 ब्रेकिंग न्यूज़ — आवाज़ राजस्थान",
@@ -139,7 +132,7 @@ async function sendToSubscribers(news, claimToken) {
   const latest = await Delivery.findOne({ newsId: news._id, claimToken, status: "processing" }).select("deliveredEndpoints").lean();
   const done = new Set(Array.isArray(latest?.deliveredEndpoints) ? latest.deliveredEndpoints : []);
   const remaining = subscribers.filter(row => row.endpoint && !done.has(String(row.endpoint))).length;
-  return { sent, removed, retry, remaining };
+  return { sent, removed, retry, remaining, noSubscribers: false };
 }
 
 async function processBreakingNews() {
@@ -150,19 +143,14 @@ async function processBreakingNews() {
     if (!claimToken) continue;
     try {
       const result = await sendToSubscribers(news, claimToken);
-      if (!result.sent && !result.removed && !result.retry && !result.remaining) {
+      if (result.noSubscribers) {
         await releaseClaim(news._id, claimToken);
-        console.log(`Push already delivered for ${news._id}`);
+        console.log(`Push deferred for ${news._id}: no active subscribers`);
         continue;
       }
-      if (!result.sent && !result.removed && !result.retry && result.remaining === 0) {
+      if (result.remaining === 0) {
         await markSent(news._id, claimToken);
-        console.log(`Push delivery complete for ${news._id}`);
-        continue;
-      }
-      if (result.remaining === 0 && !result.retry) {
-        await markSent(news._id, claimToken);
-        console.log(`Push processed for ${news._id}: sent=${result.sent}, removed=${result.removed}`);
+        console.log(`Push delivery complete for ${news._id}: sent=${result.sent}, removed=${result.removed}, retry=${result.retry}`);
       } else {
         await releaseClaim(news._id, claimToken);
         console.log(`Push pending retry for ${news._id}: sent=${result.sent}, removed=${result.removed}, retry=${result.retry}, remaining=${result.remaining}`);
