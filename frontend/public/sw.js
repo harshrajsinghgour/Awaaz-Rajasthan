@@ -1,5 +1,18 @@
-const CACHE = "awaaz-rajasthan-v6";
+const CACHE = "awaaz-rajasthan-v7";
 const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/manifest.webmanifest"];
+
+function safeNotificationUrl(value) {
+  const fallback = "/";
+  if (typeof value !== "string" || !value.trim()) return fallback;
+  try {
+    const url = new URL(value, self.location.origin);
+    if (url.origin !== self.location.origin) return fallback;
+    if (url.pathname === "/admin" || url.pathname.startsWith("/admin/") || url.pathname.startsWith("/api/")) return fallback;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return fallback;
+  }
+}
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -61,7 +74,7 @@ self.addEventListener("push", (event) => {
       badge: data.badge || "/news-placeholder.svg",
       tag: data.tag || "awaaz-rajasthan-news",
       renotify: Boolean(data.renotify),
-      data: { url: data.url || "/" },
+      data: { url: safeNotificationUrl(data.url) },
       vibrate: [100, 50, 100]
     })
   );
@@ -69,7 +82,7 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const target = event.notification.data?.url || "/";
+  const target = safeNotificationUrl(event.notification.data?.url);
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true })
       .then((list) => {
