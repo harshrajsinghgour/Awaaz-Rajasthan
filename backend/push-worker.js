@@ -7,6 +7,7 @@ const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT;
 const POLL_MS = Math.max(Number(process.env.PUSH_WORKER_POLL_MS || 30000), 10000);
+const PUSH_CONCURRENCY = Math.min(Math.max(Number(process.env.PUSH_WORKER_CONCURRENCY || 10), 1), 50);
 
 if (!MONGODB_URI) throw new Error("MONGODB_URI is required for push worker");
 if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY || !VAPID_SUBJECT) throw new Error("VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY and VAPID_SUBJECT are required for push worker");
@@ -45,13 +46,27 @@ function newsUrl(news) {
   return `/news/${encodeURIComponent(String(value))}`;
 }
 
+async function sendOne(row, payload) {
+  try {
+    await webpush.sendNotification(row.subscription, payload);
+    return { sent: 1, removed: 0 };
+  } catch (error) {
+    if (error?.statusCode === 404 || error?.statusCode === 410) {
+      await Subscriber.updateOne({ _id: row._id }, { $set: { active: false } });
+      return { sent: 0, removed: 1 };
+    }
+    console.error("Push delivery failed:", error?.statusCode || error?.message || error);
+    return { sent: 0, removed: 0 };
+  }
+}
+
 async function sendToSubscribers(news) {
   const subscribers = await Subscriber.find({ active: true }).lean();
   if (!subscribers.length) return { sent: 0, removed: 0 };
 
   const payload = JSON.stringify({
     title: "🔴 ब्रेकिंग न्यूज़ — आवाज़ राजस्थान",
-    body: String(news.title || "राजस्थान की बड़ी खबर") .slice(0, 180),
+    body: String(news.title || "राजस्थान की बड़ी खबर").slice(0, 180),
     url: newsUrl(news),
     tag: `news-${news._id}`,
     renotify: true
@@ -59,17 +74,12 @@ async function sendToSubscribers(news) {
 
   let sent = 0;
   let removed = 0;
-  for (const row of subscribers) {
-    try {
-      await webpush.sendNotification(row.subscription, payload);
-      sent += 1;
-    } catch (error) {
-      if (error?.statusCode === 404 || error?.statusCode === 410) {
-        await Subscriber.updateOne({ _id: row._id }, { $set: { active: false } });
-        removed += 1;
-      } else {
-        console.error("Push delivery failed:", error?.statusCode || error?.message || error);
-      }
+  for (let i = 0; i < subscribers.length; i += PUSH_CONCURRENCY) {
+    const batch = subscribers.slice(i, i + PUSH_CONCURRENCY);
+    const results = await Promise.all(batch.map(row => sendOne(row, payload)));
+    for (const result of results) {
+      sent += result.sent;
+      removed += result.removed;
     }
   }
   return { sent, removed };
@@ -93,7 +103,7 @@ async function processBreakingNews() {
 
 async function main() {
   await mongoose.connect(MONGODB_URI);
-  console.log(`Awaaz Rajasthan push worker started; polling every ${POLL_MS}ms`);
+  console.log(`Awaaz Rajasthan push worker started; polling every ${POLL_MS}ms; concurrency=${PUSH_CONCURRENCY}`);
   let running = false;
   const tick = async () => {
     if (running) return;
