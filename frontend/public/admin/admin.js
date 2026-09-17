@@ -6,6 +6,7 @@ function initApiBase(){const input=$("apiBase");if(input)input.value=getApiBase(
 async function api(path,options={}){const base=getApiBase();if(!base)throw new Error("पहले Backend API URL भरें।");const opts={credentials:"include",...options};opts.headers={"Content-Type":"application/json",...(options.headers||{})};const r=await fetch(base+path,opts);let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.message||"Request failed");return d;}
 function esc(v){return String(v??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]));}
 function toast(msg){const e=document.createElement("div");e.className="toast";e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),2200);}
+function formatDate(value){if(!value)return "अभी तक कोई subscription नहीं";try{return new Date(value).toLocaleString("hi-IN",{day:"numeric",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"});}catch{return "अभी तक कोई subscription नहीं";}}
 async function boot(){initApiBase();try{me=(await api("/api/admin/me")).admin;showPanel();await loadAll()}catch{showLogin()}}
 function showLogin(){$("login").classList.remove("hidden");$("panel").classList.add("hidden")}
 function showPanel(){$("login").classList.add("hidden");$("panel").classList.remove("hidden");document.querySelector('[data-tab="ads"]').style.display=me.role==="owner"?"":"none";document.querySelector('[data-tab="admins"]').style.display=me.role==="owner"?"":"none";$("notificationControl").classList.toggle("hidden",me.role!=="owner")}
@@ -13,9 +14,10 @@ $("loginForm").onsubmit=async e=>{e.preventDefault();const base=setApiBase();if(
 $("logout").onclick=async()=>{try{await api("/api/admin/logout",{method:"POST"})}finally{location.reload()}};
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button,.tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active")});
 $("goBreaking").onclick=()=>{document.querySelector('[data-tab="news"]').click();$("newsForm").classList.remove("hidden");scrollTo(0,0)};
-async function loadAll(){await loadDashboard();await loadNews();if(me.role==="owner"){await loadAds();await loadAdmins()}}
+async function loadAll(){await loadDashboard();await loadNews();if(me.role==="owner"){await Promise.all([loadAds(),loadAdmins(),loadNotificationStatus()])}}
 async function loadDashboard(){const r=await api("/api/admin/dashboard");$("stats").innerHTML=Object.entries(r.stats).map(([k,v])=>'<div class="stat"><small>'+esc(k)+'</small><b>'+Number(v).toLocaleString()+'</b></div>').join("")}
-$("refresh").onclick=loadDashboard;
+async function loadNotificationStatus(){if(me?.role!=="owner")return;const card=$("notificationControl");if(!card)return;const status=card.querySelector(".notify-status");if(!status)return;try{const r=await api("/api/admin/notifications/status");const s=r.stats||{};const active=Number(s.active||0),total=Number(s.total||0);status.innerHTML='<span class="status-dot '+(active>0?'online':'')+'"></span><b>'+active.toLocaleString()+" active devices</b><small>कुल subscriptions: "+total.toLocaleString()+" · आखिरी subscription: "+esc(formatDate(s.latestSubscribedAt))+'</small>';}catch(err){status.innerHTML='<span class="status-dot"></span><b>Notification status unavailable</b><small>'+esc(err.message)+'</small>';}}
+$("refresh").onclick=async()=>{await loadDashboard();if(me?.role==="owner")await loadNotificationStatus()};
 async function loadNews(){const r=await api("/api/admin/news");news=r.news;renderNews()}
 function renderNews(){$("newsList").innerHTML=news.map(n=>'<div class="list-row"><div><b>'+esc(n.title)+'</b><small>'+esc(n.category)+' · '+esc(n.status)+' · views '+(n.views||0)+'</small></div><div><button onclick="editNews(\\''+n._id+'\\')">Edit</button><button class="danger" onclick="deleteNews(\\''+n._id+'\\')">Delete</button></div></div>').join("")||"<p>कोई खबर नहीं।</p>"}
 $("newNews").onclick=()=>{$("newsForm").classList.remove("hidden");$("newsForm").reset();$("newsId").value=""};
