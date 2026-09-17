@@ -1,4 +1,4 @@
-const CACHE = "awaaz-rajasthan-v8";
+const CACHE = "awaaz-rajasthan-v9";
 const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/app-icon.svg", "/manifest.webmanifest"];
 
 function safeNotificationUrl(value) {
@@ -67,12 +67,16 @@ self.addEventListener("push", (event) => {
     data = { title: event.data?.text() };
   }
 
+  const title = String(data.title || "आवाज़ राजस्थान").slice(0, 120);
+  const body = String(data.body || "नई खबर उपलब्ध है।").slice(0, 220);
+  const tag = String(data.tag || "awaaz-rajasthan-news").slice(0, 100);
+
   event.waitUntil(
-    self.registration.showNotification(data.title || "आवाज़ राजस्थान", {
-      body: data.body || "नई खबर उपलब्ध है।",
+    self.registration.showNotification(title, {
+      body,
       icon: "/app-icon.svg",
       badge: "/app-icon.svg",
-      tag: data.tag || "awaaz-rajasthan-news",
+      tag,
       renotify: Boolean(data.renotify),
       data: { url: safeNotificationUrl(data.url) },
       vibrate: [100, 50, 100]
