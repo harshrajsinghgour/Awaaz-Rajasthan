@@ -1,7 +1,0 @@
-Contact: mailto:security@awaazrajasthan.in
-Expires: 2027-09-17T00:00:00.000Z
-Preferred-Languages: hi, en
-Canonical: /.well-known/security.txt
-
-# Replace the contact address above with the production security mailbox
-# if the domain/mailbox differs before launch.
