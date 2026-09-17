@@ -27,3 +27,23 @@ services:
         sync: false
       - key: VAPID_SUBJECT
         sync: false
+
+  - type: worker
+    name: awaaz-rajasthan-push-worker
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm run push-worker
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        sync: false
+      - key: PUSH_WORKER_POLL_MS
+        value: "30000"
