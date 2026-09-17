@@ -57,11 +57,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Validate required deployment files
+      - name: Validate deployment files and PWA assets
         run: |
           test -f frontend/public/manifest.webmanifest
           test -f frontend/public/sw.js
           test -f frontend/public/robots.txt
           test -f render.yaml
           test -f backend/server.production.js
-          echo "Deployment files OK"
+          node -e "JSON.parse(require('fs').readFileSync('frontend/public/manifest.webmanifest','utf8')); console.log('manifest.webmanifest JSON OK')"
+          node --check frontend/public/sw.js
+          echo "Deployment files and PWA assets OK"
