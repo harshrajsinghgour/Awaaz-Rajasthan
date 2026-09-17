@@ -1,4 +1,4 @@
-const CACHE = "awaaz-rajasthan-v5";
+const CACHE = "awaaz-rajasthan-v6";
 const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -29,8 +29,13 @@ self.addEventListener("fetch", (event) => {
     fetch(event.request)
       .then((response) => {
         if (!response || !response.ok) return response;
-        const copy = response.clone();
-        caches.open(CACHE).then((cache) => cache.put(event.request, copy)).catch(() => {});
+        if (event.request.mode === "navigate") {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put("/index.html", copy)).catch(() => {});
+        } else if (url.pathname.startsWith("/assets/") || url.pathname.endsWith(".css") || url.pathname.endsWith(".js") || url.pathname.endsWith(".svg")) {
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(event.request, copy)).catch(() => {});
+        }
         return response;
       })
       .catch(() => caches.match(event.request).then((cached) => {
