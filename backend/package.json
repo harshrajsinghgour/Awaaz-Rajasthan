@@ -1,6 +1,6 @@
 {
   "name": "awaaz-rajasthan-backend",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": true,
   "type": "module",
   "engines": { "node": ">=20" },
@@ -17,7 +17,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^2.4.0",
     "web-push": "^3.6.7"
   }
 }
