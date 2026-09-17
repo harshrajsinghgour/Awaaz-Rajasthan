@@ -29,9 +29,12 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
+      - name: Validate Vercel configuration
+        working-directory: .
+        run: node -e "const fs=require('fs'); const v=JSON.parse(fs.readFileSync('frontend/vercel.json','utf8')); if(!Array.isArray(v.rewrites)||!Array.isArray(v.headers)) throw new Error('Invalid frontend/vercel.json'); console.log('Vercel configuration OK')"
 
   backend-install:
-    name: Backend dependency check
+    name: Backend dependency and syntax check
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -49,3 +52,17 @@ jobs:
         run: npm install
       - name: Verify server syntax
         run: node --check server.js
+
+  deployment-config:
+    name: Deployment configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Validate required deployment files
+        run: |
+          test -f frontend/public/manifest.webmanifest
+          test -f frontend/public/sw.js
+          test -f frontend/public/robots.txt
+          test -f render.yaml
+          echo "Deployment files OK"
