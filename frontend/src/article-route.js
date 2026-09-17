@@ -1,6 +1,6 @@
 // Article URL bridge.
-// Keeps the existing React article loader compatible while exposing
-// shareable /news/<id> paths instead of hash-only article URLs.
+// The production app uses clean /news/<slug> URLs. The temporary hash bridge
+// is kept only for the legacy loader and is removed after React has mounted.
 (function setupArticleRoute() {
   const PREFIX = "/news/";
   const HASH_PREFIX = "#news-";
@@ -36,21 +36,32 @@
     if (!bridgeUrl(originalPushState, state, title, url)) originalPushState(state, title, url);
   };
 
-  const initialId = idFromPath();
-  if (initialId && !window.location.hash) {
+  function bootstrapLegacyHash() {
+    const initialId = idFromPath();
+    if (!initialId || window.location.hash) return;
     const cleanUrl = window.location.pathname + window.location.search;
     originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(initialId)}`);
-    window.setTimeout(() => {
-      if (window.location.pathname.startsWith(PREFIX) && window.location.hash.startsWith(HASH_PREFIX)) {
-        originalReplaceState(null, "", cleanUrl);
+
+    let attempts = 0;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      const mounted = document.querySelector(".article-modal");
+      const stillOnArticle = window.location.pathname.startsWith(PREFIX);
+      if (!stillOnArticle || mounted || attempts >= 30) {
+        window.clearInterval(timer);
+        if (stillOnArticle && window.location.hash.startsWith(HASH_PREFIX)) {
+          originalReplaceState(null, "", cleanUrl);
+        }
       }
-    }, 1800);
+    }, 100);
   }
+
+  bootstrapLegacyHash();
 
   window.addEventListener("popstate", () => {
     const id = idFromPath();
-    if (!id) return;
+    if (!id || window.location.hash) return;
     const cleanUrl = window.location.pathname + window.location.search;
-    if (!window.location.hash) originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(id)}`);
+    originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(id)}`);
   });
 })();
