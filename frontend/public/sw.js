@@ -1,4 +1,4 @@
-const CACHE = "awaaz-rajasthan-v9";
+const CACHE = "awaaz-rajasthan-v10";
 const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/app-icon.svg", "/manifest.webmanifest"];
 
 function safeNotificationUrl(value) {
@@ -67,9 +67,10 @@ self.addEventListener("push", (event) => {
     data = { title: event.data?.text() };
   }
 
-  const title = String(data.title || "आवाज़ राजस्थान").slice(0, 120);
-  const body = String(data.body || "नई खबर उपलब्ध है।").slice(0, 220);
-  const tag = String(data.tag || "awaaz-rajasthan-news").slice(0, 100);
+  const title = String(data.title || "आवाज़ राजस्थान").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 120) || "आवाज़ राजस्थान";
+  const body = String(data.body || "नई खबर उपलब्ध है।").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 220) || "नई खबर उपलब्ध है।";
+  const tag = String(data.tag || "awaaz-rajasthan-news").replace(/[^a-zA-Z0-9._:-]/g, "-").slice(0, 100) || "awaaz-rajasthan-news";
+  const url = safeNotificationUrl(data.url);
 
   event.waitUntil(
     self.registration.showNotification(title, {
@@ -78,7 +79,7 @@ self.addEventListener("push", (event) => {
       badge: "/app-icon.svg",
       tag,
       renotify: Boolean(data.renotify),
-      data: { url: safeNotificationUrl(data.url) },
+      data: { url },
       vibrate: [100, 50, 100]
     })
   );
@@ -89,11 +90,13 @@ self.addEventListener("notificationclick", (event) => {
   const target = safeNotificationUrl(event.notification.data?.url);
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true })
-      .then((list) => {
-        for (const client of list) {
-          if ("focus" in client && "navigate" in client) {
-            return client.navigate(target).then(() => client.focus());
-          }
+      .then(async (list) => {
+        const sameOrigin = list.find((client) => {
+          try { return new URL(client.url).origin === self.location.origin; } catch { return false; }
+        });
+        if (sameOrigin && "focus" in sameOrigin) {
+          if ("navigate" in sameOrigin) await sameOrigin.navigate(target);
+          return sameOrigin.focus();
         }
         return clients.openWindow(target);
       })
