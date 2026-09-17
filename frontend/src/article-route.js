@@ -57,6 +57,7 @@ async function bootstrapArticlePath() {
 
   const cleanUrl = window.location.pathname + window.location.search;
   const resolvedId = await resolveArticleId(initialValue);
+  if (!window.location.pathname.startsWith(PREFIX) || window.location.hash) return;
   originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(resolvedId)}`);
 
   let attempts = 0;
@@ -73,12 +74,13 @@ async function bootstrapArticlePath() {
   }, 100);
 }
 
-bootstrapArticlePath();
+void bootstrapArticlePath();
 
 window.addEventListener("popstate", async () => {
   const value = idFromPath();
   if (!value || window.location.hash) return;
   const cleanUrl = window.location.pathname + window.location.search;
   const resolvedId = await resolveArticleId(value);
+  if (!window.location.pathname.startsWith(PREFIX) || window.location.hash) return;
   originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(resolvedId)}`);
 });
