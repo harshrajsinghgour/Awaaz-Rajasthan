@@ -1,4 +1,4 @@
-const CACHE = "awaaz-rajasthan-v2";
+const CACHE = "awaaz-rajasthan-v3";
 const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -25,8 +25,9 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Never cache the admin console. This prevents stale admin UI/auth pages.
-  if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) return;
+  // Never cache admin or API responses. News/admin data must always respect
+  // the live backend instead of being served from a stale browser cache.
+  if (url.pathname === "/admin" || url.pathname.startsWith("/admin/") || url.pathname.startsWith("/api/")) return;
 
   event.respondWith(
     fetch(event.request)
