@@ -1,7 +1,7 @@
 // Clean article URL bridge.
-// Resolve /news/<slug> to the Mongo article id so the production React
-// loader can open the correct article even when it is not in the first page.
-const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
+// Keep the public /news/<slug-or-id> URL intact and let the article API
+// resolve the slug itself. This avoids an extra API read that would also
+// increment the article view counter before the real article load.
 const PREFIX = "/news/";
 const HASH_PREFIX = "#news-";
 const originalReplaceState = window.history.replaceState.bind(window.history);
@@ -15,21 +15,6 @@ function idFromPath(pathname = window.location.pathname) {
 
 function pathForId(id) {
   return `${PREFIX}${encodeURIComponent(String(id))}`;
-}
-
-async function resolveArticleId(value) {
-  if (!API_BASE || !value) return value;
-  try {
-    const response = await fetch(`${API_BASE}/api/news/${encodeURIComponent(value)}`, {
-      headers: { Accept: "application/json" }
-    });
-    if (!response.ok) return value;
-    const data = await response.json();
-    const item = data?.news || data?.data || data?.article || data;
-    return String(item?._id || item?.id || value);
-  } catch {
-    return value;
-  }
 }
 
 function bridgeUrl(original, state, title, url) {
@@ -51,14 +36,12 @@ window.history.pushState = function articleAwarePushState(state, title, url) {
   if (!bridgeUrl(originalPushState, state, title, url)) originalPushState(state, title, url);
 };
 
-async function bootstrapArticlePath() {
+function bootstrapArticlePath() {
   const initialValue = idFromPath();
   if (!initialValue || window.location.hash) return;
 
   const cleanUrl = window.location.pathname + window.location.search;
-  const resolvedId = await resolveArticleId(initialValue);
-  if (!window.location.pathname.startsWith(PREFIX) || window.location.hash) return;
-  originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(resolvedId)}`);
+  originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(initialValue)}`);
 
   let attempts = 0;
   const timer = window.setInterval(() => {
@@ -74,13 +57,11 @@ async function bootstrapArticlePath() {
   }, 100);
 }
 
-void bootstrapArticlePath();
+bootstrapArticlePath();
 
-window.addEventListener("popstate", async () => {
+window.addEventListener("popstate", () => {
   const value = idFromPath();
   if (!value || window.location.hash) return;
   const cleanUrl = window.location.pathname + window.location.search;
-  const resolvedId = await resolveArticleId(value);
-  if (!window.location.pathname.startsWith(PREFIX) || window.location.hash) return;
-  originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(resolvedId)}`);
+  originalReplaceState(null, "", `${cleanUrl}${HASH_PREFIX}${encodeURIComponent(value)}`);
 });
