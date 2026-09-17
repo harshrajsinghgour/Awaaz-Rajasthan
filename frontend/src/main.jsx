@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./AppProduction";
 import "./index.css";
 import "./production-polish.css";
+import "./app-production.css";
 
 if ("serviceWorker" in navigator && import.meta.env.PROD) {
   window.addEventListener("load", () => {
