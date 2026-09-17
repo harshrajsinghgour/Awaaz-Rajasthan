@@ -48,8 +48,10 @@ jobs:
         run: npm install
       - name: Verify production server syntax
         run: node --check server.production.js
+      - name: Verify push worker syntax
+        run: node --check push-worker.js
       - name: Verify package start command
-        run: node -e "const p=require('./package.json'); if(p.scripts?.start!=='node server.production.js') throw new Error('package start must use server.production.js'); console.log('Backend start command OK')"
+        run: node -e "const p=require('./package.json'); if(p.scripts?.start!=='node server.production.js') throw new Error('package start must use server.production.js'); if(p.scripts?.['push-worker']!=='node push-worker.js') throw new Error('push-worker script must use push-worker.js'); console.log('Backend commands OK')"
 
   deployment-config:
     name: Deployment configuration
@@ -64,6 +66,7 @@ jobs:
           test -f frontend/public/robots.txt
           test -f render.yaml
           test -f backend/server.production.js
+          test -f backend/push-worker.js
           node -e "JSON.parse(require('fs').readFileSync('frontend/public/manifest.webmanifest','utf8')); console.log('manifest.webmanifest JSON OK')"
           node --check frontend/public/sw.js
           echo "Deployment files and PWA assets OK"
