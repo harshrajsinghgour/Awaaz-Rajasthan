@@ -194,7 +194,8 @@ export default function AppProduction() {
     setToast(exists ? "खबर सेव से हटाई गई" : "खबर सेव हो गई");
   }
   async function share(item) {
-    const url = `${window.location.origin}${window.location.pathname}#news-${encodeURIComponent(item.id)}`;
+    const slugOrId = encodeURIComponent(item.slug || item.id);
+    const url = `${window.location.origin}/news/${slugOrId}`;
     try {
       if (navigator.share) await navigator.share({ title: item.title, text: item.excerpt, url });
       else { await navigator.clipboard.writeText(url); setToast("लिंक कॉपी हो गया"); }
