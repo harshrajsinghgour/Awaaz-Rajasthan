@@ -73,6 +73,8 @@
     const byline = clean(modal.querySelector(".article-byline span")?.textContent) || "आवाज़ राजस्थान";
     const category = clean(modal.querySelector(".news-kicker")?.textContent).split("•")[0].trim();
     const datePublished = modal.querySelector("time[datetime]")?.getAttribute("datetime") || undefined;
+    const articleBody = clean(modal.querySelector(".article-body")?.textContent);
+    const wordCount = articleBody ? articleBody.split(/\s+/u).filter(Boolean).length : undefined;
 
     document.title = `${title} | आवाज़ राजस्थान`;
     setMeta("description", description);
@@ -81,9 +83,11 @@
     setMeta("og:type", "article", true);
     setMeta("og:url", canonical, true);
     setMeta("og:image", image, true);
+    setMeta("og:image:alt", title, true);
     setMeta("twitter:title", title);
     setMeta("twitter:description", description);
     setMeta("twitter:image", image);
+    setMeta("twitter:image:alt", title);
     setCanonical(canonical);
 
     let script = document.getElementById(SCRIPT_ID);
@@ -100,18 +104,21 @@
       headline: title,
       description,
       inLanguage: "hi-IN",
+      isAccessibleForFree: true,
       mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
       author: { "@type": "Person", name: byline },
       publisher: {
         "@type": "NewsMediaOrganization",
         name: "आवाज़ राजस्थान",
-        logo: { "@type": "ImageObject", url: DEFAULT_IMAGE }
+        url: ORIGIN,
+        logo: { "@type": "ImageObject", url: `${ORIGIN}/app-icon.svg` }
       },
       image: [image]
     };
 
     if (category) article.articleSection = category;
     if (datePublished) article.datePublished = datePublished;
+    if (wordCount) article.wordCount = wordCount;
     script.textContent = JSON.stringify(article);
   }
 
