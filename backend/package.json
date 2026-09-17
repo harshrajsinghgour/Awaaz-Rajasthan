@@ -1,10 +1,10 @@
 {
   "name": "awaaz-rajasthan-backend",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "engines": { "node": ">=20" },
-  "scripts": { "start": "node server.js", "dev": "node --watch server.js" },
+  "scripts": { "start": "node server.production.js", "dev": "node --watch server.production.js" },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.5",
