@@ -1,0 +1,9 @@
+{
+  "name": "आवाज़ राजस्थान",
+  "short_name": "आवाज़ राजस्थान",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f5f7",
+  "theme_color": "#07111f",
+  "lang": "hi-IN"
+}
