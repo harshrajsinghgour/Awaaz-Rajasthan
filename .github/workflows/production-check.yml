@@ -30,6 +30,13 @@ jobs:
       - name: Validate Vercel configuration
         working-directory: .
         run: node -e "const fs=require('fs'); const v=JSON.parse(fs.readFileSync('frontend/vercel.json','utf8')); if(!Array.isArray(v.rewrites)||!Array.isArray(v.headers)) throw new Error('Invalid frontend/vercel.json'); console.log('Vercel configuration OK')"
+      - name: Validate frontend production contracts
+        working-directory: .
+        run: |
+          ! grep -R -n 'home_mid' frontend/src frontend/public/admin || (echo 'Unsupported ad position home_mid found; use home_inline' && exit 1)
+          grep -R -n 'home_inline' frontend/src/AppProduction.jsx
+          grep -R -n 'api/ads' frontend/src/AppProduction.jsx
+          grep -R -n 'api/notifications/subscribe' frontend/src/AppProduction.jsx
 
   backend-install:
     name: Backend dependency and syntax check
@@ -52,6 +59,13 @@ jobs:
         run: node --check push-worker.js
       - name: Verify package start command
         run: node -e "const p=require('./package.json'); if(p.scripts?.start!=='node server.production.js') throw new Error('package start must use server.production.js'); if(p.scripts?.['push-worker']!=='node push-worker.js') throw new Error('push-worker script must use push-worker.js'); console.log('Backend commands OK')"
+      - name: Validate backend production contracts
+        run: |
+          grep -n 'ownerOnly' server.production.js
+          grep -n 'api/admin/upload' server.production.js
+          grep -n 'api/notifications/subscribe' server.production.js
+          grep -n 'api/ads/:id/impression' server.production.js
+          grep -n 'api/ads/:id/click' server.production.js
 
   deployment-config:
     name: Deployment configuration
