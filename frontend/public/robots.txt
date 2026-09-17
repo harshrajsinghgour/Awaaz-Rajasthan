@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /admin/
 
-Sitemap: https://awaazrajasthan.in/sitemap.xml
+# Add the canonical production sitemap URL here after the public domain is finalized.
