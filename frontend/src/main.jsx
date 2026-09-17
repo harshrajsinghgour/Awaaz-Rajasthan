@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./article-route.js";
 import App from "./AppProduction";
 import "./index.css";
 import "./production-polish.css";
