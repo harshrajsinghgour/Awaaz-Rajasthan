@@ -1,0 +1,67 @@
+/* Production UI polish: intentionally additive so the main design remains intact. */
+@media (max-width: 767px){
+  .site-container{width:calc(100% - 20px)}
+  .utility-inner{min-height:28px}
+  .header-main{min-height:68px;gap:9px}
+  .brand-mark{width:46px;height:46px;border-width:2px}
+  .brand-mark span{font-size:22px}
+  .brand-mark i{bottom:2px;font-size:7px}
+  .brand-copy strong{font-size:20px}
+  .brand-copy small{font-size:7px;letter-spacing:1.5px;margin-top:3px}
+  .brand-tagline{display:none}
+  .header-actions button{width:38px;height:38px}
+  .header-actions{gap:5px}
+  .category-nav .nav-scroll button{padding:10px 11px 9px;font-size:11px}
+  .breaking-inner{height:38px}
+  .breaking-label{height:24px;padding:0 8px;font-size:10px}
+  .breaking-track span{font-size:10px}
+  .page-top{padding:14px 0 55px}
+  .top-ad{margin-bottom:18px;min-height:68px}
+  .section-intro{align-items:flex-start;gap:8px}
+  .section-intro h1{font-size:23px}
+  .hero-grid{grid-template-columns:1fr;gap:10px}
+  .news-image.large{height:235px}
+  .featured-content{padding:14px}
+  .featured-content h2{font-size:19px;line-height:1.45}
+  .featured-content p{font-size:11px}
+  .hero-side{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mini-card{display:block;padding:7px;min-height:0}
+  .mini-card .news-image{height:105px;margin-bottom:7px}
+  .mini-card h3{font-size:11px;line-height:1.45;margin:4px 2px}
+  .mini-card .meta{font-size:7px;margin:0 2px}
+  .quick-links{grid-template-columns:repeat(3,1fr);margin:18px 0 25px}
+  .quick-links button{min-height:82px;padding:9px 5px}
+  .quick-icon{width:34px;height:34px;border-radius:9px}
+  .quick-links b{font-size:10px}
+  .quick-links small{font-size:7px}
+  .district-section{padding:17px 13px 18px;margin-bottom:26px}
+  .district-toolbar{flex-direction:column;gap:8px}
+  .district-mode{width:100%}
+  .district-mode button{flex:1;height:40px}
+  .district-panel{grid-template-columns:1fr;gap:12px}
+  .rajasthan-shape{min-height:145px}
+  .district-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .district-grid button{min-height:37px;font-size:9px}
+  .content-grid{grid-template-columns:1fr;gap:20px}
+  .news-row{grid-template-columns:112px 1fr;gap:10px;padding:12px 0}
+  .news-row .news-image{height:86px}
+  .news-row h3{font-size:13px;line-height:1.45;margin:2px 0 4px}
+  .news-row p{display:none}
+  .news-row-body{padding-right:34px}
+  .row-tools{bottom:11px}
+  .row-tools button{width:28px;height:28px}
+}
+@media (max-width:380px){
+  .site-container{width:calc(100% - 16px)}
+  .header-actions button{width:35px;height:35px}
+  .brand-copy strong{font-size:18px}
+  .hero-side{grid-template-columns:1fr}
+  .mini-card{display:grid;grid-template-columns:94px 1fr;gap:8px}
+  .mini-card .news-image{height:80px;margin:0}
+  .quick-links button{min-height:76px}
+  .news-row{grid-template-columns:100px 1fr}
+  .news-row .news-image{height:78px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
