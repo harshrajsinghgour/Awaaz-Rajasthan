@@ -78,7 +78,28 @@ export default function AppProduction() {
   useEffect(() => { if (!API_BASE) { setLoading(false); return; } let cancelled = false; const timer = setTimeout(() => { setLoading(true); const params = new URLSearchParams({ limit: "100" }); if (category !== "होम") params.set("category", category); if (district) params.set("location", district); if (query.trim()) params.set("q", query.trim()); fetch(`${API_BASE}/api/news?${params.toString()}`, { headers: { Accept: "application/json" } }).then(r => r.ok ? r.json() : Promise.reject()).then(data => { const list = Array.isArray(data) ? data : (data.news || data.data || data.articles || []); if (!cancelled) setNews(list.map(normalize)); }).catch(() => {}).finally(() => { if (!cancelled) setLoading(false); }); }, query.trim() ? 350 : 0); return () => { cancelled = true; clearTimeout(timer); }; }, [category, district, query]);
   useEffect(() => { writeStorage("awaaz-bookmarks", JSON.stringify(saved)); }, [saved]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 2400); return () => clearTimeout(t); }, [toast]);
-  useEffect(() => { const raw = window.location.hash.match(/^#news-(.+)$/); if (!raw) return; let id = raw[1]; try { id = decodeURIComponent(id); } catch {} const found = news.find(n => String(n.id) === id || String(n.slug || "") === id); if (found) openArticle(found, false); }, [news]);
+  useEffect(() => {
+    const raw = window.location.hash.match(/^#news-(.+)$/);
+    if (!raw) return;
+    let id = raw[1];
+    try { id = decodeURIComponent(id); } catch {}
+    const found = news.find(n => String(n.id) === id || String(n.slug || "") === id);
+    if (found) {
+      openArticle(found, false);
+      return;
+    }
+    if (!API_BASE || !id || String(id).startsWith("f")) return;
+    let cancelled = false;
+    fetch(`${API_BASE}/api/news/${encodeURIComponent(id)}`, { headers: { Accept: "application/json" } })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => {
+        if (cancelled) return;
+        const item = data?.news || data?.data || data?.article || data;
+        if (item?.title) openArticle(normalize(item, 0), false);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [news]);
 
   const breaking = useMemo(() => news.filter(n => n.breaking).slice(0, 8).length ? news.filter(n => n.breaking).slice(0, 8) : news.slice(0, 6), [news]);
   const filtered = useMemo(() => { const q = query.trim().toLowerCase(); return news.filter(n => { const categoryMatch = category === "होम" || n.category === category || n.location === category; const districtMatch = !district || n.location === district || n.category === district || `${n.title} ${n.excerpt}`.includes(district); const textMatch = !q || [n.title, n.excerpt, n.category, n.location, n.author].join(" ").toLowerCase().includes(q); const savedMatch = !savedOnly || saved.includes(String(n.id)); return categoryMatch && districtMatch && textMatch && savedMatch; }); }, [news, category, district, query, savedOnly, saved]);
