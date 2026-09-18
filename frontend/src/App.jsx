@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
+const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "https://awaazrajasthan.onrender.com").replace(/\/$/, "");
 const E_PAPER_URL = import.meta.env.VITE_E_PAPER_URL || "/epaper";
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
 
@@ -38,7 +38,7 @@ function Icon({ name }) { return <span className="svg-icon">{icons[name]}</span>
 function normalizeNews(item, index) {
   return { id: item._id || item.id || `api-${index}`, category: item.category || "राजस्थान", location: item.location || item.city || "राजस्थान", title: item.title || item.headline || "ताजा खबर", excerpt: item.excerpt || item.summary || item.description || "", image: item.image || item.imageUrl || item.thumbnail || fallbackNews[index % fallbackNews.length].image, time: item.publishedAt || item.createdAt ? new Date(item.publishedAt || item.createdAt).toLocaleString("hi-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : item.time || "अभी", author: item.author || item.reporter || "आवाज़ राजस्थान" };
 }
-function BrandMark({ small = false }) { return <div className={`brand-mark ${small ? "small" : ""}`} aria-hidden="true"><span>आ</span><i>राजस्थान</i></div>; }
+function BrandMark({ small = false }) { return <img className={`brand-logo-image ${small ? "small" : ""}`} src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान" />; }
 function AdSlot({ position = "home_top", className = "" }) {
   const [ad, setAd] = useState(null);
   useEffect(() => {
