@@ -144,12 +144,26 @@ function enhance() {
 
 export default function ProductionEnhancements() {
   useEffect(() => {
+    let frame = 0;
+    const scheduleEnhance = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        enhance();
+      });
+    };
+
     enhance();
-    const observer = new MutationObserver(() => {
-      window.requestAnimationFrame(enhance);
-    });
+    const observer = new MutationObserver(scheduleEnhance);
+
+    // Only watch structural changes. Attribute/text mutations are deliberately
+    // ignored so this enhancement layer can never create its own observer loop.
     observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
+
+    return () => {
+      observer.disconnect();
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   return null;
