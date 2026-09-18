@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./article-route.js";
 import "./seo-runtime.js";
 import App from "./AppProduction";
+import LegacyApp from "./App";
 import ProductionEnhancements from "./production-enhancements";
 import "./index.css";
 import "./production-polish.css";
@@ -54,7 +55,11 @@ class ProductionErrorBoundary extends Component {
 
   render() {
     if (!this.state.failed) return this.props.children;
-    return (
+    // Keep the public site usable even if a production-only enhancement crashes.
+    // The legacy renderer is maintained in-repo and provides the same news API
+    // and core reading flows while the failing production component is isolated.
+    return <LegacyApp />;
+    /*
       <main style={{
         minHeight: "100dvh",
         display: "grid",
@@ -92,7 +97,7 @@ class ProductionErrorBoundary extends Component {
           >फिर कोशिश करें</button>
         </section>
       </main>
-    )
+    )*/
   }
 }
 
