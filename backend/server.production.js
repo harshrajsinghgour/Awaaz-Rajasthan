@@ -20,7 +20,7 @@ const app=express();
 const PORT=Number(process.env.PORT||5000);
 const PROD=process.env.NODE_ENV==="production";
 const FRONTEND_URL=process.env.FRONTEND_URL||"*";
-const PUBLIC_API_URL=String(process.env.PUBLIC_API_URL||"").trim().replace(/\/$/,"");
+const PUBLIC_API_URL=String(process.env.PUBLIC_API_URL||"https://awaazrajasthan.onrender.com").trim().replace(/\/$/,"");
 const JWT_SECRET=process.env.JWT_SECRET;
 if(PROD&&!JWT_SECRET) throw new Error("JWT_SECRET is required in production");
 const uploadDir=path.join(process.cwd(),"uploads");
