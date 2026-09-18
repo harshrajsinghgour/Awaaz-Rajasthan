@@ -26,7 +26,7 @@ function normalize(item, index = 0) {
     image: item?.image || item?.imageUrl || item?.thumbnail || fallback.image, video: mediaUrl(item?.video || item?.videoUrl || item?.mediaVideo || ""),
     time: item?.publishedAt || item?.createdAt ? formatDate(item.publishedAt || item.createdAt) : item?.time || "अभी",
     location: item?.location || item?.city || "राजस्थान", author: item?.author || item?.reporter || "आवाज़ राजस्थान",
-    featured: Boolean(item?.featured), breaking: Boolean(item?.breaking), views: Number(item?.views || 0), slug: item?.slug || ""
+    featured: Boolean(item?.featured), latest: item?.latest !== false, breaking: Boolean(item?.breaking), views: Number(item?.views || 0), slug: item?.slug || ""
   };
 }
 function formatDate(value) { try { const d = new Date(value); if (Number.isNaN(d.getTime())) return "अभी"; return d.toLocaleString("hi-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch { return "अभी"; } }
@@ -97,7 +97,7 @@ export default function AppProduction() {
         .then(r => r.ok ? r.json() : Promise.reject())
         .then(data => {
           const list = Array.isArray(data) ? data : (data.news || data.data || data.articles || []);
-          if (!cancelled && Array.isArray(list) && list.length) setNews(list.map(normalize));
+          if (!cancelled) setNews(Array.isArray(list) ? list.map(normalize) : []);
         })
         .catch(() => {})
         .finally(() => { if (!cancelled) setLoading(false); });
