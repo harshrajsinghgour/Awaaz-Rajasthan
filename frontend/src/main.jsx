@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { Component, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import "./article-route.js";
 import "./seo-runtime.js";
@@ -36,6 +36,57 @@ if ("serviceWorker" in navigator && import.meta.env.PROD) {
     navigator.serviceWorker.register("/sw.js").catch(() => {});
   });
 }
+class ProductionErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch(error) {
+    console.error("Awaaz Rajasthan frontend error:", error);
+  }
+
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <main style={{
+        minHeight: "100dvh",
+        display: "grid",
+        placeItems: "center",
+        padding: "24px",
+        background: "#f4f5f7",
+        color: "#071525",
+        fontFamily: '"Noto Sans Devanagari", system-ui, sans-serif',
+        textAlign: "center"
+      }}>
+        <section style={{ maxWidth: 520 }}>
+          <strong style={{ display: "block", fontSize: 24, marginBottom: 10 }}>आवाज़ राजस्थान</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>वेबसाइट लोड करते समय एक समस्या आई। कृपया पेज को दोबारा खोलें।</p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: 16,
+              border: 0,
+              borderRadius: 10,
+              padding: "11px 18px",
+              background: "#d71920",
+              color: "#fff",
+              fontWeight: 800
+            }}
+          >
+            फिर कोशिश करें
+          </button>
+        </section>
+      </main>
+    );
+  }
+}
+
 function AppBootstrap() {
   useEffect(() => {
     handlePwaShortcut();
@@ -44,6 +95,6 @@ function AppBootstrap() {
 }
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AppBootstrap />
+    <ProductionErrorBoundary><AppBootstrap /></ProductionErrorBoundary>
   </React.StrictMode>
 );
