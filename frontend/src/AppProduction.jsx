@@ -44,12 +44,12 @@ function icon(name) {
   return <svg className="wa-icon" viewBox="0 0 24 24" aria-hidden="true">{paths[name]}</svg>;
 }
 function Brand() { return <div className="brand" aria-label="आवाज़ राजस्थान"><div className="brand-mark"><span>आ</span></div><div><strong>आवाज़ राजस्थान</strong><small>राजस्थान की अपनी खबर</small></div></div>; }
-function AdSlot({ position = "home_top", className = "" }) {
+function safeAdUrl(value) { if (typeof value !== "string" || !value.trim()) return "#"; try { const url = new URL(value, window.location.origin); if (url.protocol !== "http:" && url.protocol !== "https:") return "#"; return url.href; } catch { return "#"; } }\nfunction AdSlot({ position = "home_top", className = "" }) {
   const [ad, setAd] = useState(null); const counted = useRef(false);
   useEffect(() => { if (!API_BASE) return; let cancelled = false; fetch(`${API_BASE}/api/ads?position=${encodeURIComponent(position)}&device=${window.innerWidth < 768 ? "mobile" : "desktop"}`, { headers: { Accept: "application/json" } }).then(r => r.ok ? r.json() : Promise.reject()).then(data => { const list = Array.isArray(data) ? data : (data.ads || data.data || []); if (!cancelled && list[0]) setAd(list[0]); }).catch(() => {}); return () => { cancelled = true; }; }, [position]);
   useEffect(() => { const id = ad?._id || ad?.id; if (!API_BASE || !id || counted.current) return; counted.current = true; fetch(`${API_BASE}/api/ads/${id}/impression`, { method: "POST" }).catch(() => {}); }, [ad]);
   if (!ad) return <div className={`ad-slot ${className}`}><span>विज्ञापन</span></div>;
-  const image = ad.image || ad.imageUrl || ad.banner; const href = ad.link || "#";
+  const image = ad.image || ad.imageUrl || ad.banner; const href = safeAdUrl(ad.link);
   return <a className={`ad-slot ad-live ${className}`} href={href} target="_blank" rel="noreferrer" onClick={() => fetch(`${API_BASE}/api/ads/${ad._id || ad.id}/click`, { method: "POST" }).catch(() => {})}>{image ? <img src={image} alt={ad.title || "विज्ञापन"} /> : <span>{ad.title || "विज्ञापन"}</span>}</a>;
 }
 function NewsImage({ item, className = "" }) { const [src, setSrc] = useState(safeImage(item.image)); return <img className={className} src={src} alt={item.title} loading="lazy" decoding="async" onError={() => setSrc("/news-placeholder.svg")} />; }
