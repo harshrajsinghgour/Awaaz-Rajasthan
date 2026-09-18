@@ -3,7 +3,41 @@
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07111f"><title>आवाज़ राजस्थान — Admin</title><link rel="stylesheet" href="/admin/admin.css"></head>
 <body>
 <div id="app">
-<section id="login" class="login"><div class="login-card"><div class="admin-brand-logo"><img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान लोगो" onerror="this.style.display='none';this.parentElement.classList.add('logo-fallback')"></div><h1>आवाज़ राजस्थान</h1><p>Secure Admin Console</p><form id="loginForm"><label class="api-label">Backend API URL<input id="apiBase" type="url" placeholder="https://your-render-api.onrender.com" autocomplete="url"></label><input id="email" type="email" placeholder="Admin email" autocomplete="username" required><input id="password" type="password" placeholder="Password" autocomplete="current-password" required><button>Login</button><small id="loginError"></small></form></div></section>
+<section id="login" class="login">
+  <div class="login-shell">
+    <aside class="login-visual" aria-hidden="true">
+      <div class="visual-map"></div>
+      <div class="visual-brand">आवाज़ राजस्थान</div>
+      <div class="visual-line"></div>
+      <h2>राजस्थान<br>की हर आवाज़,<br><strong>आप तक।</strong></h2>
+      <div class="visual-rule"></div>
+      <p>LOCAL<br>NEWS<br>BIGGER<br>IMPACT</p>
+      <div class="visual-heritage">राजस्थान • सत्य • जनहित</div>
+    </aside>
+    <div class="login-card">
+      <div class="admin-brand-logo">
+        <img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान लोगो" onerror="this.style.display='none';this.parentElement.classList.add('logo-fallback')">
+      </div>
+      <div class="login-kicker">SECURE ADMIN CONSOLE</div>
+      <h1>आवाज़ राजस्थान</h1>
+      <p class="login-tagline">सच के साथ, राजस्थान के लिए</p>
+      <form id="loginForm">
+        <label class="api-label">Backend API URL<input id="apiBase" type="url" placeholder="https://your-render-api.onrender.com" autocomplete="url"></label>
+        <label class="login-field"><span>✉</span><input id="email" type="email" placeholder="Admin email" autocomplete="username" required></label>
+        <label class="login-field"><span>♙</span><input id="password" type="password" placeholder="Password" autocomplete="current-password" required><button type="button" class="password-toggle" aria-label="Show password" onclick="const p=document.getElementById('password');p.type=p.type==='password'?'text':'password';this.textContent=p.type==='password'?'◉':'◌'">◉</button></label>
+        <div class="login-options">
+          <label class="remember"><input type="checkbox"> <span>मुझे याद रखें</span></label>
+          <span class="forgot">सुरक्षित लॉगिन</span>
+        </div>
+        <button class="login-submit" type="submit"><span>↪</span> Login</button>
+        <div class="login-divider"><span>या</span></div>
+        <div class="secure-note"><span>◇</span><div><b>यह एक सुरक्षित प्रशासनिक क्षेत्र है।</b><small>केवल अधिकृत उपयोगकर्ताओं के लिए।</small></div></div>
+        <small id="loginError"></small>
+      </form>
+      <div class="login-footer">© 2026 आवाज़ राजस्थान <span>•</span> सत्य • निर्भीकता • जनहित</div>
+    </div>
+  </div>
+</section>
 <section id="panel" class="hidden">
 <header class="topbar"><div><b>आवाज़ राजस्थान</b><span>Admin Console</span></div><button id="logout">Logout</button></header>
 <nav class="tabs"><button data-tab="dashboard" class="active">Dashboard</button><button data-tab="news">News</button><button data-tab="categories">श्रेणियां <small>OWNER</small></button><button data-tab="epaper">ई-पेपर <small>OWNER</small></button><button data-tab="ads">Ads <i>OWNER</i></button><button data-tab="admins">Admins</button></nav>
