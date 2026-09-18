@@ -1,7 +1,7 @@
 // Production build stabilization
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
+const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "https://awaazrajasthan.onrender.com").replace(/\/$/, "");
 const E_PAPER_URL = import.meta.env.VITE_E_PAPER_URL || "/epaper";
 const BUILD_VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
 
