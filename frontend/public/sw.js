@@ -1,4 +1,4 @@
-const CACHE = "awaaz-rajasthan-v16";
+const CACHE = "awaaz-rajasthan-v17";
 const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/awaazrajasthan-logo.png", "/manifest.webmanifest"];
 
 function safeNotificationUrl(value) {
