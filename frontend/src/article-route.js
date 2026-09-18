@@ -21,7 +21,11 @@ function bridgeUrl(original, state, title, url) {
   if (typeof url === "string" && url.startsWith(HASH_PREFIX)) {
     const id = url.slice(HASH_PREFIX.length);
     if (id) {
-      original(state, title, pathForId(decodeURIComponent(id)));
+      try {
+        original(state, title, pathForId(decodeURIComponent(id)));
+      } catch {
+        original(state, title, pathForId(id));
+      }
       return true;
     }
   }
