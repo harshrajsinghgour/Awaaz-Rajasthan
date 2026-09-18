@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node backend/server.production.js",
     "dev": "node --watch backend/server.production.js",
-    "push-worker": "node backend/push-worker.js"
+    "push-worker": "node backend/push-worker.js",
+    "build": "cd frontend && npm install && npm run build"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
