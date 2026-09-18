@@ -1,9 +1,6 @@
 import React, { Component, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import "./article-route.js";
-import "./seo-runtime.js";
 import App from "./AppProduction";
-import LegacyApp from "./App";
 import ProductionEnhancements from "./production-enhancements";
 import "./index.css";
 import "./production-polish.css";
@@ -55,10 +52,16 @@ class ProductionErrorBoundary extends Component {
 
   render() {
     if (!this.state.failed) return this.props.children;
-    // Keep the public site usable even if a production-only enhancement crashes.
-    // The legacy renderer is maintained in-repo and provides the same news API
-    // and core reading flows while the failing production component is isolated.
-    return <LegacyApp />;
+    return (
+      <main style={{ minHeight: "100dvh", display: "grid", placeItems: "center", padding: "24px", background: "#f4f5f7" }}>
+        <section style={{ width: "min(92vw, 420px)", textAlign: "center", background: "#fff", borderRadius: "24px", padding: "30px 22px", boxShadow: "0 16px 45px rgba(7,17,31,.12)" }}>
+          <img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान" style={{ width: "min(58vw, 250px)", margin: "0 auto 18px" }} />
+          <h1 style={{ margin: "0 0 8px", color: "#07111f", fontSize: "25px" }}>आवाज़ राजस्थान</h1>
+          <p style={{ margin: "0 0 18px", color: "#687282", lineHeight: 1.6 }}>वेबसाइट लोड करते समय एक समस्या आई।</p>
+          <button type="button" onClick={() => window.location.reload()} style={{ border: 0, borderRadius: "10px", background: "#d71920", color: "#fff", padding: "11px 20px", fontWeight: 800 }}>फिर कोशिश करें</button>
+        </section>
+      </main>
+    );
     /*
       <main style={{
         minHeight: "100dvh",
@@ -104,6 +107,9 @@ class ProductionErrorBoundary extends Component {
 function AppBootstrap() {
   useEffect(() => {
     handlePwaShortcut();
+    // Non-critical URL/SEO bridges must never block the main application from mounting.
+    import("./article-route.js").catch((error) => console.error("Article route bridge:", error));
+    import("./seo-runtime.js").catch((error) => console.error("SEO runtime:", error));
   }, []);
   return <><App /><ProductionEnhancements /></>;
 }
