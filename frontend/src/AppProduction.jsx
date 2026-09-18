@@ -32,6 +32,7 @@ function normalize(item, index = 0) {
 function formatDate(value) { try { const d = new Date(value); if (Number.isNaN(d.getTime())) return "अभी"; return d.toLocaleString("hi-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch { return "अभी"; } }
 function safeImage(src) { return typeof src === "string" && src.trim() ? src : "/news-placeholder.svg"; }
 function readStorage(key, fallback = null) { try { return window.localStorage.getItem(key) ?? fallback; } catch { return fallback; } }
+function readStorageJson(key, fallback = []) { try { const raw = readStorage(key, ""); return raw ? JSON.parse(raw) : fallback; } catch { return fallback; } }
 function writeStorage(key, value) { try { window.localStorage.setItem(key, value); } catch {} }
 function icon(name) {
   const paths = {
@@ -59,7 +60,7 @@ function Skeletons() { return <div className="skeleton-list">{[1, 2, 3, 4].map(i
 
 export default function AppProduction() {
   const [news, setNews] = useState(FALLBACK), [loading, setLoading] = useState(Boolean(API_BASE)), [category, setCategory] = useState("होम"), [district, setDistrict] = useState(""), [query, setQuery] = useState(""), [searchOpen, setSearchOpen] = useState(false), [menuOpen, setMenuOpen] = useState(false);
-  const [saved, setSaved] = useState(() => { try { return JSON.parse(readStorage("awaaz-bookmarks", "[]") || "[]"); } catch { return []; } }), [savedOnly, setSavedOnly] = useState(false), [article, setArticle] = useState(null), [notifyOpen, setNotifyOpen] = useState(false), [notifyState, setNotifyState] = useState("idle"), [toast, setToast] = useState("");
+  const [saved, setSaved] = useState(() => { try { return readStorageJson("awaaz-bookmarks", []); } catch { return []; } }), [savedOnly, setSavedOnly] = useState(false), [article, setArticle] = useState(null), [notifyOpen, setNotifyOpen] = useState(false), [notifyState, setNotifyState] = useState("idle"), [toast, setToast] = useState("");
   const [dark, setDark] = useState(() => readStorage("awaaz-theme", "") === "dark"), [showTop, setShowTop] = useState(false), [installPrompt, setInstallPrompt] = useState(null);
   const [vapidPublicKey, setVapidPublicKey] = useState(BUILD_VAPID_PUBLIC_KEY);
   useEffect(() => {
