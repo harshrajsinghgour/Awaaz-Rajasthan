@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /api/
 
-# Sitemap will be added here when the canonical public domain is finalized.
+Sitemap: https://awaazrajasthan.vercel.app/sitemap.xml
