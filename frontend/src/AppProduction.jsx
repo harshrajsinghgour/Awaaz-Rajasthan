@@ -30,7 +30,9 @@ function normalize(item, index = 0) {
   };
 }
 function formatDate(value) { try { const d = new Date(value); if (Number.isNaN(d.getTime())) return "अभी"; return d.toLocaleString("hi-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch { return "अभी"; } }
-function safeImage(src) { return src || "/news-placeholder.svg"; }
+function safeImage(src) { return typeof src === "string" && src.trim() ? src : "/news-placeholder.svg"; }
+function readStorage(key, fallback = null) { try { return window.localStorage.getItem(key) ?? fallback; } catch { return fallback; } }
+function writeStorage(key, value) { try { window.localStorage.setItem(key, value); } catch {} }
 function icon(name) {
   const paths = {
     menu: <><path d="M4 6h16M4 12h16M4 18h16" /></>, search: <><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></>,
@@ -57,8 +59,8 @@ function Skeletons() { return <div className="skeleton-list">{[1, 2, 3, 4].map(i
 
 export default function AppProduction() {
   const [news, setNews] = useState(FALLBACK), [loading, setLoading] = useState(Boolean(API_BASE)), [category, setCategory] = useState("होम"), [district, setDistrict] = useState(""), [query, setQuery] = useState(""), [searchOpen, setSearchOpen] = useState(false), [menuOpen, setMenuOpen] = useState(false);
-  const [saved, setSaved] = useState(() => { try { return JSON.parse(localStorage.getItem("awaaz-bookmarks") || "[]"); } catch { return []; } }), [savedOnly, setSavedOnly] = useState(false), [article, setArticle] = useState(null), [notifyOpen, setNotifyOpen] = useState(false), [notifyState, setNotifyState] = useState("idle"), [toast, setToast] = useState("");
-  const [dark, setDark] = useState(() => localStorage.getItem("awaaz-theme") === "dark"), [showTop, setShowTop] = useState(false), [installPrompt, setInstallPrompt] = useState(null);
+  const [saved, setSaved] = useState(() => { try { return JSON.parse(readStorage("awaaz-bookmarks", "[]") || "[]"); } catch { return []; } }), [savedOnly, setSavedOnly] = useState(false), [article, setArticle] = useState(null), [notifyOpen, setNotifyOpen] = useState(false), [notifyState, setNotifyState] = useState("idle"), [toast, setToast] = useState("");
+  const [dark, setDark] = useState(() => readStorage("awaaz-theme", "") === "dark"), [showTop, setShowTop] = useState(false), [installPrompt, setInstallPrompt] = useState(null);
   const [vapidPublicKey, setVapidPublicKey] = useState(BUILD_VAPID_PUBLIC_KEY);
   useEffect(() => {
     if (vapidPublicKey || !API_BASE) return;
@@ -70,10 +72,10 @@ export default function AppProduction() {
     return () => { cancelled = true; };
   }, [vapidPublicKey]);
 
-  useEffect(() => { document.documentElement.lang = "hi"; document.documentElement.dataset.theme = dark ? "dark" : "light"; localStorage.setItem("awaaz-theme", dark ? "dark" : "light"); }, [dark]);
+  useEffect(() => { document.documentElement.lang = "hi"; document.documentElement.dataset.theme = dark ? "dark" : "light"; writeStorage("awaaz-theme", dark ? "dark" : "light"); }, [dark]);
   useEffect(() => { const onScroll = () => setShowTop(window.scrollY > 650); const onInstall = e => { e.preventDefault(); setInstallPrompt(e); }; window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("beforeinstallprompt", onInstall); return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("beforeinstallprompt", onInstall); }; }, []);
   useEffect(() => { if (!API_BASE) { setLoading(false); return; } let cancelled = false; const timer = setTimeout(() => { setLoading(true); const params = new URLSearchParams({ limit: "100" }); if (category !== "होम") params.set("category", category); if (district) params.set("location", district); if (query.trim()) params.set("q", query.trim()); fetch(`${API_BASE}/api/news?${params.toString()}`, { headers: { Accept: "application/json" } }).then(r => r.ok ? r.json() : Promise.reject()).then(data => { const list = Array.isArray(data) ? data : (data.news || data.data || data.articles || []); if (!cancelled) setNews(list.map(normalize)); }).catch(() => {}).finally(() => { if (!cancelled) setLoading(false); }); }, query.trim() ? 350 : 0); return () => { cancelled = true; clearTimeout(timer); }; }, [category, district, query]);
-  useEffect(() => { localStorage.setItem("awaaz-bookmarks", JSON.stringify(saved)); }, [saved]);
+  useEffect(() => { writeStorage("awaaz-bookmarks", JSON.stringify(saved)); }, [saved]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 2400); return () => clearTimeout(t); }, [toast]);
   useEffect(() => { const raw = window.location.hash.match(/^#news-(.+)$/); if (!raw) return; let id = raw[1]; try { id = decodeURIComponent(id); } catch {} const found = news.find(n => String(n.id) === id || String(n.slug || "") === id); if (found) openArticle(found, false); }, [news]);
 
