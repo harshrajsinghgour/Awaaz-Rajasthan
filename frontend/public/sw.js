@@ -1,4 +1,4 @@
-const CACHE = "awaaz-rajasthan-v15";
+const CACHE = "awaaz-rajasthan-v16";
 const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/awaazrajasthan-logo.png", "/manifest.webmanifest"];
 
 function safeNotificationUrl(value) {
@@ -39,7 +39,7 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname === "/admin" || url.pathname.startsWith("/admin/") || url.pathname.startsWith("/api/")) return;
 
   event.respondWith(
-    fetch(event.request)
+    fetch(event.request, { cache: "no-store" })
       .then((response) => {
         if (!response || !response.ok) return response;
         if (event.request.mode === "navigate") {
