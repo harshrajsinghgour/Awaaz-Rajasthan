@@ -15,7 +15,7 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/app-icon.svg",
+      "src": "/awaazrajasthan-logo.png",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
