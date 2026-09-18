@@ -137,6 +137,7 @@ export default function AppProduction() {
     if (!API_BASE) { setNotifyState("error"); setToast("नोटिफिकेशन सर्वर अभी कॉन्फ़िगर नहीं है"); return; }
     setNotifyState("loading");
     try {
+      if (Notification.permission === "denied") { setNotifyState("error"); setToast("Chrome में इस वेबसाइट के Notifications Block हैं। Site settings में जाकर Notifications → Allow करें, फिर पेज Reload करें।"); return; }
       const permission = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
       if (permission !== "granted") throw new Error("permission");
       const reg = await navigator.serviceWorker.register("/sw.js");
@@ -152,7 +153,7 @@ export default function AppProduction() {
       setNotifyState("enabled"); setToast("ब्रेकिंग न्यूज़ नोटिफिकेशन चालू हो गए");
     } catch (error) {
       setNotifyState("error");
-      setToast(error?.message === "subscribe-api" ? "नोटिफिकेशन सर्वर से कनेक्शन नहीं हो पाया" : "नोटिफिकेशन की अनुमति नहीं मिली");
+      setToast(error?.message === "subscribe-api" ? "नोटिफिकेशन सर्वर से कनेक्शन नहीं हो पाया" : error?.message === "permission" ? "नोटिफिकेशन की अनुमति नहीं मिली। Chrome में Notifications → Allow करें।" : "नोटिफिकेशन चालू नहीं हो पाए। फिर से कोशिश करें।");
     }
   }
   async function installApp() { if (!installPrompt) return; try { await installPrompt.prompt(); await installPrompt.userChoice; } catch {} finally { setInstallPrompt(null); } }
