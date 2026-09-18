@@ -14,7 +14,7 @@ function syncMobileNavigation() {
 
   const setLabel = (button, label, aria) => {
     const span = button.querySelector("span");
-    if (span) span.textContent = label;
+    if (span && span.textContent !== label) span.textContent = label;
     button.setAttribute("aria-label", aria);
   };
 
