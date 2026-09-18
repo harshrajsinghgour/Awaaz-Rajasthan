@@ -123,7 +123,7 @@
         "@type": "NewsMediaOrganization",
         name: "आवाज़ राजस्थान",
         url: ORIGIN,
-        logo: { "@type": "ImageObject", url: `${ORIGIN}/app-icon.svg` }
+        logo: { "@type": "ImageObject", url: `${ORIGIN}/awaazrajasthan-logo.png` }
       },
       image: [image]
     };
