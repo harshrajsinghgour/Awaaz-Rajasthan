@@ -30,7 +30,7 @@ function normalize(item, index = 0) {
   };
 }
 function formatDate(value) { try { const d = new Date(value); if (Number.isNaN(d.getTime())) return "अभी"; return d.toLocaleString("hi-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch { return "अभी"; } }
-function safeImage(src) { return typeof src === "string" && src.trim() ? src : "/news-placeholder.svg"; }
+function mediaUrl(src) {\n  if (typeof src !== "string" || !src.trim()) return "";\n  const value = src.trim();\n  if (/^(data:|blob:)/i.test(value)) return value;\n  if (/^https?:\\/\\//i.test(value)) return value;\n  if (value === "/news-placeholder.svg" || value.startsWith("/assets/") || value.startsWith("/awaazrajasthan-logo")) return value;\n  try { return new URL(value, `${API_BASE}/`).href; } catch { return value; }\n}\nfunction safeImage(src) { return mediaUrl(src) || "/news-placeholder.svg"; }
 function readStorage(key, fallback = null) { try { return window.localStorage.getItem(key) ?? fallback; } catch { return fallback; } }
 function readStorageJson(key, fallback = []) { try { const raw = readStorage(key, ""); if (!raw) return fallback; const value = JSON.parse(raw); return Array.isArray(value) ? value : fallback; } catch { return fallback; } }
 function writeStorage(key, value) { try { window.localStorage.setItem(key, value); } catch {} }
@@ -52,7 +52,7 @@ function safeAdUrl(value) { if (typeof value !== "string" || !value.trim()) retu
   useEffect(() => { if (!API_BASE) return; let cancelled = false; fetch(`${API_BASE}/api/ads?position=${encodeURIComponent(position)}&device=${window.innerWidth < 768 ? "mobile" : "desktop"}`, { headers: { Accept: "application/json" } }).then(r => r.ok ? r.json() : Promise.reject()).then(data => { const list = Array.isArray(data) ? data : (data.ads || data.data || []); if (!cancelled && list[0]) setAd(list[0]); }).catch(() => {}); return () => { cancelled = true; }; }, [position]);
   useEffect(() => { const id = ad?._id || ad?.id; if (!API_BASE || !id || counted.current) return; counted.current = true; fetch(`${API_BASE}/api/ads/${id}/impression`, { method: "POST" }).catch(() => {}); }, [ad]);
   if (!ad) return <div className={`ad-slot ${className}`}><span>विज्ञापन</span></div>;
-  const image = ad.image || ad.imageUrl || ad.banner; const video = ad.video || ad.videoUrl || ""; const href = safeAdUrl(ad.link);
+  const image = mediaUrl(ad.image || ad.imageUrl || ad.banner); const video = mediaUrl(ad.video || ad.videoUrl || ""); const href = safeAdUrl(ad.link);
   return <a className={`ad-slot ad-live ${className}`} href={href} target="_blank" rel="noreferrer" onClick={() => fetch(`${API_BASE}/api/ads/${ad._id || ad.id}/click`, { method: "POST" }).catch(() => {})}>{video ? <video src={video} poster={image || undefined} controls muted playsInline preload="metadata" aria-label={ad.title || "विज्ञापन वीडियो"} /> : image ? <img src={image} alt={ad.title || "विज्ञापन"} /> : <span>{ad.title || "विज्ञापन"}</span>}</a>;
 }
 function NewsImage({ item, className = "" }) { const [src, setSrc] = useState(safeImage(item.image)); return <img className={className} src={src} alt={item.title} loading="lazy" decoding="async" onError={() => setSrc("/news-placeholder.svg")} />; }
