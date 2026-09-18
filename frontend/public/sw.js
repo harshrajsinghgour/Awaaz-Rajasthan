@@ -1,5 +1,5 @@
-const CACHE = "awaaz-rajasthan-v12";
-const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/app-icon.svg", "/manifest.webmanifest"];
+const CACHE = "awaaz-rajasthan-v13";
+const APP_SHELL = ["/", "/index.html", "/news-placeholder.svg", "/awaazrajasthan-logo.png", "/manifest.webmanifest"];
 
 function safeNotificationUrl(value) {
   const fallback = "/";
@@ -75,8 +75,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
-      icon: "/app-icon.svg",
-      badge: "/app-icon.svg",
+      icon: "/awaazrajasthan-logo.png",
+      badge: "/awaazrajasthan-logo.png",
       tag,
       renotify: Boolean(data.renotify),
       data: { url },
