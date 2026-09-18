@@ -15,7 +15,7 @@ function syncMobileNavigation() {
   const setLabel = (button, label, aria) => {
     const span = button.querySelector("span");
     if (span && span.textContent !== label) span.textContent = label;
-    button.setAttribute("aria-label", aria);
+    if (button.getAttribute("aria-label") !== aria) button.setAttribute("aria-label", aria);
   };
 
   setLabel(buttons[1], "खबरें", "ताज़ा खबरें खोलें");
