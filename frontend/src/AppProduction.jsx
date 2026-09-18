@@ -1,5 +1,5 @@
 // Production build stabilization
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "https://awaazrajasthan.onrender.com").replace(/\/$/, "");
 const E_PAPER_URL = import.meta.env.VITE_E_PAPER_URL || "/epaper";
