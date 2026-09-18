@@ -58,32 +58,15 @@ class ProductionErrorBoundary extends Component {
         display: "grid",
         placeItems: "center",
         padding: "24px",
-        background: "#f4f5f7",
-        color: "#071525",
-        fontFamily: '"Noto Sans Devanagari", system-ui, sans-serif',
-        textAlign: "center"
+        background: "#f4f5f7"
       }}>
-        <section style={{ maxWidth: 520 }}>
-          <strong style={{ display: "block", fontSize: 24, marginBottom: 10 }}>आवाज़ राजस्थान</strong>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>वेबसाइट लोड करते समय एक समस्या आई। कृपया पेज को दोबारा खोलें।</p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            style={{
-              marginTop: 16,
-              border: 0,
-              borderRadius: 10,
-              padding: "11px 18px",
-              background: "#d71920",
-              color: "#fff",
-              fontWeight: 800
-            }}
-          >
-            फिर कोशिश करें
-          </button>
-        </section>
+        <img
+          src="/app-icon.svg"
+          alt="आवाज़ राजस्थान"
+          style={{ width: "min(58vw, 280px)", height: "auto", display: "block" }}
+        />
       </main>
-    );
+    )
   }
 }
 
