@@ -99,27 +99,17 @@ export default function AppProduction() {
   useEffect(() => { writeStorage("awaaz-bookmarks", JSON.stringify(saved)); }, [saved]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 2400); return () => clearTimeout(t); }, [toast]);
   useEffect(() => {
-    const onPopState = () => window.location.reload();
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, []);
-  useEffect(() => {
-    const hashMatch = window.location.hash.match(/^#news-(.+)$/);
-    const pathMatch = window.location.pathname.match(/^\/news\/([^/]+)\/?$/);
-    if (!hashMatch && !pathMatch) return;
-
-    let id = hashMatch?.[1] || pathMatch?.[1] || "";
+    const raw = window.location.hash.match(/^#news-(.+)$/);
+    if (!raw) return;
+    let id = raw[1];
     try { id = decodeURIComponent(id); } catch {}
-
     const found = news.find(n => String(n.id) === id || String(n.slug || "") === id);
     if (found) {
       openArticle(found, false);
       return;
     }
-
     if (!API_BASE || !id || String(id).startsWith("f")) return;
     let cancelled = false;
-
     fetch(`${API_BASE}/api/news/${encodeURIComponent(id)}`, { headers: { Accept: "application/json" } })
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(data => {
@@ -128,7 +118,6 @@ export default function AppProduction() {
         if (item?.title) openArticle(normalize(item, 0), false);
       })
       .catch(() => {});
-
     return () => { cancelled = true; };
   }, [news]);
 
@@ -139,38 +128,8 @@ export default function AppProduction() {
   function selectCategory(value) { setCategory(value); setDistrict(""); setSavedOnly(false); setMenuOpen(false); setSearchOpen(false); window.scrollTo({ top: 0, behavior: "smooth" }); }
   function toggleSave(id) { const key = String(id), exists = saved.includes(key); setSaved(prev => exists ? prev.filter(x => x !== key) : [key, ...prev]); setToast(exists ? "खबर सेव से हटाई गई" : "खबर सेव हो गई"); }
   async function share(item) { const slugOrId = encodeURIComponent(item.slug || item.id), url = `${window.location.origin}/news/${slugOrId}`; try { if (navigator.share) await navigator.share({ title: item.title, text: item.excerpt, url }); else { await navigator.clipboard.writeText(url); setToast("लिंक कॉपी हो गया"); } } catch {} }
-  async function openArticle(item, updateUrl = true) {
-    setArticle(item);
-    setMenuOpen(false);
-
-    if (updateUrl) {
-      const key = encodeURIComponent(item.slug || item.id);
-      window.history.pushState(null, "", `/news/${key}`);
-    }
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    document.title = `${item.title} | आवाज़ राजस्थान`;
-    setMeta("description", item.excerpt || "राजस्थान की ताज़ा खबरें — आवाज़ राजस्थान");
-    setMeta("og:title", item.title, true);
-    setMeta("og:description", item.excerpt || "राजस्थान की ताज़ा खबरें", true);
-
-    if (!API_BASE || String(item.id).startsWith("f")) return;
-
-    try {
-      const r = await fetch(`${API_BASE}/api/news/${encodeURIComponent(item.id)}`, { headers: { Accept: "application/json" } });
-      if (!r.ok) return;
-      const data = await r.json();
-      const n = data.news || data.data || data.article || data;
-      setArticle(prev => prev ? { ...prev, ...normalize(n, 0) } : prev);
-    } catch {}
-  }
-
-  function closeArticle() {
-    setArticle(null);
-    window.history.replaceState(null, "", "/");
-    document.title = "आवाज़ राजस्थान | Rajasthan News";
-    setMeta("description", "आवाज़ राजस्थान — राजस्थान की ताज़ा, स्थानीय और भरोसेमंद खबरें।");
-  }
+  async function openArticle(item, updateHash = true) { setArticle(item); setMenuOpen(false); if (updateHash) window.history.replaceState(null, "", `#news-${encodeURIComponent(item.id)}`); window.scrollTo({ top: 0, behavior: "smooth" }); document.title = `${item.title} | आवाज़ राजस्थान`; setMeta("description", item.excerpt || "राजस्थान की ताज़ा खबरें — आवाज़ राजस्थान"); setMeta("og:title", item.title, true); setMeta("og:description", item.excerpt || "राजस्थान की ताज़ा खबरें", true); if (!API_BASE || String(item.id).startsWith("f")) return; try { const r = await fetch(`${API_BASE}/api/news/${encodeURIComponent(item.id)}`, { headers: { Accept: "application/json" } }); if (!r.ok) return; const data = await r.json(), n = data.news || data.data || data.article || data; setArticle(prev => prev ? { ...prev, ...normalize(n, 0) } : prev); } catch {} }
+  function closeArticle() { setArticle(null); window.history.replaceState(null, "", window.location.pathname + window.location.search); document.title = "आवाज़ राजस्थान | Rajasthan News"; setMeta("description", "आवाज़ राजस्थान — राजस्थान की ताज़ा, स्थानीय और भरोसेमंद खबरें।"); }
 
   async function enableNotifications() {
     if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) { setNotifyState("error"); setToast("इस डिवाइस पर पुश नोटिफिकेशन उपलब्ध नहीं है"); return; }
