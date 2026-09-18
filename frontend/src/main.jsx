@@ -1,7 +1,6 @@
 import React, { Component, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./AppProduction";
-import ProductionEnhancements from "./production-enhancements";
 import "./index.css";
 import "./production-polish.css";
 import "./app-production.css";
@@ -52,7 +51,8 @@ class ProductionErrorBoundary extends Component {
 
   render() {
     if (!this.state.failed) return this.props.children;
-    return (
+    return <LegacyApp />;
+    /*
       <main style={{ minHeight: "100dvh", display: "grid", placeItems: "center", padding: "24px", background: "#f4f5f7" }}>
         <section style={{ width: "min(92vw, 420px)", textAlign: "center", background: "#fff", borderRadius: "24px", padding: "30px 22px", boxShadow: "0 16px 45px rgba(7,17,31,.12)" }}>
           <img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान" style={{ width: "min(58vw, 250px)", margin: "0 auto 18px" }} />
@@ -111,7 +111,7 @@ function AppBootstrap() {
     import("./article-route.js").catch((error) => console.error("Article route bridge:", error));
     import("./seo-runtime.js").catch((error) => console.error("SEO runtime:", error));
   }, []);
-  return <><App /><ProductionEnhancements /></>;
+  return <App />;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
