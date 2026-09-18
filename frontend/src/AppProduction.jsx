@@ -30,7 +30,15 @@ function normalize(item, index = 0) {
   };
 }
 function formatDate(value) { try { const d = new Date(value); if (Number.isNaN(d.getTime())) return "अभी"; return d.toLocaleString("hi-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); } catch { return "अभी"; } }
-function mediaUrl(src) {\n  if (typeof src !== "string" || !src.trim()) return "";\n  const value = src.trim();\n  if (/^(data:|blob:)/i.test(value)) return value;\n  if (/^https?:\\/\\//i.test(value)) return value;\n  if (value === "/news-placeholder.svg" || value.startsWith("/assets/") || value.startsWith("/awaazrajasthan-logo")) return value;\n  try { return new URL(value, `${API_BASE}/`).href; } catch { return value; }\n}\nfunction safeImage(src) { return mediaUrl(src) || "/news-placeholder.svg"; }
+function mediaUrl(src) {
+  if (typeof src !== "string" || !src.trim()) return "";
+  const value = src.trim();
+  if (/^(data:|blob:)/i.test(value)) return value;
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value === "/news-placeholder.svg" || value.startsWith("/assets/") || value.startsWith("/awaazrajasthan-logo")) return value;
+  try { return new URL(value, `${API_BASE}/`).href; } catch { return value; }
+}
+function safeImage(src) { return mediaUrl(src) || "/news-placeholder.svg"; }
 function readStorage(key, fallback = null) { try { return window.localStorage.getItem(key) ?? fallback; } catch { return fallback; } }
 function readStorageJson(key, fallback = []) { try { const raw = readStorage(key, ""); if (!raw) return fallback; const value = JSON.parse(raw); return Array.isArray(value) ? value : fallback; } catch { return fallback; } }
 function writeStorage(key, value) { try { window.localStorage.setItem(key, value); } catch {} }
