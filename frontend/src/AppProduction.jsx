@@ -46,7 +46,7 @@ function icon(name) {
   };
   return <svg className="wa-icon" viewBox="0 0 24 24" aria-hidden="true">{paths[name]}</svg>;
 }
-function Brand() { return <div className="brand" aria-label="आवाज़ राजस्थान"><div className="brand-mark"><span>आ</span></div><div><strong>आवाज़ राजस्थान</strong><small>राजस्थान की अपनी खबर</small></div></div>; }
+function Brand() { return <div className="brand" aria-label="आवाज़ राजस्थान"><img className="brand-logo-image" src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान" /><div><strong>आवाज़ राजस्थान</strong><small>राजस्थान की अपनी खबर</small></div></div>; }
 function safeAdUrl(value) { if (typeof value !== "string" || !value.trim()) return "#"; try { const url = new URL(value, window.location.origin); if (url.protocol !== "http:" && url.protocol !== "https:") return "#"; return url.href; } catch { return "#"; } }function AdSlot({ position = "home_top", className = "" }) {
   const [ad, setAd] = useState(null); const counted = useRef(false);
   useEffect(() => { if (!API_BASE) return; let cancelled = false; fetch(`${API_BASE}/api/ads?position=${encodeURIComponent(position)}&device=${window.innerWidth < 768 ? "mobile" : "desktop"}`, { headers: { Accept: "application/json" } }).then(r => r.ok ? r.json() : Promise.reject()).then(data => { const list = Array.isArray(data) ? data : (data.ads || data.data || []); if (!cancelled && list[0]) setAd(list[0]); }).catch(() => {}); return () => { cancelled = true; }; }, [position]);
