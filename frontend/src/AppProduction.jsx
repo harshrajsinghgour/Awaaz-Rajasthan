@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 const E_PAPER_URL = import.meta.env.VITE_E_PAPER_URL || "/epaper";
-const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
+const BUILD_VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
 
 const CATEGORIES = ["होम", "राजस्थान", "जयपुर", "जोधपुर", "उदयपुर", "कोटा", "अजमेर", "भीलवाड़ा", "बीकानेर", "अलवर", "अपराध", "राजनीति", "शिक्षा", "नौकरी", "खेल", "देश", "दुनिया", "मनोरंजन", "बिजनेस"];
 const DISTRICTS = ["अजमेर", "अलवर", "बालोतरा", "बांसवाड़ा", "बारां", "बाड़मेर", "ब्यावर", "भरतपुर", "भीलवाड़ा", "बीकानेर", "बूंदी", "चित्तौड़गढ़", "चूरू", "दौसा", "डीग", "धौलपुर", "डीडवाना-कुचामन", "डूंगरपुर", "हनुमानगढ़", "जयपुर", "जैसलमेर", "जालौर", "झालावाड़", "झुंझुनूं", "जोधपुर", "करौली", "खैरथल-तिजारा", "कोटा", "कोटपूतली-बहरोड़", "नागौर", "पाली", "फलोदी", "प्रतापगढ़", "राजसमंद", "सलूम्बर", "सवाई माधोपुर", "सीकर", "सिरोही", "श्रीगंगानगर", "टोंक", "उदयपुर"];
@@ -58,6 +58,16 @@ export default function AppProduction() {
   const [news, setNews] = useState(FALLBACK), [loading, setLoading] = useState(Boolean(API_BASE)), [category, setCategory] = useState("होम"), [district, setDistrict] = useState(""), [query, setQuery] = useState(""), [searchOpen, setSearchOpen] = useState(false), [menuOpen, setMenuOpen] = useState(false);
   const [saved, setSaved] = useState(() => { try { return JSON.parse(localStorage.getItem("awaaz-bookmarks") || "[]"); } catch { return []; } }), [savedOnly, setSavedOnly] = useState(false), [article, setArticle] = useState(null), [notifyOpen, setNotifyOpen] = useState(false), [notifyState, setNotifyState] = useState("idle"), [toast, setToast] = useState("");
   const [dark, setDark] = useState(() => localStorage.getItem("awaaz-theme") === "dark"), [showTop, setShowTop] = useState(false), [installPrompt, setInstallPrompt] = useState(null);
+  const [vapidPublicKey, setVapidPublicKey] = useState(BUILD_VAPID_PUBLIC_KEY);
+  useEffect(() => {
+    if (vapidPublicKey || !API_BASE) return;
+    let cancelled = false;
+    fetch(`${API_BASE}/api/notifications/public-key`, { headers: { Accept: "application/json" } })
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => { if (!cancelled && data?.publicKey) setVapidPublicKey(String(data.publicKey).trim()); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [vapidPublicKey]);
 
   useEffect(() => { document.documentElement.lang = "hi"; document.documentElement.dataset.theme = dark ? "dark" : "light"; localStorage.setItem("awaaz-theme", dark ? "dark" : "light"); }, [dark]);
   useEffect(() => { const onScroll = () => setShowTop(window.scrollY > 650); const onInstall = e => { e.preventDefault(); setInstallPrompt(e); }; window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("beforeinstallprompt", onInstall); return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("beforeinstallprompt", onInstall); }; }, []);
@@ -78,7 +88,7 @@ export default function AppProduction() {
 
   async function enableNotifications() {
     if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) { setNotifyState("error"); setToast("इस डिवाइस पर पुश नोटिफिकेशन उपलब्ध नहीं है"); return; }
-    if (!VAPID_PUBLIC_KEY) { setNotifyState("error"); setToast("नोटिफिकेशन सेवा अभी कॉन्फ़िगर नहीं है"); return; }
+    if (!vapidPublicKey) { setNotifyState("error"); setToast("नोटिफिकेशन सेवा अभी कॉन्फ़िगर नहीं है"); return; }
     if (!API_BASE) { setNotifyState("error"); setToast("नोटिफिकेशन सर्वर अभी कॉन्फ़िगर नहीं है"); return; }
     setNotifyState("loading");
     try {
@@ -87,8 +97,8 @@ export default function AppProduction() {
       const reg = await navigator.serviceWorker.register("/sw.js");
       let subscription = await reg.pushManager.getSubscription();
       if (!subscription) {
-        const pad = "=".repeat((4 - VAPID_PUBLIC_KEY.length % 4) % 4);
-        const base64 = (VAPID_PUBLIC_KEY + pad).replace(/-/g, "+").replace(/_/g, "/");
+        const pad = "=".repeat((4 - vapidPublicKey.length % 4) % 4);
+        const base64 = (vapidPublicKey + pad).replace(/-/g, "+").replace(/_/g, "/");
         const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
         subscription = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: bytes });
       }
