@@ -75,7 +75,27 @@ export default function AppProduction() {
 
   useEffect(() => { document.documentElement.lang = "hi"; document.documentElement.dataset.theme = dark ? "dark" : "light"; writeStorage("awaaz-theme", dark ? "dark" : "light"); }, [dark]);
   useEffect(() => { const onScroll = () => setShowTop(window.scrollY > 650); const onInstall = e => { e.preventDefault(); setInstallPrompt(e); }; window.addEventListener("scroll", onScroll, { passive: true }); window.addEventListener("beforeinstallprompt", onInstall); return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("beforeinstallprompt", onInstall); }; }, []);
-  useEffect(() => {\n    if (!API_BASE) return;\n    let cancelled = false;\n    const controller = new AbortController();\n    const timeoutId = window.setTimeout(() => controller.abort(), 8000);\n    const timer = setTimeout(() => {\n      const params = new URLSearchParams({ limit: "100" });\n      if (category !== "होम") params.set("category", category);\n      if (district) params.set("location", district);\n      if (query.trim()) params.set("q", query.trim());\n      fetch(`${API_BASE}/api/news?${params.toString()}`, { headers: { Accept: "application/json" }, signal: controller.signal })\n        .then(r => r.ok ? r.json() : Promise.reject())\n        .then(data => {\n          const list = Array.isArray(data) ? data : (data.news || data.data || data.articles || []);\n          if (!cancelled && Array.isArray(list) && list.length) setNews(list.map(normalize));\n        })\n        .catch(() => {})\n        .finally(() => { if (!cancelled) setLoading(false); });\n    }, query.trim() ? 350 : 0);\n    return () => { cancelled = true; clearTimeout(timer); clearTimeout(timeoutId); controller.abort(); };\n  }, [category, district, query]);
+  useEffect(() => {
+    if (!API_BASE) return;
+    let cancelled = false;
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 8000);
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams({ limit: "100" });
+      if (category !== "होम") params.set("category", category);
+      if (district) params.set("location", district);
+      if (query.trim()) params.set("q", query.trim());
+      fetch(`${API_BASE}/api/news?${params.toString()}`, { headers: { Accept: "application/json" }, signal: controller.signal })
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(data => {
+          const list = Array.isArray(data) ? data : (data.news || data.data || data.articles || []);
+          if (!cancelled && Array.isArray(list) && list.length) setNews(list.map(normalize));
+        })
+        .catch(() => {})
+        .finally(() => { if (!cancelled) setLoading(false); });
+    }, query.trim() ? 350 : 0);
+    return () => { cancelled = true; clearTimeout(timer); clearTimeout(timeoutId); controller.abort(); };
+  }, [category, district, query]);
   useEffect(() => { writeStorage("awaaz-bookmarks", JSON.stringify(saved)); }, [saved]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 2400); return () => clearTimeout(t); }, [toast]);
   useEffect(() => {
