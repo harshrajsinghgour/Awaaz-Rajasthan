@@ -43,7 +43,7 @@ const adClickLimiter=rateLimit({windowMs:15*60*1000,limit:60,standardHeaders:"dr
 const subscriptionLimiter=rateLimit({windowMs:60*60*1000,limit:10,standardHeaders:"draft-8",legacyHeaders:false});
 app.use("/uploads",express.static(uploadDir,{maxAge:"7d",immutable:true}));
 
-const NEWS_CATEGORIES=["राजस्थान","जयपुर","जोधपुर","उदयपुर","कोटा","अजमेर","भीलवाड़ा","बीकानेर","अलवर","अपराध","राजनीति","खेल","शिक्षा","नौकरी","देश","दुनिया","मनोरंजन","बिजनेस"];
+const NEWS_CATEGORIES=["राजस्थान","जयपुर","जोधपुर","उदयपुर","कोटा","अजमेर","भीलवाड़ा","बीकानेर","सभी जिले","अपराध","राजनीति","खेल","शिक्षा","नौकरी","देश","दुनिया","मनोरंजन","बिजनेस"];
 const AD_POSITIONS=["home_top","home_inline","sidebar","article_top","article_bottom","mobile","desktop"];
 const AD_DEVICES=["all","mobile","desktop"];
 const newsSchema=new mongoose.Schema({title:{type:String,required:true,trim:true,maxlength:220},slug:{type:String,unique:true,sparse:true,index:true},excerpt:{type:String,trim:true,maxlength:600,default:""},content:{type:String,default:""},category:{type:String,default:"राजस्थान",index:true},location:{type:String,default:"राजस्थान",index:true},image:{type:String,default:""},author:{type:String,default:"आवाज़ राजस्थान"},video:{type:String,default:""},status:{type:String,enum:["draft","published","archived"],default:"draft",index:true},featured:{type:Boolean,default:false,index:true},breaking:{type:Boolean,default:false,index:true},views:{type:Number,default:0},publishedAt:{type:Date,default:null,index:true}},{timestamps:true});
