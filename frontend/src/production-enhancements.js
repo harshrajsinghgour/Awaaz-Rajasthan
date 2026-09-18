@@ -28,10 +28,7 @@ function syncMobileNavigation() {
     buttons[1].addEventListener("click", (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
-      const target = [...document.querySelectorAll(".category-nav button")]
-        .find((node) => node.textContent?.includes("राजस्थान"));
-      target?.click();
-      window.setTimeout(() => scrollToElement(".latest-section"), 0);
+      scrollToElement(".latest-section");
     });
   }
   if (!buttons[2].dataset.productionBound) {
