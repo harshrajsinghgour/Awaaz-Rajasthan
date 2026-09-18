@@ -1,6 +1,7 @@
 const $=id=>document.getElementById(id);
 let me=null,news=[],ads=[],admins=[];
-function getApiBase(){return String(localStorage.getItem("awaaz_admin_api")||"").replace(/\/$/,"");}
+const DEFAULT_API_BASE="https://awaazrajasthan.onrender.com";
+function getApiBase(){return String(localStorage.getItem("awaaz_admin_api")||DEFAULT_API_BASE).replace(/\/$/,"");}
 function setApiBase(){const input=$("apiBase");const value=String(input?.value||"").trim().replace(/\/$/,"");if(value){localStorage.setItem("awaaz_admin_api",value);return value;}return getApiBase();}
 function initApiBase(){const input=$("apiBase");if(input)input.value=getApiBase();}
 async function api(path,options={}){const base=getApiBase();if(!base)throw new Error("पहले Backend API URL भरें।");const opts={credentials:"include",...options};opts.headers={"Content-Type":"application/json",...(options.headers||{})};const r=await fetch(base+path,opts);let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.message||"Request failed");return d;}
