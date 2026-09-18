@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const API_BASE = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "https://awaazrajasthan.onrender.com").replace(/\/$/, "");
-const E_PAPER_URL = import.meta.env.VITE_E_PAPER_URL || "/epaper";
+const E_PAPER_URL = import.meta.env.VITE_E_PAPER_URL || `${API_BASE}/api/epaper/latest`;
 const BUILD_VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
 
 const CATEGORIES = ["होम", "राजस्थान", "जयपुर", "जोधपुर", "उदयपुर", "कोटा", "अजमेर", "भीलवाड़ा", "सभी जिले", "अपराध", "राजनीति", "शिक्षा", "नौकरी", "खेल", "देश", "दुनिया", "मनोरंजन", "बिजनेस"];
