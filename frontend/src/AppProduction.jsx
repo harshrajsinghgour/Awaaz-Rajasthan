@@ -99,6 +99,11 @@ export default function AppProduction() {
   useEffect(() => { writeStorage("awaaz-bookmarks", JSON.stringify(saved)); }, [saved]);
   useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(""), 2400); return () => clearTimeout(t); }, [toast]);
   useEffect(() => {
+    const onPopState = () => window.location.reload();
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+  useEffect(() => {
     const hashMatch = window.location.hash.match(/^#news-(.+)$/);
     const pathMatch = window.location.pathname.match(/^\/news\/([^/]+)\/?$/);
     if (!hashMatch && !pathMatch) return;
