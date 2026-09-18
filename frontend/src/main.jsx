@@ -1,7 +1,6 @@
-import React, { Component, useEffect } from "react";
+import React, { Component } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./AppProduction";
-import LegacyApp from "./App.jsx";
 import "./index.css";
 import "./production-polish.css";
 import "./app-production.css";
@@ -9,113 +8,52 @@ import "./final-production-polish.css";
 import "./production-completion.css";
 import "./premium-editorial.css";
 
-function handlePwaShortcut() {
-  const section = new URLSearchParams(window.location.search).get("section");
-  if (!section) return;
-  const run = () => {
-    if (section === "search") {
-      document.querySelector('[aria-label="खोजें"]')?.click();
-    } else if (section === "saved") {
-      const button = [...document.querySelectorAll(".mobile-bottom-nav button")]
-        .find((node) => node.textContent?.includes("सेव"));
-      button?.click();
-    } else if (section === "latest") {
-      const heading = [...document.querySelectorAll("h2")]
-        .find((node) => node.textContent?.trim() === "ताज़ा खबरें");
-      heading?.closest(".latest-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    const cleanUrl = `${window.location.pathname}${window.location.hash}`;
-    window.history.replaceState(null, "", cleanUrl);
-  };
-  window.setTimeout(run, 0);
-}
-if ("serviceWorker" in navigator && import.meta.env.PROD) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").then((registration) => {
-      registration.update().catch(() => {});
-    }).catch(() => {});
-  });
-}
-class ProductionErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { failed: false };
+class FrontendErrorBoundary extends Component {
+  state = { error: null };
+
+  static getDerivedStateFromError(error) {
+    return { error };
   }
 
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  componentDidCatch(error) {
-    console.error("Awaaz Rajasthan frontend error:", error);
+  componentDidCatch(error, info) {
+    console.error("Awaaz Rajasthan frontend runtime error:", error, info);
   }
 
   render() {
-    if (!this.state.failed) return this.props.children;
-    return <LegacyApp />;
-    /*
-      <main style={{ minHeight: "100dvh", display: "grid", placeItems: "center", padding: "24px", background: "#f4f5f7" }}>
-        <section style={{ width: "min(92vw, 420px)", textAlign: "center", background: "#fff", borderRadius: "24px", padding: "30px 22px", boxShadow: "0 16px 45px rgba(7,17,31,.12)" }}>
-          <img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान" style={{ width: "min(58vw, 250px)", margin: "0 auto 18px" }} />
-          <h1 style={{ margin: "0 0 8px", color: "#07111f", fontSize: "25px" }}>आवाज़ राजस्थान</h1>
-          <p style={{ margin: "0 0 18px", color: "#687282", lineHeight: 1.6 }}>वेबसाइट लोड करते समय एक समस्या आई।</p>
-          <button type="button" onClick={() => window.location.reload()} style={{ border: 0, borderRadius: "10px", background: "#d71920", color: "#fff", padding: "11px 20px", fontWeight: 800 }}>फिर कोशिश करें</button>
-        </section>
-      </main>
-    );
-    /*
-      <main style={{
-        minHeight: "100dvh",
-        display: "grid",
-        placeItems: "center",
-        padding: "24px",
-        background: "#f4f5f7"
-      }}>
-        <section style={{
-          width: "min(92vw, 420px)",
-          textAlign: "center",
-          background: "#fff",
-          borderRadius: "24px",
-          padding: "30px 22px",
-          boxShadow: "0 16px 45px rgba(7,17,31,.12)"
-        }}>
-          <img
-            src="/awaazrajasthan-logo.png"
-            alt="आवाज़ राजस्थान"
-            style={{ width: "min(58vw, 250px)", height: "auto", display: "block", margin: "0 auto 18px" }}
-          />
-          <h1 style={{ margin: "0 0 8px", color: "#07111f", fontSize: "25px" }}>आवाज़ राजस्थान</h1>
-          <p style={{ margin: "0 0 18px", color: "#687282", lineHeight: 1.6 }}>वेबसाइट लोड करते समय एक समस्या आई। कृपया पेज को दोबारा खोलें।</p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            style={{
-              border: 0,
-              borderRadius: "10px",
-              background: "#d71920",
-              color: "#fff",
-              padding: "11px 20px",
-              fontWeight: 800,
-              cursor: "pointer"
-            }}
-          >फिर कोशिश करें</button>
-        </section>
-      </main>
-    )*/
+    if (this.state.error) {
+      return (
+        <main style={{ minHeight: "100dvh", display: "grid", placeItems: "center", padding: 24, background: "#f4f5f7", fontFamily: "system-ui,sans-serif" }}>
+          <section style={{ width: "min(92vw,460px)", textAlign: "center", background: "#fff", borderRadius: 20, padding: "30px 22px", boxShadow: "0 16px 45px rgba(7,17,31,.12)" }}>
+            <img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान" style={{ width: "min(58vw,220px)", maxWidth: "100%", margin: "0 auto 18px" }} />
+            <h1 style={{ margin: "0 0 8px", color: "#07111f", fontSize: 24 }}>आवाज़ राजस्थान</h1>
+            <p style={{ margin: "0 0 18px", color: "#687282", lineHeight: 1.6 }}>वेबसाइट लोड करते समय एक तकनीकी समस्या आई।</p>
+            <button type="button" onClick={() => window.location.reload()} style={{ border: 0, borderRadius: 10, background: "#d71920", color: "#fff", padding: "12px 22px", fontWeight: 800, cursor: "pointer" }}>फिर कोशिश करें</button>
+          </section>
+        </main>
+      );
+    }
+    return this.props.children;
   }
 }
 
-function AppBootstrap() {
-  useEffect(() => {
-    handlePwaShortcut();
-    // Non-critical URL/SEO bridges must never block the main application from mounting.
-    import("./article-route.js").catch((error) => console.error("Article route bridge:", error));
-    import("./seo-runtime.js").catch((error) => console.error("SEO runtime:", error));
-  }, []);
-  return <App />;
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator) || !import.meta.env.PROD) return;
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").then(registration => {
+      registration.update().catch(() => {});
+    }).catch(error => console.warn("Service worker registration skipped:", error));
+  }, { once: true });
 }
-ReactDOM.createRoot(document.getElementById("root")).render(
+
+registerServiceWorker();
+
+const root = document.getElementById("root");
+if (!root) throw new Error("Awaaz Rajasthan root element is missing.");
+
+ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <ProductionErrorBoundary><AppBootstrap /></ProductionErrorBoundary>
+    <FrontendErrorBoundary>
+      <App />
+    </FrontendErrorBoundary>
   </React.StrictMode>
 );
