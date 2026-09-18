@@ -135,3 +135,6 @@ export default function AppProduction() {
     {showTop && <button className="to-top" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>↑</button>}{toast && <div className="toast" role="status">{toast}</div>}
   </div>;
 }
+
+
+export default AppProduction;
