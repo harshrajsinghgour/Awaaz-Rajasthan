@@ -2,6 +2,10 @@
 
 Production-oriented Rajasthan news platform with a mobile-first React frontend, Express/MongoDB API and owner-controlled admin console.
 
+## Preview testing
+
+The `vercel-preview` branch is reserved for Vercel Preview testing. Production deployment should be performed only after preview verification and final approval.
+
 ## Structure
 
 - `frontend/` — Vite + React public website and PWA
