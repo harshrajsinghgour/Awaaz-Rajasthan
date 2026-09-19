@@ -185,8 +185,64 @@ app.post("/api/notifications/subscribe",subscriptionLimiter,async(req,res,next)=
 app.post("/api/admin/login",async(req,res,next)=>{try{const email=String(req.body.email||"").toLowerCase().trim(),password=String(req.body.password||"");if(!isValidEmail(email)||!password)return res.status(401).json({message:"ईमेल या पासवर्ड गलत है।"});const a=await Admin.findOne({email});if(!a||!a.active||!(await verifyAdminPassword(a,password))){console.warn("ADMIN_LOGIN_FAILED",JSON.stringify({email,exists:!!a,active:a?.active===true,hashPresent:!!a?.passwordHash,hashType:a?.passwordHash?String(a.passwordHash).slice(0,4):null}));return res.status(401).json({message:"ईमेल या पासवर्ड गलत है।"});}a.lastLoginAt=new Date();await a.save();setCookie(res,sign(a));res.json({admin:safe(a),token:sign(a)});}catch(e){next(e);}});
 app.post("/api/admin/logout",(_r,res)=>{clearCookie(res);res.json({ok:true});});
 app.get("/api/admin/me",auth,(req,res)=>res.json({admin:safe(req.admin)}));
-app.post("/api/admin/admin-password/request-otp",auth,ownerOnly,async(req,res,next)=>{try{const target=await Admin.findById(req.body?.adminId);if(!target||target.role==="owner")return res.status(404).json({message:"Admin not found"});const otp=String(Math.floor(100000+Math.random()*900000));await AdminOtp.updateMany({adminId:target._id,used:false},{$set:{used:true}});await AdminOtp.create({adminId:target._id,otpHash:await bcrypt.hash(otp,10),expiresAt:new Date(Date.now()+10*60*1000)});await sendAdminOtpEmail(target.email,target.name,otp);res.json({ok:true,message:"OTP sent to registered admin email"});}catch(e){next(e);}});
-app.post("/api/admin/admin-password/reset-otp",auth,ownerOnly,async(req,res,next)=>{try{const adminId=String(req.body?.adminId||""),otp=String(req.body?.otp||"").trim(),nextPassword=String(req.body?.newPassword||"");if(!/^\d{6}$/.test(otp))return res.status(400).json({message:"Invalid OTP"});if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});const target=await Admin.findById(adminId);if(!target||target.role==="owner")return res.status(404).json({message:"Admin not found"});const record=await AdminOtp.findOne({adminId:target._id,used:false,expiresAt:{$gt:new Date()}}).sort({createdAt:-1});if(!record)return res.status(400).json({message:"OTP expired or not requested"});if(record.attempts>=5)return res.status(429).json({message:"Too many OTP attempts"});if(!(await bcrypt.compare(otp,record.otpHash))){record.attempts+=1;await record.save();return res.status(401).json({message:"Incorrect OTP"});}target.passwordHash=await bcrypt.hash(nextPassword,12);target.sessionVersion+=1;await target.save();record.used=true;await record.save();await AdminOtp.deleteMany({adminId:target._id});res.json({ok:true});}catch(e){next(e);}});
+const issueAdminOtp=async(target)=>{
+ const otp=String(crypto.randomInt(100000,1000000));
+ await sendAdminOtpEmail(target.email,target.name,otp);
+ await AdminOtp.updateMany({adminId:target._id,used:false},{$set:{used:true}});
+ await AdminOtp.create({adminId:target._id,otpHash:await bcrypt.hash(otp,10),expiresAt:new Date(Date.now()+10*60*1000)});
+};
+const resetAdminWithOtp=async(target,otp,nextPassword)=>{
+ const record=await AdminOtp.findOne({adminId:target._id,used:false,expiresAt:{$gt:new Date()}}).sort({createdAt:-1});
+ if(!record)return {status:400,message:"OTP expired or not requested"};
+ if(record.attempts>=5)return {status:429,message:"Too many OTP attempts"};
+ if(!(await bcrypt.compare(otp,record.otpHash))){record.attempts+=1;await record.save();return {status:401,message:"Incorrect OTP"};}
+ target.passwordHash=await bcrypt.hash(nextPassword,12);
+ target.sessionVersion+=1;
+ await target.save();
+ record.used=true;await record.save();await AdminOtp.deleteMany({adminId:target._id});
+ return {ok:true};
+};
+app.post("/api/admin/password/request-otp",rateLimit({windowMs:15*60*1000,limit:5,standardHeaders:"draft-8",legacyHeaders:false}),async(req,res,next)=>{
+ try{
+  const email=String(req.body?.email||"").toLowerCase().trim();
+  if(!isValidEmail(email))return res.status(400).json({message:"Valid email required"});
+  const target=await Admin.findOne({email,active:true});
+  if(target) await issueAdminOtp(target);
+  res.json({ok:true,message:"अगर यह registered admin email है, OTP भेज दिया गया है।"});
+ }catch(e){next(e);}
+});
+app.post("/api/admin/password/reset-otp",rateLimit({windowMs:15*60*1000,limit:10,standardHeaders:"draft-8",legacyHeaders:false}),async(req,res,next)=>{
+ try{
+  const email=String(req.body?.email||"").toLowerCase().trim(),otp=String(req.body?.otp||"").trim(),nextPassword=String(req.body?.newPassword||"");
+  if(!isValidEmail(email)||!/^[0-9]{6}$/.test(otp))return res.status(400).json({message:"Valid email और 6 digit OTP required"});
+  if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});
+  const target=await Admin.findOne({email,active:true});
+  if(!target)return res.status(400).json({message:"OTP expired or invalid"});
+  const result=await resetAdminWithOtp(target,otp,nextPassword);
+  if(result.ok)return res.json({ok:true,message:"Password successfully changed. अब नए password से login करें।"});
+  return res.status(result.status).json({message:result.message});
+ }catch(e){next(e);}
+});
+app.post("/api/admin/admin-password/request-otp",auth,ownerOnly,async(req,res,next)=>{
+ try{
+  const target=await Admin.findById(req.body?.adminId);
+  if(!target||target.role==="owner")return res.status(404).json({message:"Admin not found"});
+  await issueAdminOtp(target);
+  res.json({ok:true,message:"OTP sent to registered admin email"});
+ }catch(e){next(e);}
+});
+app.post("/api/admin/admin-password/reset-otp",auth,ownerOnly,async(req,res,next)=>{
+ try{
+  const adminId=String(req.body?.adminId||""),otp=String(req.body?.otp||"").trim(),nextPassword=String(req.body?.newPassword||"");
+  if(!/^\d{6}$/.test(otp))return res.status(400).json({message:"Invalid OTP"});
+  if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});
+  const target=await Admin.findById(adminId);
+  if(!target||target.role==="owner")return res.status(404).json({message:"Admin not found"});
+  const result=await resetAdminWithOtp(target,otp,nextPassword);
+  if(result.ok)return res.json({ok:true});
+  return res.status(result.status).json({message:result.message});
+ }catch(e){next(e);}
+});
 app.post("/api/admin/change-password",auth,async(req,res,next)=>{try{const current=String(req.body.currentPassword||""),nextPassword=String(req.body.newPassword||"");if(nextPassword.length<10)return res.status(400).json({message:"New password must be at least 10 characters"});if(!(await bcrypt.compare(current,req.admin.passwordHash)))return res.status(401).json({message:"Current password is incorrect"});req.admin.passwordHash=await bcrypt.hash(nextPassword,12);req.admin.sessionVersion+=1;await req.admin.save();setCookie(res,sign(req.admin));res.json({ok:true});}catch(e){next(e);}});
 app.post("/api/admin/logout-all",auth,async(req,res)=>{req.admin.sessionVersion+=1;await req.admin.save();clearCookie(res);res.json({ok:true});});
 app.get("/api/admin/dashboard",auth,async(req,res,next)=>{try{const [news,published,drafts,ads,views,ast]=await Promise.all([News.countDocuments(),News.countDocuments({status:"published"}),News.countDocuments({status:"draft"}),Ad.countDocuments(),News.aggregate([{$group:{_id:null,total:{$sum:"$views"}}}]),Ad.aggregate([{$group:{_id:null,impressions:{$sum:"$impressions"},clicks:{$sum:"$clicks"}}}])]);res.json({stats:{news,published,drafts,ads,views:views[0]?.total||0,impressions:ast[0]?.impressions||0,clicks:ast[0]?.clicks||0}});}catch(e){next(e);}});
