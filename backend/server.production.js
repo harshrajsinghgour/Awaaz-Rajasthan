@@ -98,8 +98,23 @@ const adminOtpSchema=new mongoose.Schema({adminId:{type:mongoose.Schema.Types.Ob
 const subscriberSchema=new mongoose.Schema({endpoint:{type:String,required:true,unique:true},subscription:{type:mongoose.Schema.Types.Mixed,required:true},active:{type:Boolean,default:true}},{timestamps:true});
 const News=mongoose.model("News",newsSchema),Ad=mongoose.model("Ad",adSchema),AdBooking=mongoose.model("AdBooking",adBookingSchema),Admin=mongoose.model("Admin",adminSchema),Subscriber=mongoose.model("Subscriber",subscriberSchema),Epaper=mongoose.model("Epaper",epaperSchema),Category=mongoose.model("Category",categorySchema),AdPrice=mongoose.model("AdPrice",adPriceSchema),AdminOtp=mongoose.model("AdminOtp",adminOtpSchema);
 const upload=multer({storage:multer.diskStorage({destination:(_r,_f,cb)=>cb(null,uploadDir),filename:(_r,f,cb)=>cb(null,`${crypto.randomBytes(12).toString("hex")}${path.extname(f.originalname).toLowerCase()}`)}),limits:{fileSize:Number(process.env.MAX_UPLOAD_MB||8)*1024*1024},fileFilter:(_r,f,cb)=>cb(/^(image\/(jpeg|png|webp|gif)|video\/(mp4|webm|ogg)|application\/pdf)$/.test(f.mimetype)?null:new Error("केवल JPG, PNG, WEBP, GIF, MP4, WEBM, OGG या PDF फ़ाइल स्वीकार है।"),true)});
+const RESEND_API_KEY=String(process.env.RESEND_API_KEY||"").trim();
+const RESEND_FROM=String(process.env.RESEND_FROM||"").trim();
 const mailTransporter=process.env.SMTP_HOST?nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||587),secure:String(process.env.SMTP_SECURE||"false")==="true",auth:process.env.SMTP_USER?{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}:undefined}):null;
-async function sendAdminOtpEmail(to,name,otp){if(!mailTransporter||!process.env.SMTP_FROM)throw new Error("SMTP email service is not configured on Render");await mailTransporter.sendMail({from:process.env.SMTP_FROM,to,subject:"Awaaz Rajasthan Admin Password OTP",text:"Hello "+(name||"Admin")+", your OTP to reset the Awaaz Rajasthan admin password is "+otp+". It expires in 10 minutes. If you did not request this, ignore this email."});}
+async function sendAdminOtpEmail(to,name,otp){
+ const subject="Awaaz Rajasthan Admin Password OTP";
+ const text="Hello "+(name||"Admin")+", your OTP to reset the Awaaz Rajasthan admin password is "+otp+". It expires in 10 minutes. If you did not request this, ignore this email.";
+ if(RESEND_API_KEY&&RESEND_FROM){
+  const response=await fetch("https://api.resend.com/emails",{method:"POST",headers:{"Authorization":"Bearer "+RESEND_API_KEY,"Content-Type":"application/json"},body:JSON.stringify({from:RESEND_FROM,to:[to],subject,text})});
+  if(!response.ok){const body=await response.text().catch(()=>"" );throw new Error("Resend email failed: "+response.status+" "+body.slice(0,300));}
+  return;
+ }
+ if(mailTransporter&&process.env.SMTP_FROM){
+  await mailTransporter.sendMail({from:process.env.SMTP_FROM,to,subject,text});
+  return;
+ }
+ throw new Error("Email service is not configured on Render"); 
+}
 const sign=a=>jwt.sign({sub:String(a._id),role:a.role,email:a.email,sv:a.sessionVersion||0},JWT_SECRET||"development-secret",{expiresIn:"8h"});
 async function verifyAdminPassword(admin,password){
  if(!admin||typeof password!=="string"||!password)return false;
