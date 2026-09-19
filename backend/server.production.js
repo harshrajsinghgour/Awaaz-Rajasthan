@@ -105,7 +105,7 @@ async function verifyAdminPassword(admin,password){
  if(!admin||typeof password!=="string"||!password)return false;
  const stored=String(admin.passwordHash||"");
  try{
-  if(/^\\$2[aby]\\$\\d{2}\\$/.test(stored)) return await bcrypt.compare(password,stored);
+  if(/^\$2[aby]\$\d{2}\$/.test(stored)) return await bcrypt.compare(password,stored);
  }catch{}
  // Migrate legacy plaintext passwords created by older admin builds.
  if(stored&&stored===password){
