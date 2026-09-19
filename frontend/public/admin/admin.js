@@ -17,6 +17,29 @@ async function boot(){initApiBase();try{me=(await api("/api/admin/me")).admin;sh
 function showLogin(){$("login").classList.remove("hidden");$("panel").classList.add("hidden")}
 function showPanel(){$("login").classList.add("hidden");$("panel").classList.remove("hidden");document.querySelector('[data-tab="ads"]').style.display=me.role==="owner"?"":"none";document.querySelector('[data-tab="admins"]').style.display=me.role==="owner"?"":"none";document.querySelector('[data-tab="epaper"]').style.display=me.role==="owner"?"":"none";document.querySelector('[data-tab="categories"]').style.display=me.role==="owner"?"":"none";$("notificationControl").classList.toggle("hidden",me.role!=="owner")}
 $("loginForm").onsubmit=async e=>{e.preventDefault();setApiBase();$("loginError").textContent="";try{const r=await api("/api/admin/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});me=r.admin;if(r.token)localStorage.setItem("awaaz_admin_token",r.token);showPanel();await loadAll()}catch(err){$("loginError").textContent=err.message}};
+$("openForgotPassword")?.addEventListener("click",()=>{$("forgotPasswordBox").classList.toggle("hidden");$("forgotPasswordMsg").textContent="";});
+$("sendForgotOtp")?.addEventListener("click",async()=>{
+ const email=$("forgotEmail").value.trim().toLowerCase();
+ if(!email)return toast("Registered admin email डालें");
+ const btn=$("sendForgotOtp");btn.disabled=true;btn.textContent="OTP भेज रहे हैं...";
+ try{
+  const r=await api("/api/admin/password/request-otp",{method:"POST",body:JSON.stringify({email})});
+  $("forgotOtpStep").classList.remove("hidden");$("forgotPasswordMsg").textContent=r.message||"OTP भेज दिया गया है।";
+ }catch(e){$("forgotPasswordMsg").textContent=e.message||"OTP भेजने में समस्या हुई।"}
+ finally{btn.disabled=false;btn.textContent="📧 OTP भेजें";}
+});
+$("resetForgotPassword")?.addEventListener("click",async()=>{
+ const email=$("forgotEmail").value.trim().toLowerCase(),otp=$("forgotOtp").value.trim(),newPassword=$("forgotNewPassword").value;
+ if(!/^\d{6}$/.test(otp))return toast("6 digit OTP डालें");
+ if(newPassword.length<10)return toast("Password कम से कम 10 characters का होना चाहिए");
+ const btn=$("resetForgotPassword");btn.disabled=true;
+ try{
+  await api("/api/admin/password/reset-otp",{method:"POST",body:JSON.stringify({email,otp,newPassword})});
+  $("forgotPasswordMsg").textContent="Password बदल गया है। अब नए password से login करें।";
+  $("forgotOtpStep").classList.add("hidden");$("forgotOtp").value="";$("forgotNewPassword").value="";
+ }catch(e){$("forgotPasswordMsg").textContent=e.message||"Password reset नहीं हुआ।"}
+ finally{btn.disabled=false;}
+});
 $("logout").onclick=async()=>{try{await api("/api/admin/logout",{method:"POST"})}finally{localStorage.removeItem("awaaz_admin_token");location.reload()}};
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button,.tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active")});
 $("goBreaking").onclick=()=>{document.querySelector('[data-tab="news"]').click();$("newsForm").classList.remove("hidden");scrollTo(0,0)};
