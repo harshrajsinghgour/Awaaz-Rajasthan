@@ -22,3 +22,50 @@
 @media(min-width:1200px){.site-container{width:1180px}.header-main{min-height:90px}.brand-mark{width:64px;height:64px}.brand-copy strong{font-size:29px}.news-image.large{height:420px}}
 
 .epaper-page{min-height:100vh;background:linear-gradient(180deg,#07111c 0 180px,#f7f7f5 180px);color:#101722;padding-bottom:80px}.epaper-head{height:82px;display:flex;align-items:center;justify-content:space-between;max-width:1180px;margin:auto;padding:0 20px}.epaper-brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}.epaper-brand img{width:48px;height:48px;border-radius:50%;object-fit:cover}.epaper-brand span{display:flex;flex-direction:column}.epaper-brand b{font-size:20px}.epaper-brand small{color:#d7b45a}.epaper-home{color:#fff;text-decoration:none;font-weight:700}.epaper-main{padding-top:44px}.epaper-title{text-align:center;max-width:760px;margin:0 auto 28px}.epaper-title>span{font-size:12px;letter-spacing:2px;color:#b01922;font-weight:800}.epaper-title h1{font-size:clamp(30px,6vw,52px);margin:8px 0}.epaper-title p{color:#66707b;margin:0}.epaper-filter{background:linear-gradient(145deg,#fff,#fffaf2);border:1px solid #e1e4e8;border-radius:22px;padding:20px;max-width:760px;margin:0 auto 28px;box-shadow:0 12px 34px #07111c14}.epaper-filter label{display:flex;flex-direction:column;gap:9px;font-weight:800}.epaper-filter-label{font-size:16px;color:#07111c}.epaper-filter select{width:100%;min-height:56px;border:2px solid #d9dde2;border-radius:15px;padding:13px 46px 13px 16px;background:#fff;color:#07111c;font:inherit;font-size:17px;font-weight:800;outline:none;box-shadow:0 3px 10px #07111c0a;transition:border-color .2s,box-shadow .2s}.epaper-filter select:focus{border-color:#b01922;box-shadow:0 0 0 4px #b0192214}.epaper-filter select:disabled{opacity:.7}.epaper-filter small{font-size:12px;font-weight:600;color:#747c85}.epaper-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}.epaper-card{background:#fff;border:1px solid #e3e5e8;border-radius:20px;overflow:hidden;box-shadow:0 10px 30px #07111c10}.epaper-preview{height:240px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fffdf8;border-bottom:1px solid #eee;gap:8px;text-align:center}.epaper-watermark{position:absolute;width:210px;height:210px;object-fit:contain;opacity:.055;filter:grayscale(1);pointer-events:none}.epaper-preview-icon,.epaper-preview strong,.epaper-preview span{position:relative}.epaper-preview-icon{font-size:54px}.epaper-preview span{color:#707780}.epaper-card-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}.epaper-card-actions button,.epaper-card-actions a{border:0;border-radius:11px;padding:12px;text-align:center;text-decoration:none;font:inherit;font-weight:800;cursor:pointer;background:#07111c;color:#fff}.epaper-card-actions a{background:#b01922}.epaper-state{background:#fff;border:1px solid #e3e5e8;border-radius:18px;padding:35px;text-align:center;color:#68717a}@media(max-width:700px){.epaper-head{height:72px;padding:0 14px}.epaper-brand img{width:42px;height:42px}.epaper-brand b{font-size:16px}.epaper-main{padding:30px 14px}.epaper-filter{padding:16px;border-radius:19px}.epaper-filter select{min-height:54px;font-size:16px}.epaper-title h1{font-size:31px}.epaper-preview{height:210px}.epaper-card-actions{grid-template-columns:1fr}.epaper-home{font-size:14px}}
+
+/* Premium e-paper calendar */
+.epaper-date-panel{position:relative;background:linear-gradient(145deg,#fff 0%,#fffaf7 100%);border:1px solid #e4e6e9;border-radius:26px;padding:28px;max-width:980px;margin:0 auto 30px;box-shadow:0 18px 45px #07111c14}
+.epaper-date-panel-head{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.epaper-date-icon{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;background:#fde8e9;color:#c71922;font-size:34px;font-weight:900}
+.epaper-date-panel-head>div:nth-child(2){display:flex;flex-direction:column;gap:3px;min-width:0}
+.epaper-date-panel-head>div:nth-child(2) span{font-size:24px;font-weight:900;color:#101722}
+.epaper-date-panel-head>div:nth-child(2) strong{font-size:15px;color:#69727c;font-weight:600}
+.epaper-today-btn{margin-left:auto;border:0;border-radius:15px;background:#fde8e9;color:#b01922;padding:15px 20px;font:inherit;font-weight:900;cursor:pointer;white-space:nowrap;min-height:52px}
+.epaper-today-btn:hover{background:#f9d9db}
+.epaper-calendar-trigger{width:100%;min-height:66px;display:flex;align-items:center;gap:14px;border:2px solid #d9dde2;border-radius:17px;background:#fff;padding:10px 18px;color:#101722;font:inherit;cursor:pointer;text-align:left;transition:.2s}
+.epaper-calendar-trigger:hover,.epaper-calendar-trigger:focus{border-color:#d71920;box-shadow:0 0 0 4px #d7192012;outline:none}
+.calendar-trigger-icon{font-size:28px;color:#17334b}
+.calendar-trigger-date{font-size:20px;font-weight:900;flex:1}
+.calendar-trigger-arrow{font-size:29px;line-height:1;color:#101722}
+.epaper-date-help{display:block;margin-top:11px;color:#707983;font-size:13px;font-weight:600}
+.epaper-calendar-overlay{position:absolute;z-index:50;left:0;right:0;top:100%;margin-top:10px;display:flex;justify-content:center}
+.epaper-calendar{width:min(100%,680px);background:#fff;border:1px solid #e0e3e7;border-radius:22px;padding:20px;box-shadow:0 24px 60px #07111c2b}
+.epaper-calendar-top{display:grid;grid-template-columns:46px 1fr 46px;align-items:center;text-align:center;margin-bottom:12px}
+.epaper-calendar-top strong{font-size:25px;color:#101722}
+.epaper-calendar-top button{width:44px;height:44px;border:0;border-radius:12px;background:#f4f5f6;font-size:34px;line-height:1;cursor:pointer;color:#101722}
+.epaper-calendar-top button:hover{background:#fde8e9;color:#b01922}
+.epaper-weekdays,.epaper-days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.epaper-weekdays span{text-align:center;padding:8px 2px;color:#65707b;font-size:13px;font-weight:900}
+.epaper-weekdays .weekend{color:#c71922}
+.epaper-day{min-height:48px;border:0;border-radius:50%;background:transparent;font:inherit;font-size:16px;font-weight:800;color:#101722;cursor:pointer}
+.epaper-day.available:hover{background:#fde8e9;color:#b01922}
+.epaper-day.available.selected{background:#d71920;color:#fff;box-shadow:0 5px 15px #d7192030}
+.epaper-day.today:not(.selected){box-shadow:inset 0 0 0 2px #d71920;color:#b01922}
+.epaper-day.unavailable{color:#c8cdd2;cursor:not-allowed}
+.epaper-day.empty{pointer-events:none}
+.epaper-calendar-note{margin-top:14px;background:#fdecef;color:#6d5558;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:700;text-align:center}
+.epaper-calendar-close{width:100%;margin-top:12px;border:1px solid #d9dde2;background:#fff;border-radius:12px;padding:11px;font:inherit;font-weight:800;cursor:pointer}
+@media(max-width:700px){
+ .epaper-date-panel{padding:18px;border-radius:21px}
+ .epaper-date-panel-head{gap:11px;align-items:center}
+ .epaper-date-icon{width:52px;height:52px;font-size:28px;flex:none}
+ .epaper-date-panel-head>div:nth-child(2) span{font-size:19px}
+ .epaper-date-panel-head>div:nth-child(2) strong{font-size:12px}
+ .epaper-today-btn{padding:11px 12px;font-size:13px;border-radius:12px}
+ .epaper-calendar-trigger{min-height:60px;padding:8px 14px}
+ .calendar-trigger-date{font-size:17px}
+ .epaper-calendar{padding:14px;border-radius:18px}
+ .epaper-calendar-top strong{font-size:21px}
+ .epaper-day{min-height:44px;font-size:15px}
+ .epaper-weekdays span{font-size:11px}
+}
