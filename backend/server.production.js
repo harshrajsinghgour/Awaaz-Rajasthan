@@ -99,12 +99,18 @@ const boundedText=(value,max)=>String(value??"").trim().slice(0,max);
 const b2ObjectKey=(folder,file)=>`${folder}/${crypto.randomUUID()}-${path.basename(file.filename)}`;
 async function storeUploadedFile(file,folder){
  if(!file) throw new Error("File required");
- if(!B2_ENABLED) return {key:null,url:`${PUBLIC_API_URL}/uploads/${file.filename}`,relativeUrl:`/uploads/${file.filename}`,storage:"local"};
- const key=b2ObjectKey(folder,file);
- await b2.send(new PutObjectCommand({Bucket:B2_BUCKET_NAME,Key:key,Body:fs.createReadStream(file.path),ContentType:file.mimetype,CacheControl:"public, max-age=31536000, immutable"}));
- try{fs.unlinkSync(file.path)}catch{}
- const relative=`/api/media/${key.split("/").map(encodeURIComponent).join("/")}`;
- return {key,url:`${PUBLIC_API_URL}${relative}`,relativeUrl:relative,storage:"b2"};
+ const local=()=>({key:null,url:`${PUBLIC_API_URL}/uploads/${file.filename}`,relativeUrl:`/uploads/${file.filename}`,storage:"local"});
+ if(!B2_ENABLED) return local();
+ try{
+  const key=b2ObjectKey(folder,file);
+  await b2.send(new PutObjectCommand({Bucket:B2_BUCKET_NAME,Key:key,Body:fs.createReadStream(file.path),ContentType:file.mimetype,CacheControl:"public, max-age=31536000, immutable"}));
+  try{fs.unlinkSync(file.path)}catch{}
+  const relative=`/api/media/${key.split("/").map(encodeURIComponent).join("/")}`;
+  return {key,url:`${PUBLIC_API_URL}${relative}`,relativeUrl:relative,storage:"b2"};
+ }catch(error){
+  console.error("B2 upload failed; using local storage fallback:",error?.name||error?.Code||error?.message||error);
+  return local();
+ }
 }
 async function getB2SignedUrl(key){
  if(!B2_ENABLED) return null;
