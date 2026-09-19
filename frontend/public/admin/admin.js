@@ -41,6 +41,14 @@ $("saveAdPrices")?.addEventListener("click",async()=>{
   await api("/api/admin/ad-prices",{method:"PUT",body:JSON.stringify({prices:rows})});toast("Ad Price List save हो गई");await loadAdPrices();
  }catch(e){toast(e.message)}
 });
+async function loadAdFees(){
+ if(me?.role!=="owner")return;
+ try{
+  const r=await api("/api/admin/ad-bookings?status=paid"),rows=r.bookings||[];
+  $("adFeesList").innerHTML=rows.map(x=>'<div class="list-row booking-row"><div><b>'+esc(x.bookingId)+' · '+esc(x.businessName)+'</b><small>💰 ₹'+Number(x.amount||0).toLocaleString("en-IN")+' · '+esc(x.position)+' · '+esc(formatDate(x.startDate))+' → '+esc(formatDate(x.endDate))+'</small><small>Payment: <b>PAID</b> · UTR: '+esc(x.paymentTxnId||"—")+'</small></div><div class="booking-actions"><button onclick="setAdBookingStatus(this.dataset.id,\'approved\')" data-id="'+esc(x._id)+'">✅ Allow & Publish</button><button onclick="setAdBookingStatus(this.dataset.id,\'rejected\')" data-id="'+esc(x._id)+'" class="danger">Reject</button></div></div>').join("")||"<p>अभी कोई paid ad booking नहीं है।</p>";
+ }catch(e){$("adFeesList").innerHTML="<p>"+esc(e.message)+"</p>"}
+}
+$("refreshAdFees")?.addEventListener("click",loadAdFees);
 async function loadAdBookings(){
  if(me?.role!=="owner")return;
  try{
@@ -63,7 +71,7 @@ window.deleteAdBooking=async id=>{if(!confirm("यह ad booking और उस�
 $("refreshAdBookings")?.addEventListener("click",loadAdBookings);
 $("bookingStatusFilter")?.addEventListener("change",loadAdBookings);
 
-async function loadAll(){await refreshCategories();await loadDashboard();await loadNews();if(me.role==="owner")await Promise.all([loadAds(),loadAdBookings(),loadAdPrices(),loadAdmins(),loadOtpAdmins(),loadNotificationStatus(),loadCategories(),loadEpapers()])}
+async function loadAll(){await refreshCategories();await loadDashboard();await loadNews();if(me.role==="owner")await Promise.all([loadAds(),loadAdBookings(),loadAdFees(),loadAdPrices(),loadAdmins(),loadOtpAdmins(),loadNotificationStatus(),loadCategories(),loadEpapers()])}
 async function uploadEpaper(file){if(!file||file.type!=="application/pdf")throw new Error("केवल PDF ई-पेपर चुनें।");const base=getApiBase(),form=new FormData();form.append("file",file);const r=await fetch(base+"/api/admin/epapers/upload",{method:"POST",credentials:"include",body:form});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.message||"E-paper upload failed");return d.url||d.pdf;}
 async function loadEpapers(){if(me?.role!=="owner")return;try{const r=await api("/api/admin/epapers");const items=r.epapers||[];$("epaperList").innerHTML=items.map(x=>'<div class="list-row"><div><b>'+esc(x.title||"ई-पेपर")+'</b><small>'+esc(formatDate(x.issueDate))+' · '+esc(x.status)+'</small></div><div><button onclick="window.open('+JSON.stringify(x.pdf.startsWith("http")?x.pdf:getApiBase()+x.pdf)+',"_blank")">Open PDF</button><button class="danger" onclick="deleteEpaper(this.dataset.id)" data-id="'+esc(x._id)+'">Delete</button></div></div>').join("")||"<p>अभी कोई ई-पेपर upload नहीं है।</p>"}catch(e){$("epaperList").innerHTML="<p>"+esc(e.message)+"</p>"}}
 $("epaperFile")?.addEventListener("change",e=>{const f=e.target.files?.[0];$("epaperFileName").innerHTML=f?"<b>"+esc(f.name)+"</b> · "+(f.size/1024/1024).toFixed(2)+" MB":"<span>केवल PDF चुनें।</span>"});
