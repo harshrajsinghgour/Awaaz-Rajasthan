@@ -73,13 +73,12 @@ function EpaperPage() {
   const [date,setDate]=useState("");
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState("");
+  const [calendarOpen,setCalendarOpen]=useState(false);
+  const [calendarMonth,setCalendarMonth]=useState(()=>{const d=new Date();return new Date(d.getFullYear(),d.getMonth(),1)});
 
   function todayKey(){
     const d=new Date();
-    const y=d.getFullYear();
-    const m=String(d.getMonth()+1).padStart(2,"0");
-    const day=String(d.getDate()).padStart(2,"0");
-    return y+"-"+m+"-"+day;
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
   }
   function issueKey(value){
     const d=new Date(value);
@@ -89,6 +88,18 @@ function EpaperPage() {
   function dateLabel(value){
     const d=new Date(value+"T00:00:00");
     return Number.isNaN(d.getTime())?value:d.toLocaleDateString("hi-IN",{day:"numeric",month:"long",year:"numeric"});
+  }
+  function monthLabel(d){
+    return d.toLocaleDateString("hi-IN",{month:"long",year:"numeric"});
+  }
+  function openEdition(selectedDate){
+    const edition=allItems.find(x=>issueKey(x?.issueDate)===selectedDate);
+    if(!edition){setDate(selectedDate);setItems([]);setCalendarOpen(false);return;}
+    setDate(selectedDate);
+    setItems(allItems.filter(x=>issueKey(x?.issueDate)===selectedDate));
+    setCalendarOpen(false);
+    const url=mediaUrl(edition.pdf);
+    if(url) window.open(url,"_blank","noopener,noreferrer");
   }
   async function getJson(url){
     const response=await fetch(url,{headers:{Accept:"application/json"}});
@@ -105,54 +116,88 @@ function EpaperPage() {
       .then(d=>{
         if(cancelled)return;
         const list=Array.isArray(d?.epapers)?d.epapers:[];
-        const unique=new Map();
-        list.forEach(x=>{const key=issueKey(x?.issueDate);if(key&&!unique.has(key))unique.set(key,x);});
-        const dates=[...unique.keys()].sort((a,b)=>b.localeCompare(a));
         const today=todayKey();
         setAllItems(list);
         setDate(today);
         setItems(list.filter(x=>issueKey(x?.issueDate)===today));
+        setCalendarMonth(new Date(Number(today.slice(0,4)),Number(today.slice(5,7))-1,1));
       })
       .catch(e=>{if(!cancelled)setError(e.message||"ई-पेपर लोड नहीं हो पाया।")})
       .finally(()=>{if(!cancelled)setLoading(false)});
     return()=>{cancelled=true};
   },[]);
 
-  useEffect(()=>{
-    if(!allItems.length||!date)return;
-    setItems(allItems.filter(x=>issueKey(x?.issueDate)===date));
-    setError("");
-  },[date,allItems]);
-
   const availableDates=[...new Set(allItems.map(x=>issueKey(x?.issueDate)).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
+  const availableSet=new Set(availableDates);
   const today=todayKey();
   const selectedToday=date===today;
+  const calendarYear=calendarMonth.getFullYear();
+  const calendarMonthIndex=calendarMonth.getMonth();
+  const firstDay=new Date(calendarYear,calendarMonthIndex,1).getDay();
+  const daysInMonth=new Date(calendarYear,calendarMonthIndex+1,0).getDate();
+  const calendarCells=Array.from({length:firstDay+daysInMonth},(_,i)=>i<firstDay?null:i-firstDay+1);
+  const hindiDays=["रवि","सोम","मंगल","बुध","गुरु","शुक्र","शनि"];
+
+  function chooseCalendarDay(day){
+    const key=calendarYear+"-"+String(calendarMonthIndex+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+    if(availableSet.has(key)) openEdition(key);
+  }
+  function openToday(){
+    if(availableSet.has(today)) openEdition(today);
+    else {setDate(today);setItems([]);}
+  }
 
   return <div className="epaper-page">
     <header className="epaper-head">
       <a href="/" className="epaper-brand"><img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान"/><span><b>आवाज़ राजस्थान</b><small>ई-पेपर</small></span></a>
       <a href="/" className="epaper-home">← होम</a>
     </header>
+
     <main className="epaper-main container">
       <div className="epaper-title">
         <span>📰 DAILY EDITION</span>
-        <h1>{selectedToday?"आज का ई-पेपर":"ई-पेपर संस्करण"}</h1>
-        <p>आज का ई-पेपर सीधे पढ़ें। ऊपर से कोई भी उपलब्ध तारीख चुनकर उस दिन का संस्करण देखें या डाउनलोड करें।</p>
+        <h1>{selectedToday?"आज का ई-पेपर":"आवाज़ राजस्थान ई-पेपर"}</h1>
+        <p>तारीख चुनें और उस दिन का प्रकाशित ई-पेपर सीधे पढ़ें या डाउनलोड करें।</p>
       </div>
 
-      <div className="epaper-filter epaper-date-filter">
-        <label><span className="epaper-filter-label">📅 उपलब्ध ई-पेपर की तारीख</span>
-          <select value={date} onChange={e=>setDate(e.target.value)} disabled={!availableDates.length}>
-            {!availableDates.length?<option value="">अभी कोई प्रकाशित तारीख उपलब्ध नहीं</option>:<option value="">तारीख चुनें</option>}
-            {availableDates.map(d=><option key={d} value={d}>{d===today?"आज — ":""}{dateLabel(d)}</option>)}
-          </select>
-          <small>सिर्फ उन्हीं तारीखों को दिखाया जा रहा है जिनका ई-पेपर प्रकाशित है।</small>
-        </label>
+      <div className="epaper-date-panel">
+        <div className="epaper-date-panel-head">
+          <div className="epaper-date-icon">▦</div>
+          <div><span>ई-पेपर की तारीख</span><strong>कैलेंडर से तारीख चुनें</strong></div>
+          <button type="button" className="epaper-today-btn" onClick={openToday}>▣ &nbsp;आज का ई-पेपर</button>
+        </div>
+
+        <button type="button" className="epaper-calendar-trigger" onClick={()=>setCalendarOpen(true)} aria-label="ई-पेपर की तारीख चुनें">
+          <span className="calendar-trigger-icon">▣</span>
+          <span className="calendar-trigger-date">{date?dateLabel(date):"तारीख चुनें"}</span>
+          <span className="calendar-trigger-arrow">⌄</span>
+        </button>
+
+        <small className="epaper-date-help">सिर्फ उन्हीं तारीखों को कैलेंडर में सक्रिय रखा गया है जिनका ई-पेपर प्रकाशित है।</small>
+
+        {calendarOpen&&<div className="epaper-calendar-overlay" role="dialog" aria-modal="true" aria-label="ई-पेपर कैलेंडर">
+          <div className="epaper-calendar">
+            <div className="epaper-calendar-top">
+              <button type="button" onClick={()=>setCalendarMonth(new Date(calendarYear,calendarMonthIndex-1,1))} aria-label="पिछला महीना">‹</button>
+              <strong>{monthLabel(calendarMonth)}</strong>
+              <button type="button" onClick={()=>setCalendarMonth(new Date(calendarYear,calendarMonthIndex+1,1))} aria-label="अगला महीना">›</button>
+            </div>
+            <div className="epaper-weekdays">{hindiDays.map((d,i)=><span key={d} className={i===0||i===6?"weekend":""}>{d}</span>)}</div>
+            <div className="epaper-days">{calendarCells.map((day,i)=>{
+              if(!day)return <span className="epaper-day empty" key={"e"+i}/>;
+              const key=calendarYear+"-"+String(calendarMonthIndex+1).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+              const active=availableSet.has(key), isSelected=key===date, isToday=key===today;
+              return <button type="button" key={key} disabled={!active} className={"epaper-day "+(active?"available ":"unavailable ")+(isSelected?"selected ":"")+(isToday?"today":"")} onClick={()=>chooseCalendarDay(day)}>{day}</button>;
+            })}</div>
+            <div className="epaper-calendar-note">ⓘ केवल प्रकाशित ई-पेपर वाली तारीखें चुनी जा सकती हैं।</div>
+            <button type="button" className="epaper-calendar-close" onClick={()=>setCalendarOpen(false)}>बंद करें</button>
+          </div>
+        </div>}
       </div>
 
       {loading?<div className="epaper-state">ई-पेपर लोड हो रहा है…</div>
       :error?<div className="epaper-state">{error}</div>
-      :items.length===0?<div className="epaper-state"><strong>{selectedToday?"आज का ई-पेपर अभी उपलब्ध नहीं है।":"इस तारीख का ई-पेपर उपलब्ध नहीं है।"}</strong><br/><small>ऊपर से दूसरी उपलब्ध तारीख चुनें।</small></div>
+      :items.length===0?<div className="epaper-state"><strong>{selectedToday?"आज का ई-पेपर अभी उपलब्ध नहीं है।":"इस तारीख का ई-पेपर उपलब्ध नहीं है।"}</strong><br/><small>कैलेंडर से किसी सक्रिय तारीख को चुनें।</small></div>
       :<div className="epaper-grid">{items.map(x=>{
         const url=mediaUrl(x.pdf);
         const downloadUrl=API_BASE+"/api/epapers/"+x._id+"/download";
