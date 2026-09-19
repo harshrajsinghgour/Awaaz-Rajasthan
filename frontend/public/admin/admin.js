@@ -1,10 +1,10 @@
 const $=id=>document.getElementById(id);
 let me=null,news=[],ads=[],admins=[];
 const DEFAULT_API_BASE="https://awaazrajasthan.onrender.com";
-function getApiBase(){return String(localStorage.getItem("awaaz_admin_api")||DEFAULT_API_BASE).replace(/\/$/,"");}
+function getApiBase(){return DEFAULT_API_BASE;}
 function setApiBase(){return getApiBase();}
 function initApiBase(){}
-async function api(path,options={}){const base=getApiBase();const opts={credentials:"include",...options};opts.headers={"Content-Type":"application/json",...(options.headers||{})};const r=await fetch(base+path,opts);let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.message||"Request failed");return d;}
+async function api(path,options={}){const base=getApiBase();const opts={credentials:"include",...options};const token=localStorage.getItem("awaaz_admin_token");opts.headers={"Content-Type":"application/json",...(options.headers||{})};if(token&&!opts.headers.Authorization)opts.headers.Authorization="Bearer "+token;const r=await fetch(base+path,opts);let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.message||"Request failed");return d;}
 async function uploadMedia(file){if(!file)return "";if(!/^(image\/(jpeg|png|webp|gif)|video\/(mp4|webm|ogg))$/.test(file.type))throw new Error("केवल JPG, PNG, WEBP, GIF, MP4, WEBM या OGG media स्वीकार है।");const base=getApiBase();if(!base)throw new Error("पहले Backend API URL भरें।");const form=new FormData();form.append("file",file);const r=await fetch(base+"/api/admin/upload",{method:"POST",credentials:"include",body:form});let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.message||"Image upload failed");return new URL(d.url,base).href;}
 function esc(v){return String(v??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]));}
 function toast(msg){const e=document.createElement("div");e.className="toast";e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),2200);}
@@ -16,8 +16,8 @@ function previewMedia(inputId,urlId,boxId){const box=$(boxId);if(!box)return;con
 async function boot(){initApiBase();try{me=(await api("/api/admin/me")).admin;showPanel();await loadAll()}catch{showLogin()}}
 function showLogin(){$("login").classList.remove("hidden");$("panel").classList.add("hidden")}
 function showPanel(){$("login").classList.add("hidden");$("panel").classList.remove("hidden");document.querySelector('[data-tab="ads"]').style.display=me.role==="owner"?"":"none";document.querySelector('[data-tab="admins"]').style.display=me.role==="owner"?"":"none";document.querySelector('[data-tab="epaper"]').style.display=me.role==="owner"?"":"none";document.querySelector('[data-tab="categories"]').style.display=me.role==="owner"?"":"none";$("notificationControl").classList.toggle("hidden",me.role!=="owner")}
-$("loginForm").onsubmit=async e=>{e.preventDefault();setApiBase();$("loginError").textContent="";try{const r=await api("/api/admin/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});me=r.admin;showPanel();await loadAll()}catch(err){$("loginError").textContent=err.message}};
-$("logout").onclick=async()=>{try{await api("/api/admin/logout",{method:"POST"})}finally{location.reload()}};
+$("loginForm").onsubmit=async e=>{e.preventDefault();setApiBase();$("loginError").textContent="";try{const r=await api("/api/admin/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});me=r.admin;if(r.token)localStorage.setItem("awaaz_admin_token",r.token);showPanel();await loadAll()}catch(err){$("loginError").textContent=err.message}};
+$("logout").onclick=async()=>{try{await api("/api/admin/logout",{method:"POST"})}finally{localStorage.removeItem("awaaz_admin_token");location.reload()}};
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button,.tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.tab).classList.add("active")});
 $("goBreaking").onclick=()=>{document.querySelector('[data-tab="news"]').click();$("newsForm").classList.remove("hidden");scrollTo(0,0)};
 
