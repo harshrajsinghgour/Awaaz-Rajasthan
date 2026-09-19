@@ -32,12 +32,12 @@ async function loadAdPrices(){
  if(me?.role!=="owner")return;
  try{
   const r=await api("/api/admin/ad-prices");const rows=r.prices||[];
-  $("adPriceList").innerHTML=rows.map((x,i)=>'<div class="price-edit-row"><input type="hidden" class="price-position" value="'+esc(x.position)+'"><label>नाम<input class="price-label" value="'+esc(x.label||"")+'" maxlength="80"></label><label>विवरण<input class="price-description" value="'+esc(x.description||"")+'" maxlength="200"></label><label>₹ / दिन<input class="price-rate" type="number" min="0" max="10000000" value="'+Number(x.ratePerDay||0)+'"></label><label class="check"><input class="price-active" type="checkbox" '+(x.active!==false?"checked":"")+'> Active</label></div>').join("");
+  $("adPriceList").innerHTML=rows.map((x,i)=>'<div class="price-edit-row"><input type="hidden" class="price-position" value="'+esc(x.position)+'"><label>नाम<input class="price-label" value="'+esc(x.label||"")+'" maxlength="80"></label><label>विवरण<input class="price-description" value="'+esc(x.description||"")+'" maxlength="200"></label><label>📷 Photo ₹ / दिन<input class="price-image-rate" type="number" min="0" max="10000000" value="'+Number(x.imageRatePerDay ?? x.ratePerDay ?? 0)+'"></label><label>🎥 Video ₹ / दिन<input class="price-video-rate" type="number" min="0" max="10000000" value="'+Number(x.videoRatePerDay || Math.max(Number(x.ratePerDay||0),Math.round(Number(x.ratePerDay||0)*1.5)))+'"></label><label class="check"><input class="price-active" type="checkbox" '+(x.active!==false?"checked":"")+'> Active</label></div>').join("");
  }catch(e){$("adPriceList").innerHTML="<p>"+esc(e.message)+"</p>"}
 }
 $("saveAdPrices")?.addEventListener("click",async()=>{
  try{
-  const rows=[...document.querySelectorAll(".price-edit-row")].map(row=>({position:row.querySelector(".price-position").value,label:row.querySelector(".price-label").value,description:row.querySelector(".price-description").value,ratePerDay:Number(row.querySelector(".price-rate").value),active:row.querySelector(".price-active").checked}));
+  const rows=[...document.querySelectorAll(".price-edit-row")].map(row=>({position:row.querySelector(".price-position").value,label:row.querySelector(".price-label").value,description:row.querySelector(".price-description").value,ratePerDay:Number(row.querySelector(".price-image-rate").value),imageRatePerDay:Number(row.querySelector(".price-image-rate").value),videoRatePerDay:Number(row.querySelector(".price-video-rate").value),active:row.querySelector(".price-active").checked}));
   await api("/api/admin/ad-prices",{method:"PUT",body:JSON.stringify({prices:rows})});toast("Ad Price List save हो गई");await loadAdPrices();
  }catch(e){toast(e.message)}
 });
