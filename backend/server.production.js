@@ -158,7 +158,7 @@ async function storeUploadedFile(file,folder){
 }
 async function getB2SignedUrl(key){
  if(!B2_ENABLED) return null;
- return getSignedUrl(b2,new GetObjectCommand({Bucket:B2_BUCKET_NAME,Key}),{expiresIn:3600});
+ return getSignedUrl(b2,new GetObjectCommand({Bucket:B2_BUCKET_NAME,Key:key}),{expiresIn:3600});
 }
 
 async function auth(req,res,next){try{const token=req.cookies.awaaz_admin||String(req.headers.authorization||"").replace(/^Bearer\s+/i,"");if(!token)return res.status(401).json({message:"Authentication required"});const p=jwt.verify(token,JWT_SECRET||"development-secret"),a=await Admin.findById(p.sub);if(!a||!a.active||Number(p.sv||0)!==Number(a.sessionVersion||0))return res.status(401).json({message:"Session expired"});req.admin=a;next();}catch{res.status(401).json({message:"Invalid or expired session"});}}
