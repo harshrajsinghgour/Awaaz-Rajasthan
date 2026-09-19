@@ -64,3 +64,9 @@
  .epaper-calendar-overlay{padding:10px}.epaper-calendar{padding:15px;border-radius:19px;width:100%;max-height:calc(100vh - 20px)}.epaper-calendar-top strong{font-size:22px}.epaper-calendar-top button{width:42px;height:42px;font-size:31px}.epaper-day{min-height:43px;font-size:15px}.epaper-weekdays span{font-size:11px;padding:6px 1px}.epaper-calendar-note{font-size:11px}
  .epaper-grid{grid-template-columns:1fr}.epaper-preview{height:210px}.epaper-card-actions{grid-template-columns:1fr}.epaper-state{padding:30px 20px}
 }
+
+/* Saved-news state */
+.card-meta button.saved,.row-bottom button.saved,.article-toolbar button.saved{background:#e5e7eb!important;color:#68717a!important;border-color:#d1d5db!important}
+.card-meta button.saved .wa-icon,.row-bottom button.saved .wa-icon,.article-toolbar button.saved .wa-icon{stroke:#6b7280;fill:#6b7280}
+.card-meta button.saved:after,.row-bottom button.saved:after{content:"✓";font-size:11px;font-weight:900;margin-left:3px}
+.quick-tools button.selected{background:#e9ecef!important;color:#5f6872!important;border-color:#cfd4da!important}
