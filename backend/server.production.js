@@ -16,7 +16,7 @@ import crypto from "node:crypto";
 import { spawn } from "node:child_process";
 import webpush from "web-push";
 import nodemailer from "nodemailer";
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand, HeadBucketCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PDFDocument, rgb } from "pdf-lib";
 import Razorpay from "razorpay";
@@ -31,11 +31,12 @@ const RAZORPAY_KEY_SECRET=String(process.env.RAZORPAY_KEY_SECRET||"").trim();
 const RAZORPAY_WEBHOOK_SECRET=String(process.env.RAZORPAY_WEBHOOK_SECRET||"").trim();
 const RAZORPAY_ENABLED=Boolean(RAZORPAY_KEY_ID&&RAZORPAY_KEY_SECRET);
 const razorpay=RAZORPAY_ENABLED?new Razorpay({key_id:RAZORPAY_KEY_ID,key_secret:RAZORPAY_KEY_SECRET}):null;
-const B2_BUCKET_NAME=String(process.env.B2_BUCKET_NAME||"").trim();
-const B2_ENDPOINT=String(process.env.B2_ENDPOINT||"").trim().replace(/\/$/,"");
-const B2_REGION=String(process.env.B2_REGION||"").trim();
-const B2_KEY_ID=String(process.env.B2_KEY_ID||"").trim();
-const B2_APPLICATION_KEY=String(process.env.B2_APPLICATION_KEY||"").trim();
+const cleanEnv=v=>String(v||"").trim().replace(/^(['"])(.*)\1$/,"$2").trim();
+const B2_BUCKET_NAME=cleanEnv(process.env.B2_BUCKET_NAME);
+const B2_ENDPOINT=cleanEnv(process.env.B2_ENDPOINT).replace(/\/$/,"");
+const B2_REGION=cleanEnv(process.env.B2_REGION);
+const B2_KEY_ID=cleanEnv(process.env.B2_KEY_ID);
+const B2_APPLICATION_KEY=cleanEnv(process.env.B2_APPLICATION_KEY);
 const B2_ENABLED=Boolean(B2_BUCKET_NAME&&B2_ENDPOINT&&B2_REGION&&B2_KEY_ID&&B2_APPLICATION_KEY);
 const b2=B2_ENABLED?new S3Client({endpoint:B2_ENDPOINT,region:B2_REGION,forcePathStyle:true,credentials:{accessKeyId:B2_KEY_ID,secretAccessKey:B2_APPLICATION_KEY}}):null;
 const JWT_SECRET=process.env.JWT_SECRET;
@@ -159,6 +160,15 @@ async function storeUploadedFile(file,folder){
 async function getB2SignedUrl(key){
  if(!B2_ENABLED) return null;
  return getSignedUrl(b2,new GetObjectCommand({Bucket:B2_BUCKET_NAME,Key:key}),{expiresIn:3600});
+}
+async function verifyB2Storage(){
+ if(!B2_ENABLED) return {enabled:false,ok:false,reason:"B2 environment variables are incomplete"};
+ try{
+  await b2.send(new HeadBucketCommand({Bucket:B2_BUCKET_NAME}));
+  return {enabled:true,ok:true};
+ }catch(error){
+  return {enabled:true,ok:false,reason:String(error?.Code||error?.name||error?.message||"B2 connection failed").slice(0,180)};
+ }
 }
 
 async function auth(req,res,next){try{const token=req.cookies.awaaz_admin||String(req.headers.authorization||"").replace(/^Bearer\s+/i,"");if(!token)return res.status(401).json({message:"Authentication required"});const p=jwt.verify(token,JWT_SECRET||"development-secret"),a=await Admin.findById(p.sub);if(!a||!a.active||Number(p.sv||0)!==Number(a.sessionVersion||0))return res.status(401).json({message:"Session expired"});req.admin=a;next();}catch{res.status(401).json({message:"Invalid or expired session"});}}
@@ -316,5 +326,5 @@ app.post("/api/admin/upload",auth,permissions("media:write"),upload.single("file
 app.get("/api/admin/ads/analytics",auth,ownerOnly,async(_r,res,next)=>{try{const ads=await Ad.find({}).select("title position device status startDate endDate impressions clicks createdAt").sort({createdAt:-1}).lean();res.json({analytics:ads.map(a=>({...a,ctr:a.impressions?Number(((a.clicks/a.impressions)*100).toFixed(2)):0}))});}catch(e){next(e);}});
 app.use((err,_req,res,_next)=>{console.error(err);res.status(err.status||500).json({message:PROD?"Server error":String(err.message||err)});});
 const DEFAULT_CATEGORY_ROWS=[["राजस्थान","🏜️",1],["जयपुर","🏛️",2],["जोधपुर","🏰",3],["उदयपुर","🌊",4],["कोटा","🎓",5],["अजमेर","🕌",6],["भीलवाड़ा","🏭",7],["अपराध","🚨",8],["राजनीति","🏛️",9],["शिक्षा","📚",10],["नौकरी","💼",11],["खेल","🏆",12],["देश","🇮🇳",13],["दुनिया","🌍",14],["मनोरंजन","🎬",15],["बिजनेस","📈",16]];
-async function bootstrap(){if(!process.env.MONGODB_URI){if(PROD)throw new Error("MONGODB_URI is required in production");return;}await mongoose.connect(process.env.MONGODB_URI);await Promise.all(DEFAULT_CATEGORY_ROWS.map(([name,icon,sortOrder])=>Category.updateOne({name},{$setOnInsert:{name,icon,sortOrder,active:true}},{upsert:true})));const email=String(process.env.OWNER_EMAIL||"harshrajsinghgour1@gmail.com").toLowerCase().trim(),password=String(process.env.OWNER_PASSWORD||"");if(email&&password){const hash=await bcrypt.hash(password,12);await Admin.updateOne({email},{$setOnInsert:{name:"harshraj singh gour",email,passwordHash:hash,role:"owner",permissions:["news:read","news:write","news:delete","media:write"],active:true,sessionVersion:0}},{upsert:true});}app.listen(PORT,()=>{ console.log(`Awaaz Rajasthan API listening on ${PORT}`); if(process.env.ENABLE_PUSH_WORKER!=="false" && process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY && process.env.VAPID_SUBJECT){ const worker=spawn(process.execPath,[path.join(process.cwd(),"backend","push-worker.js")],{stdio:"inherit",env:process.env}); worker.on("exit",(code,signal)=>console.log(`Push worker exited: code=${code??""} signal=${signal??""}`)); worker.on("error",error=>console.error("Push worker process error:",error)); } else console.log("Push worker not started: VAPID configuration is not complete or ENABLE_PUSH_WORKER=false"); });}
+async function bootstrap(){if(!process.env.MONGODB_URI){if(PROD)throw new Error("MONGODB_URI is required in production");return;}await mongoose.connect(process.env.MONGODB_URI);await Promise.all(DEFAULT_CATEGORY_ROWS.map(([name,icon,sortOrder])=>Category.updateOne({name},{$setOnInsert:{name,icon,sortOrder,active:true}},{upsert:true})));const email=String(process.env.OWNER_EMAIL||"harshrajsinghgour1@gmail.com").toLowerCase().trim(),password=String(process.env.OWNER_PASSWORD||"");if(email&&password){const hash=await bcrypt.hash(password,12);await Admin.updateOne({email},{$setOnInsert:{name:"harshraj singh gour",email,passwordHash:hash,role:"owner",permissions:["news:read","news:write","news:delete","media:write"],active:true,sessionVersion:0}},{upsert:true});}app.listen(PORT,async()=>{ console.log(`Awaaz Rajasthan API listening on ${PORT}`); const b2Status=await verifyB2Storage(); console.log(`B2 storage: ${b2Status.ok?"READY":b2Status.reason}`); if(process.env.ENABLE_PUSH_WORKER!=="false" && process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY && process.env.VAPID_SUBJECT){ const worker=spawn(process.execPath,[path.join(process.cwd(),"backend","push-worker.js")],{stdio:"inherit",env:process.env}); worker.on("exit",(code,signal)=>console.log(`Push worker exited: code=${code??""} signal=${signal??""}`)); worker.on("error",error=>console.error("Push worker process error:",error)); } else console.log("Push worker not started: VAPID configuration is not complete or ENABLE_PUSH_WORKER=false"); });}
 bootstrap().catch(e=>{console.error(e);process.exit(1);});
