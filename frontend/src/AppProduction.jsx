@@ -173,7 +173,7 @@ function EpaperPage() {
           <span className="calendar-trigger-arrow">⌄</span>
         </button>
 
-        <small className="epaper-date-help">सिर्फ उन्हीं तारीखों को कैलेंडर में सक्रिय रखा गया है जिनका ई-पेपर प्रकाशित है।</small>
+        
 
         {calendarOpen&&<div className="epaper-calendar-overlay" role="dialog" aria-modal="true" aria-label="ई-पेपर कैलेंडर">
           <div className="epaper-calendar">
