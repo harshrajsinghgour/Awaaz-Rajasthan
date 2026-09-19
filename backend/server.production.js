@@ -86,6 +86,20 @@ const upload=multer({storage:multer.diskStorage({destination:(_r,_f,cb)=>cb(null
 const mailTransporter=process.env.SMTP_HOST?nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||587),secure:String(process.env.SMTP_SECURE||"false")==="true",auth:process.env.SMTP_USER?{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}:undefined}):null;
 async function sendAdminOtpEmail(to,name,otp){if(!mailTransporter||!process.env.SMTP_FROM)throw new Error("SMTP email service is not configured on Render");await mailTransporter.sendMail({from:process.env.SMTP_FROM,to,subject:"Awaaz Rajasthan Admin Password OTP",text:"Hello "+(name||"Admin")+", your OTP to reset the Awaaz Rajasthan admin password is "+otp+". It expires in 10 minutes. If you did not request this, ignore this email."});}
 const sign=a=>jwt.sign({sub:String(a._id),role:a.role,email:a.email,sv:a.sessionVersion||0},JWT_SECRET||"development-secret",{expiresIn:"8h"});
+async function verifyAdminPassword(admin,password){
+ if(!admin||typeof password!=="string"||!password)return false;
+ const stored=String(admin.passwordHash||"");
+ try{
+  if(/^\\$2[aby]\\$\\d{2}\\$/.test(stored)) return await bcrypt.compare(password,stored);
+ }catch{}
+ // Migrate legacy plaintext passwords created by older admin builds.
+ if(stored&&stored===password){
+  admin.passwordHash=await bcrypt.hash(password,12);
+  await admin.save();
+  return true;
+ }
+ return false;
+}
 const safe=a=>{const o=a.toObject?a.toObject():{...a};delete o.passwordHash;return o;};
 const activeAd=(a,n=new Date())=>a.status==="active"&&(!a.startDate||a.startDate<=n)&&(!a.endDate||a.endDate>=n);
 const slugify=v=>String(v).toLowerCase().trim().replace(/[^a-z0-9\u0900-\u097f]+/gi,"-").replace(/^-+|-+$/g,"").slice(0,150)||crypto.randomUUID();
@@ -130,7 +144,7 @@ app.get("/api/ads",async(req,res,next)=>{try{const device=AD_DEVICES.includes(St
 app.post("/api/ads/:id/impression",adImpressionLimiter,async(req,res,next)=>{try{if(!mongoose.isValidObjectId(req.params.id))return res.status(400).json({message:"Invalid ad id"});const ad=await Ad.findById(req.params.id).select("status startDate endDate").lean();if(!ad||!activeAd(ad))return res.status(404).json({message:"Ad not active"});await Ad.updateOne({_id:req.params.id},{$inc:{impressions:1}});res.status(204).end();}catch(e){next(e);}});
 app.post("/api/ads/:id/click",adClickLimiter,async(req,res,next)=>{try{if(!mongoose.isValidObjectId(req.params.id))return res.status(400).json({message:"Invalid ad id"});const ad=await Ad.findById(req.params.id).select("status startDate endDate").lean();if(!ad||!activeAd(ad))return res.status(404).json({message:"Ad not active"});await Ad.updateOne({_id:req.params.id},{$inc:{clicks:1}});res.status(204).end();}catch(e){next(e);}});
 app.post("/api/notifications/subscribe",subscriptionLimiter,async(req,res,next)=>{try{const body=req.body||{},endpoint=String(body.endpoint||"").trim();if(!endpoint||endpoint.length>2048||!isHttpUrl(endpoint))return res.status(400).json({message:"Invalid subscription endpoint"});if(!body.keys||typeof body.keys!=="object"||Array.isArray(body.keys))return res.status(400).json({message:"Push subscription keys are required"});const p256dh=String(body.keys.p256dh||"").trim(),authKey=String(body.keys.auth||"").trim();if(!p256dh||p256dh.length>512||!authKey||authKey.length>512)return res.status(400).json({message:"Invalid push subscription keys"});if(body.expirationTime!==undefined&&body.expirationTime!==null&&(!Number.isFinite(Number(body.expirationTime))||Number(body.expirationTime)<0))return res.status(400).json({message:"Invalid subscription expiration"});await Subscriber.findOneAndUpdate({endpoint},{subscription:{...body,endpoint,keys:{p256dh,auth:authKey}},active:true},{upsert:true,new:true,setDefaultsOnInsert:true});res.status(201).json({ok:true});}catch(e){next(e);}});
-app.post("/api/admin/login",async(req,res,next)=>{try{const email=String(req.body.email||"").toLowerCase().trim(),password=String(req.body.password||"");if(!isValidEmail(email)||!password)return res.status(401).json({message:"ईमेल या पासवर्ड गलत है।"});const a=await Admin.findOne({email});if(!a||!a.active||!(await bcrypt.compare(password,a.passwordHash)))return res.status(401).json({message:"ईमेल या पासवर्ड गलत है।"});a.lastLoginAt=new Date();await a.save();setCookie(res,sign(a));res.json({admin:safe(a),token:sign(a)});}catch(e){next(e);}});
+app.post("/api/admin/login",async(req,res,next)=>{try{const email=String(req.body.email||"").toLowerCase().trim(),password=String(req.body.password||"");if(!isValidEmail(email)||!password)return res.status(401).json({message:"ईमेल या पासवर्ड गलत है।"});const a=await Admin.findOne({email});if(!a||!a.active||!(await verifyAdminPassword(a,password))){console.warn("ADMIN_LOGIN_FAILED",JSON.stringify({email,exists:!!a,active:a?.active===true,hashPresent:!!a?.passwordHash,hashType:a?.passwordHash?String(a.passwordHash).slice(0,4):null}));return res.status(401).json({message:"ईमेल या पासवर्ड गलत है।"});}a.lastLoginAt=new Date();await a.save();setCookie(res,sign(a));res.json({admin:safe(a),token:sign(a)});}catch(e){next(e);}});
 app.post("/api/admin/logout",(_r,res)=>{clearCookie(res);res.json({ok:true});});
 app.get("/api/admin/me",auth,(req,res)=>res.json({admin:safe(req.admin)}));
 app.post("/api/admin/admin-password/request-otp",auth,ownerOnly,async(req,res,next)=>{try{const target=await Admin.findById(req.body?.adminId);if(!target||target.role==="owner")return res.status(404).json({message:"Admin not found"});const otp=String(Math.floor(100000+Math.random()*900000));await AdminOtp.updateMany({adminId:target._id,used:false},{$set:{used:true}});await AdminOtp.create({adminId:target._id,otpHash:await bcrypt.hash(otp,10),expiresAt:new Date(Date.now()+10*60*1000)});await sendAdminOtpEmail(target.email,target.name,otp);res.json({ok:true,message:"OTP sent to registered admin email"});}catch(e){next(e);}});
