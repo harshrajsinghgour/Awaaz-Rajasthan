@@ -146,7 +146,8 @@ app.get("/api/admin/epapers",auth,ownerOnly,async(_r,res,next)=>{try{const items
 async function watermarkEpaper(filePath){try{const bytes=fs.readFileSync(filePath),pdf=await PDFDocument.load(bytes);let logoBytes=null;const logoUrl=String(process.env.FRONTEND_URL||"").replace(/\/$/,"")+"/awaazrajasthan-logo.png";if(logoUrl.startsWith("http")){try{const r=await fetch(logoUrl);if(r.ok)logoBytes=Buffer.from(await r.arrayBuffer())}catch{}}const logo=logoBytes?await pdf.embedPng(logoBytes):null;for(const page of pdf.getPages()){const {width,height}=page.getSize();if(logo){const size=Math.min(width,height)*.28;page.drawImage(logo,{x:(width-size)/2,y:(height-size)/2,width:size,height:size,opacity:.07})}else page.drawText("आवाज़ राजस्थान",{x:width*.27,y:height*.48,size:28,color:rgb(.45,.45,.45),opacity:.08})}fs.writeFileSync(filePath,await pdf.save())}catch(e){console.error("E-paper watermark skipped:",e.message)}}
 app.post("/api/admin/epapers/upload",auth,ownerOnly,upload.single("file"),async(req,res,next)=>{
  try{
-  if(!req.file||req.file.mimetype!=="application/pdf")return res.status(400).json({message:"केवल PDF ई-पेपर स्वीकार है।"});\n   await watermarkEpaper(req.file.path);
+  if(!req.file||req.file.mimetype!=="application/pdf")return res.status(400).json({message:"केवल PDF ई-पेपर स्वीकार है।"});
+  await watermarkEpaper(req.file.path);
   if(B2_ENABLED){
    const stored=await storeUploadedFile(req.file,"epapers");
    return res.status(201).json({pdf:stored.relativeUrl,url:stored.url,filename:req.file.originalname,storage:"b2"});
