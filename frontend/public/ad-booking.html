@@ -33,6 +33,7 @@
 <button class="submit" id="submitBtn" type="submit">Booking Submit करें</button>
 <p id="error" class="hint"></p>
 </form>
+<section class="card"><h2>💰 विज्ञापन Price List</h2><p class="hint">यहाँ दिखाई गई rates Owner द्वारा Admin Panel से बदली जा सकती हैं।</p><div id="priceList"></div></section>
 <section id="paymentCard" class="card pay hidden"><h2>💳 Payment / Booking Confirmation</h2><div id="bookingInfo"></div><div id="paymentDetails"></div><label>Payment Transaction ID<input id="txn" maxlength="100" placeholder="UPI transaction / UTR number"></label><button class="submit" id="paymentBtn" type="button">Payment Details Submit करें</button><p class="hint">Payment करने के बाद transaction/UTR ID यहाँ डालें। Owner payment verify करके booking approve करेगा।</p></section>
 <section id="trackCard" class="card hidden"><h2>🔎 Booking Status</h2><div id="trackStatus" class="status"></div></section>
 </main>
@@ -42,7 +43,7 @@ let options=[],booking=null;
 const $=id=>document.getElementById(id);
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
 async function api(path,opts={}){const r=await fetch(API+path,opts);let d={};try{d=await r.json()}catch{}if(!r.ok)throw new Error(d.message||"Request failed");return d}
-async function init(){try{const d=await api("/api/ad-bookings/options");options=d.positions||[];$("position").innerHTML=options.map(x=>'<option value="'+esc(x.value)+'">'+esc(x.label)+' — ₹'+Number(x.ratePerDay).toLocaleString("en-IN")+'/day</option>').join("");updatePrice();const now=new Date().toISOString().slice(0,10);$("startDate").min=now;$("endDate").min=now}catch(e){$("error").textContent=e.message}}
+async function init(){try{const d=await api("/api/ad-bookings/options");options=d.positions||[];$("priceList").innerHTML=options.map(x=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e6e9ed"><span><b>${esc(x.label)}</b><small style="display:block;color:#68727c">${esc(x.description||"")}</small></span><b style="white-space:nowrap;color:#b01922">₹${Number(x.ratePerDay||0).toLocaleString("en-IN")}/day</b></div>`).join("");$("position").innerHTML=options.map(x=>'<option value="'+esc(x.value)+'">'+esc(x.label)+' — ₹'+Number(x.ratePerDay).toLocaleString("en-IN")+'/day</option>').join("");updatePrice();const now=new Date().toISOString().slice(0,10);$("startDate").min=now;$("endDate").min=now}catch(e){$("error").textContent=e.message}}
 function updatePrice(){const p=options.find(x=>x.value===$("position").value),s=$("startDate").value,e=$("endDate").value;if(!p)return;let days=0;if(s&&e){const a=new Date(s+"T00:00:00"),b=new Date(e+"T00:00:00");days=Math.max(0,Math.floor((b-a)/86400000)+1)}$("days").textContent=days;$("rate").textContent="₹"+Number(p.ratePerDay).toLocaleString("en-IN");$("amount").textContent="₹"+Number(days*p.ratePerDay).toLocaleString("en-IN")}
 ["position","startDate","endDate"].forEach(id=>$(id).addEventListener("change",updatePrice));
 async function upload(file){if(!file)return "";const f=new FormData();f.append("file",file);const d=await api("/api/ad-bookings/upload",{method:"POST",body:f});return d.url||d.relativeUrl}
