@@ -140,15 +140,13 @@ function EpaperPage() {
         <p>आज का ई-पेपर सीधे पढ़ें। ऊपर से कोई भी उपलब्ध तारीख चुनकर उस दिन का संस्करण देखें या डाउनलोड करें।</p>
       </div>
 
-      <div className="epaper-filter">
-        <label>📅 ई-पेपर की तारीख
-          <select value={date} onChange={e=>setDate(e.target.value)}>
-            <option value="">तारीख चुनें</option>
+      <div className="epaper-filter epaper-date-filter">
+        <label><span className="epaper-filter-label">📅 उपलब्ध ई-पेपर की तारीख</span>
+          <select value={date} onChange={e=>setDate(e.target.value)} disabled={!availableDates.length}>
+            {!availableDates.length?<option value="">अभी कोई प्रकाशित तारीख उपलब्ध नहीं</option>:<option value="">तारीख चुनें</option>}
             {availableDates.map(d=><option key={d} value={d}>{d===today?"आज — ":""}{dateLabel(d)}</option>)}
           </select>
-        </label>
-        <label className="epaper-date-input">सीधे तारीख चुनें
-          <input type="date" value={date} onChange={e=>setDate(e.target.value)}/>
+          <small>सिर्फ उन्हीं तारीखों को दिखाया जा रहा है जिनका ई-पेपर प्रकाशित है।</small>
         </label>
       </div>
 
