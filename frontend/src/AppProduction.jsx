@@ -68,10 +68,112 @@ function NewsImage({ item, className = "" }) { const [src, setSrc] = useState(sa
 function Skeletons() { return <div className="skeleton-list">{[1, 2, 3, 4].map(i => <div className="skeleton-card" key={i}><div className="sk-image" /><div className="sk-copy"><i /><i /><i /></div></div>)}</div>; }
 
 function EpaperPage() {
-  const [allItems,setAllItems]=useState([]),[items,setItems]=useState([]),[date,setDate]=useState(""),[loading,setLoading]=useState(true),[error,setError]=useState("");
-  useEffect(()=>{let cancelled=false;fetch(API_BASE+"/api/epapers",{headers:{Accept:"application/json"}}).then(r=>r.ok?r.json():Promise.reject(new Error("ई-पेपर लोड नहीं हो पाए।"))).then(d=>{if(!cancelled){const list=Array.isArray(d.epapers)?d.epapers:[];setAllItems(list);setItems(list)}}).catch(e=>{if(!cancelled)setError(e.message)}).finally(()=>{if(!cancelled)setLoading(false)});return()=>{cancelled=true}},[]);
-  useEffect(()=>{if(!date){setItems(allItems);return}setLoading(true);let cancelled=false;fetch(API_BASE+"/api/epapers?date="+encodeURIComponent(date),{headers:{Accept:"application/json"}}).then(r=>r.ok?r.json():Promise.reject(new Error("इस तारीख का ई-पेपर उपलब्ध नहीं है।"))).then(d=>{if(!cancelled)setItems(Array.isArray(d.epapers)?d.epapers:[])}).catch(e=>{if(!cancelled){setItems([]);setError(e.message)}}).finally(()=>{if(!cancelled)setLoading(false)});return()=>{cancelled=true}},[date,allItems]);
-  return <div className="epaper-page"><header className="epaper-head"><a href="/" className="epaper-brand"><img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान"/><span><b>आवाज़ राजस्थान</b><small>ई-पेपर</small></span></a><a href="/" className="epaper-home">← होम</a></header><main className="epaper-main container"><div className="epaper-title"><span>📰 DAILY EDITION</span><h1>आवाज़ राजस्थान ई-पेपर</h1><p>तारीख चुनें और उस दिन का प्रकाशित ई-पेपर पढ़ें या डाउनलोड करें।</p></div><div className="epaper-filter"><label>📅 उपलब्ध ई-पेपर<select value={date} onChange={e=>setDate(e.target.value)}><option value="">सभी उपलब्ध तारीखें</option>{allItems.map(x=><option key={x._id} value={String(x.issueDate).slice(0,10)}>{new Date(x.issueDate).toLocaleDateString("hi-IN")}</option>)}</select></label><label className="epaper-date-input">सीधे तारीख चुनें<input type="date" value={date} onChange={e=>setDate(e.target.value)}/></label></div>{loading?<div className="epaper-state">ई-पेपर लोड हो रहा है…</div>:error&&items.length===0?<div className="epaper-state">{error}</div>:items.length===0?<div className="epaper-state">इस तारीख के लिए प्रकाशित ई-पेपर उपलब्ध नहीं है।</div>:<div className="epaper-grid">{items.map(x=>{const url=mediaUrl(x.pdf),downloadUrl=API_BASE+"/api/epapers/"+x._id+"/download";return <article className="epaper-card" key={x._id}><div className="epaper-preview"><img className="epaper-watermark" src="/awaazrajasthan-logo.png" alt="" aria-hidden="true"/><div className="epaper-preview-icon">📰</div><strong>{x.title||"आज का ई-पेपर"}</strong><span>{new Date(x.issueDate).toLocaleDateString("hi-IN",{day:"numeric",month:"long",year:"numeric"})}</span></div><div className="epaper-card-actions"><a href={url} target="_blank" rel="noreferrer">📖 पढ़ें</a><a href={downloadUrl} rel="noreferrer">⬇️ डाउनलोड करें</a></div></article>})}</div>}</main></div>;
+  const [allItems,setAllItems]=useState([]);
+  const [items,setItems]=useState([]);
+  const [date,setDate]=useState("");
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState("");
+
+  function todayKey(){
+    const d=new Date();
+    const y=d.getFullYear();
+    const m=String(d.getMonth()+1).padStart(2,"0");
+    const day=String(d.getDate()).padStart(2,"0");
+    return y+"-"+m+"-"+day;
+  }
+  function issueKey(value){
+    const d=new Date(value);
+    if(Number.isNaN(d.getTime())) return "";
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function dateLabel(value){
+    const d=new Date(value+"T00:00:00");
+    return Number.isNaN(d.getTime())?value:d.toLocaleDateString("hi-IN",{day:"numeric",month:"long",year:"numeric"});
+  }
+  async function getJson(url){
+    const response=await fetch(url,{headers:{Accept:"application/json"}});
+    const type=response.headers.get("content-type")||"";
+    if(!response.ok) throw new Error("ई-पेपर सर्वर से लोड नहीं हो पाया।");
+    if(!type.includes("application/json")) throw new Error("ई-पेपर सर्वर ने सही डेटा नहीं भेजा। कृपया थोड़ी देर बाद फिर कोशिश करें।");
+    return response.json();
+  }
+
+  useEffect(()=>{
+    let cancelled=false;
+    setLoading(true);
+    getJson(API_BASE+"/api/epapers")
+      .then(d=>{
+        if(cancelled)return;
+        const list=Array.isArray(d?.epapers)?d.epapers:[];
+        const unique=new Map();
+        list.forEach(x=>{const key=issueKey(x?.issueDate);if(key&&!unique.has(key))unique.set(key,x);});
+        const dates=[...unique.keys()].sort((a,b)=>b.localeCompare(a));
+        const today=todayKey();
+        setAllItems(list);
+        setDate(today);
+        setItems(list.filter(x=>issueKey(x?.issueDate)===today));
+      })
+      .catch(e=>{if(!cancelled)setError(e.message||"ई-पेपर लोड नहीं हो पाया।")})
+      .finally(()=>{if(!cancelled)setLoading(false)});
+    return()=>{cancelled=true};
+  },[]);
+
+  useEffect(()=>{
+    if(!allItems.length||!date)return;
+    setItems(allItems.filter(x=>issueKey(x?.issueDate)===date));
+    setError("");
+  },[date,allItems]);
+
+  const availableDates=[...new Set(allItems.map(x=>issueKey(x?.issueDate)).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
+  const today=todayKey();
+  const selectedToday=date===today;
+
+  return <div className="epaper-page">
+    <header className="epaper-head">
+      <a href="/" className="epaper-brand"><img src="/awaazrajasthan-logo.png" alt="आवाज़ राजस्थान"/><span><b>आवाज़ राजस्थान</b><small>ई-पेपर</small></span></a>
+      <a href="/" className="epaper-home">← होम</a>
+    </header>
+    <main className="epaper-main container">
+      <div className="epaper-title">
+        <span>📰 DAILY EDITION</span>
+        <h1>{selectedToday?"आज का ई-पेपर":"ई-पेपर संस्करण"}</h1>
+        <p>आज का ई-पेपर सीधे पढ़ें। ऊपर से कोई भी उपलब्ध तारीख चुनकर उस दिन का संस्करण देखें या डाउनलोड करें।</p>
+      </div>
+
+      <div className="epaper-filter">
+        <label>📅 ई-पेपर की तारीख
+          <select value={date} onChange={e=>setDate(e.target.value)}>
+            <option value="">तारीख चुनें</option>
+            {availableDates.map(d=><option key={d} value={d}>{d===today?"आज — ":""}{dateLabel(d)}</option>)}
+          </select>
+        </label>
+        <label className="epaper-date-input">सीधे तारीख चुनें
+          <input type="date" value={date} onChange={e=>setDate(e.target.value)}/>
+        </label>
+      </div>
+
+      {loading?<div className="epaper-state">ई-पेपर लोड हो रहा है…</div>
+      :error?<div className="epaper-state">{error}</div>
+      :items.length===0?<div className="epaper-state"><strong>{selectedToday?"आज का ई-पेपर अभी उपलब्ध नहीं है।":"इस तारीख का ई-पेपर उपलब्ध नहीं है।"}</strong><br/><small>ऊपर से दूसरी उपलब्ध तारीख चुनें।</small></div>
+      :<div className="epaper-grid">{items.map(x=>{
+        const url=mediaUrl(x.pdf);
+        const downloadUrl=API_BASE+"/api/epapers/"+x._id+"/download";
+        const issue=issueKey(x.issueDate);
+        return <article className="epaper-card" key={x._id}>
+          <div className="epaper-preview">
+            <img className="epaper-watermark" src="/awaazrajasthan-logo.png" alt="" aria-hidden="true"/>
+            <div className="epaper-preview-icon">📰</div>
+            <strong>{x.title||"आज का ई-पेपर"}</strong>
+            <span>{dateLabel(issue)}</span>
+          </div>
+          <div className="epaper-card-actions">
+            <a href={url} target="_blank" rel="noreferrer">📖 पढ़ें</a>
+            <a href={downloadUrl} rel="noreferrer">⬇️ डाउनलोड करें</a>
+          </div>
+        </article>
+      })}</div>}
+    </main>
+  </div>;
 }
 
 export default function AppProduction() {
